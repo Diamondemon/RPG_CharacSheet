@@ -1863,11 +1863,89 @@ class CharThrFrame(LabelFrame):
         self.master.master.master.selectedchar.playerequipment[where+"_throw"].upmastery(number)
         self.refresh()
 
-
-
-
+#"""
 class CharArmFrame(LabelFrame):
-    """ Cadre d'affichage de l'armure du personnage """
+
+    def __init__(self, master, **kw):
+        LabelFrame.__init__(self, master, **kw)
+
+        self.threshold_types=["Arm. Légère","Arm. Moyenne","Arm. Lourde"]
+        self.Threshold_View=ttk.Treeview(self,height=3)
+        self.Threshold_View.grid(row=0,column=0,sticky="we",padx="4p",pady="4p")
+        
+        self.Threshold_View["columns"]=("0","1","2")
+        self.Threshold_View.column("#0",width=150,anchor="c")
+        self.Threshold_View.column("0",width=120,anchor="c")
+        self.Threshold_View.column("1",width=120,anchor="c")
+        self.Threshold_View.column("2",width=120,anchor="c")
+
+        self.Threshold_View.heading("0",text="Val. d'Arm.")
+        self.Threshold_View.heading("1",text="Vit.")
+        self.Threshold_View.heading("2",text="Mobi.")
+
+        for key in self.threshold_types:
+            self.Threshold_View.insert("","end",key,text=key)
+
+        ttk.Separator(self,orient="horizontal").grid(row=1,column=0,columnspan=8,sticky="we",padx="4p",pady="4p")
+
+        self.armor_image = ImageTk.PhotoImage(Image.open("Images/symb-armor.png").resize((12, 20), Image.ANTIALIAS))
+        self.armor_attr = ["Nom","Prot.","Amort.","Mobi.","Vit.","Sol."]
+
+        self.Armorlist = ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
+                          "Cuissots", "Grèves", "Solerets"]
+
+        self.Armor_View=ttk.Treeview(self,height=len(self.Armorlist))
+        self.Armor_View.grid(row=2,column=0,sticky="we",padx="4p",pady="4p")
+
+        self.Armor_View["columns"]=("0","1","2","3","4","5","6")
+        self.Armor_View.column("#0", width=100)
+
+        i=0
+        for key in self.armor_attr:
+            self.Armor_View.heading(str(i),text=key)
+            if i==0:
+                self.Armor_View.column(str(i), width=100,anchor="c")
+            else:
+                self.Armor_View.column(str(i), width=50,anchor="c")
+            i+=1
+
+        self.Armor_View.heading("6",image=self.armor_image)
+        self.Armor_View.column("6",width=30,anchor="e")
+
+        for key in self.Armorlist:
+            self.Armor_View.insert("","end",key,text=key)
+
+    def refresh(self):
+        palier = np.array([[[-10, -4, -8], [-8, -8, -10], [-4, -20, -12]], [[-8, -2, -6], [-4, -4, -6], [-2, -10, -10]],
+                           [[-6, 0, -4], [-3, -4, -6], [-1, -8, -8]], [[-4, 0, -2], [-1, -4, -4], [0, -6, -6]],
+                           [[-2, 0, 0], [0, -2, -2], [0, -4, -4]], [[0, 2, 0], [0, 0, -1], [0, -2, -2]],
+                           [[0, 4, 0], [0, 2, -1], [2, 0, -2]], [[2, 6, 2], [4, 2, 1], [6, 0, 0]],
+                           [[4, 8, 4], [6, 3, 2], [8, 0, 0]]])
+        armor_level = self.master.master.master.selectedchar.get_armor_level()
+        self.Threshold_View.heading("#0",text="Palier d'armure "+str(armor_level))
+        i=0
+        for item in self.Threshold_View.get_children():
+            for j in range(3):
+                self.Threshold_View.set(item,column=str(j),value=("+"*int(palier[armor_level,i,j]>0))+str(palier[armor_level,i,j]))
+            i+=1
+
+        for item in self.Armor_View.get_children():
+            self.Armor_View.set(item,"6",self.master.master.master.selectedchar.get_invested_armor(item))
+            linked_equip=self.master.master.master.selectedchar.get_current_armor(item)
+            if linked_equip:
+                valuelist=linked_equip.get_stats_aslist(["name","prot", "amort", "mobi", "vit", "solid"])
+                for i in range(6):
+                    self.Armor_View.set(item,str(i),value=valuelist[i])
+
+            else:
+
+                for i in range(6):
+                    self.Armor_View.set(item,str(i),value="...")
+
+
+"""
+class CharArmFrame(LabelFrame):
+    " "" Cadre d'affichage de l'armure du personnage "" "
 
     def __init__(self,master,**kw):
         LabelFrame.__init__(self,master,**kw)
@@ -1901,7 +1979,7 @@ class CharArmFrame(LabelFrame):
             i+=1
 
     def refresh(self):
-        """ fonction pour rafraichir l'armure du personnage """
+        " "" fonction pour rafraichir l'armure du personnage "" "
         for i in self.grid_slaves():
             info=i.grid_info()
             if info["row"]>=6 and info["column"]>=1:
@@ -1935,7 +2013,7 @@ class CharArmFrame(LabelFrame):
                     Label(self,text="...").grid(row=i,column=j)
             Label(self,text=self.master.master.master.selectedchar.thirdstats["invested_armor"][key]).grid(row=i,column=7,padx="4p")
             i+=1
-
+"""
 
 
 
