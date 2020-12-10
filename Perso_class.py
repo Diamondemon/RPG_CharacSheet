@@ -610,10 +610,24 @@ class player(object):
             self.passivestats[stat][0]=number
     
     def convert_init(self,number):
+        """ Méthode pour convertir l'initiative en habileté """
         if self.secondstats["symb-init"]-number>=self.secondstats["symb-ability"][1]+number:
             self.secondstats["symb-init"]-=number
             self.secondstats["symb-ability"][1]+=number
             self.secondstats["symb-ability"][0]+=number
+
+    def get_armor_level(self):
+        """ Méthode pour récupérer le niveau de palier d'armure """
+        return self.secondstats["armor-level"]
+
+    def get_current_armor(self,location):
+        """ Méthode pour récupérer un des objets équipés"""
+        return self.playerequipment[location]
+
+
+    def get_invested_armor(self,location):
+        """ Méthode pour récupérer les investissements d'armure faits sur une position d'objet spécifique """
+        return self.thirdstats["invested_armor"][location]
     
     def __setstate__(self, dict_attr):
         """Méthode appelée lors de la désérialisation de l'objet"""
@@ -689,6 +703,18 @@ class ArmorEquip(Obj):
         """ Méthode de remise à neuf de la pièce d'armure """
         if self.carac["solid"]+solid>=0:
             self.carac["solid"]+=solid
+
+    def get_stats_aslist(self, keylist):
+        valuelist = []
+
+        for key in keylist:
+            if key in self.carac.keys():
+                valuelist.append(self.carac[key])
+
+            if key=="name":
+                valuelist.append(self.name)
+
+        return valuelist
 
 
 
