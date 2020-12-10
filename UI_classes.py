@@ -1258,8 +1258,7 @@ class CharUsefulFrame(Frame):
         self.PercFrame=CharPercFrame(self,text=" Pourcentages ",relief="groove")
         self.PercFrame.grid(row=6,column=4,padx="4p",pady="4p",sticky="we")
 
-        # self.bind("<Visibility>",func=self.refresh)
-        #self.bind("<Enter>",func=self.toggle_visibility)
+        self.bind("<Visibility>",func=self.refresh)
 
 
     def refresh(self,event=None):
@@ -1275,14 +1274,7 @@ class CharUsefulFrame(Frame):
         self.CharThrF.refresh()
         self.PercFrame.refresh()
 
-    """def toggle_visibility(self,event=None):
-        print("tamer")
-        self.oui+=1
-        self.oui%=2
-        if self.oui%2==0:
-            self.lower()
-        else:
-            self.lift()"""
+
 
 
 
@@ -1672,9 +1664,15 @@ class CharMelFrame(LabelFrame):
                     Label(self,text="...").grid(row=3,column=i)
                     Label(self,text="...").grid(row=4,column=i)
 
+
     def up_mastery(self,where,number):
         self.master.master.master.selectedchar.playerequipment[where+"_melee"].upmastery(number)
-        self.refresh()
+
+        if where=="left":
+            item = self.grid_slaves(1,6)
+        else:
+            item = self.grid_slaves(4, 6)
+        item[0]["text"]=str(self.master.master.master.selectedchar.get_weapon(where, "melee").get_stats_aslist(["mastery"])[0])
 
 
 
@@ -1863,7 +1861,7 @@ class CharThrFrame(LabelFrame):
         self.master.master.master.selectedchar.playerequipment[where+"_throw"].upmastery(number)
         self.refresh()
 
-#"""
+
 class CharArmFrame(LabelFrame):
 
     def __init__(self, master, **kw):

@@ -765,8 +765,21 @@ class player(object):
         return self.playerequipment[location]
 
     def get_invested_armor(self, location):
-        """ Méthode pour récupérer les investissements d'armure faits sur une position d'objet spécifique """
+        """
+        :param location: armor piece location
+        :return: corresponding points of armor invested in the requested armor piece location
+        """
+
         return self.thirdstats["invested_armor"][location]
+
+    def get_weapon(self, side, weapontype):
+        """
+        :param weapontype: "melee" or "throw" weapon
+        :param side: "left" or "right" hand weapon
+        :return: corresponding weapon
+        """
+
+        return self.playerequipment[side+"_"+weapontype]
 
     def __setstate__(self, dict_attr):
         """Méthode appelée lors de la désérialisation de l'objet"""
@@ -897,6 +910,18 @@ class MeleeEquip(Obj):
         """ Méthode pour changer la qualité de l'arme """
         self.carac["quality"] = quality
 
+    def get_stats_aslist(self, keylist):
+        valuelist = []
+
+        for key in keylist:
+            if key in self.carac.keys():
+                valuelist.append(self.carac[key])
+
+            if key == "name":
+                valuelist.append(self.name)
+
+        return valuelist
+
 
 class ThrowEquip(Obj):
     """ Classe d'arme de jet et tir """
@@ -959,6 +984,18 @@ class ThrowEquip(Obj):
         new_obj.del_cord()
         return new_obj
 
+    def get_stats_aslist(self, keylist):
+        valuelist = []
+
+        for key in keylist:
+            if key in self.carac.keys():
+                valuelist.append(self.carac[key])
+
+            if key == "name":
+                valuelist.append(self.name)
+
+        return valuelist
+
 
 class ShieldEquip(Obj):
     """ Classe de bouclier """
@@ -996,6 +1033,18 @@ class ShieldEquip(Obj):
     def newquali(self, quality=""):
         """ Méthode pour changer la qualité de l'arme """
         self.carac["quality"] = quality
+
+    def get_stats_aslist(self, keylist):
+        valuelist = []
+
+        for key in keylist:
+            if key in self.carac.keys():
+                valuelist.append(self.carac[key])
+
+            if key == "name":
+                valuelist.append(self.name)
+
+        return valuelist
 
 
 class Competence(object):
