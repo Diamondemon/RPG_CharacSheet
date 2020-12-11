@@ -1858,8 +1858,18 @@ class CharThrFrame(LabelFrame):
                     Label(self,text="...").grid(row=4,column=i)
 
     def up_mastery(self,where,number):
-        self.master.master.master.selectedchar.playerequipment[where+"_throw"].upmastery(number)
-        self.refresh()
+        self.master.master.master.selectedchar.get_weapon(where,"throw").upmastery(number)
+
+        if self.master.master.master.selectedchar.get_weapon(where,"throw").get_stats_aslist(["type"])[0]=="Tir":
+            col=5
+        else:
+            col=4
+
+        if where=="left":
+            item = self.grid_slaves(1,col)
+        else:
+            item = self.grid_slaves(4, col)
+        item[0]["text"]=str(self.master.master.master.selectedchar.get_weapon(where, "throw").get_stats_aslist(["mastery"])[0])
 
 
 class CharArmFrame(LabelFrame):
