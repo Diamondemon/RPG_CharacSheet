@@ -772,6 +772,18 @@ class player(object):
 
         return self.thirdstats["invested_armor"][location]
 
+    def get_lightnings(self,spell):
+
+        return self.spells[spell]
+
+    def get_name(self):
+
+        return self.name
+
+    def get_spelllist(self):
+
+        return self.spells.keys()
+
     def get_weapon(self, side, weapontype):
         """
         :param weapontype: "melee" or "throw" weapon
@@ -780,6 +792,22 @@ class player(object):
         """
 
         return self.playerequipment[side+"_"+weapontype]
+
+    def ismage(self):
+
+        return self.mage
+
+    def pop_spell(self,spell):
+        """
+        :param spell: name of the spell to remove from the player's set
+        :return:
+        """
+
+        if self.spells[spell]>0:
+            self.use_lightning(spell,-self.spells[spell])
+
+        self.spells.pop(spell)
+
 
     def __setstate__(self, dict_attr):
         """Méthode appelée lors de la désérialisation de l'objet"""
@@ -816,6 +844,21 @@ class Obj(object):
         self.description = description
         self.is_stackable = stackable
 
+    def get_stat(self,key):
+
+        if key in self.__dict__.keys():
+            return self.__dict__[key]
+
+    def get_stats_aslist(self, keylist):
+        valuelist = []
+
+        for key in keylist:
+            valuelist.append(self.get_stat(key))
+
+        return valuelist
+
+
+
 
 class Cord(Obj):
     """ Corde pour les armes de tir """
@@ -824,12 +867,16 @@ class Cord(Obj):
         Obj.__init__(self, name, description, stackable)
         self.perc = pourcentage  # chance de ne pas casser en cas d'échec
 
+    def set_perc(self,newval):
+
+        self.perc = newval
+
 
 class ArmorEquip(Obj):
     """ Classe de pièce d'équipement d'armure """
 
     def __init__(self, name="", description="", stackable=False, location=""):
-        Obj.__init__(self, name, description, stackable=False)
+        Obj.__init__(self, name, description, stackable)
         self.location = location
         self.carac = {}
         self.carac["prot"] = 0  # protection, pour les dégats du tranchant
@@ -850,15 +897,19 @@ class ArmorEquip(Obj):
         if self.carac["solid"] + solid >= 0:
             self.carac["solid"] += solid
 
+    def get_stat(self,key):
+
+        if key in self.carac.keys():
+            return self.carac[key]
+
+        else:
+            return Obj.get_stat(self,key)
+
     def get_stats_aslist(self, keylist):
         valuelist = []
 
         for key in keylist:
-            if key in self.carac.keys():
-                valuelist.append(self.carac[key])
-
-            if key == "name":
-                valuelist.append(self.name)
+            valuelist.append(self.get_stat(key))
 
         return valuelist
 
@@ -869,7 +920,7 @@ class MeleeEquip(Obj):
     def __init__(self, name="", description="", stackable=False, weight="", hast=False):
         """ Si c'est une arme de hast, l'objet fournit un bonus particulier.
         Sinon, l'objet possède une caractéristique de vitesse d'utilisation. """
-        Obj.__init__(self, name, description, stackable=False)
+        Obj.__init__(self, name, description, stackable)
         self.carac = {}
         self.carac["weight"] = weight  # type d'arme (lourde, légère)
         self.carac["hand"] = 0  # nombre de mains nécessaires à l'utilisation
@@ -910,24 +961,31 @@ class MeleeEquip(Obj):
         """ Méthode pour changer la qualité de l'arme """
         self.carac["quality"] = quality
 
+    def get_stat(self, key):
+
+        if key in self.carac.keys():
+            return self.carac[key]
+
+        else:
+            return Obj.get_stat(self, key)
+
     def get_stats_aslist(self, keylist):
         valuelist = []
 
         for key in keylist:
-            if key in self.carac.keys():
-                valuelist.append(self.carac[key])
-
-            if key == "name":
-                valuelist.append(self.name)
+            valuelist.append(self.get_stat(key))
 
         return valuelist
 
+    def is_hast(self):
+
+        return self.carac["hast"]
 
 class ThrowEquip(Obj):
     """ Classe d'arme de jet et tir """
 
     def __init__(self, name="", description="", stackable=False, throw_type="Tir"):
-        Obj.__init__(self, name, description, stackable=False)
+        Obj.__init__(self, name, description, stackable)
         self.carac = {}
         self.carac["type"] = throw_type  # spécifie s'il s'agit d'une arme de lancer ou de tir
         self.carac["hand"] = 0  # nombre de mains nécessaires à l'utilisation
@@ -984,15 +1042,19 @@ class ThrowEquip(Obj):
         new_obj.del_cord()
         return new_obj
 
+    def get_stat(self, key):
+
+        if key in self.carac.keys():
+            return self.carac[key]
+
+        else:
+            return Obj.get_stat(self, key)
+
     def get_stats_aslist(self, keylist):
         valuelist = []
 
         for key in keylist:
-            if key in self.carac.keys():
-                valuelist.append(self.carac[key])
-
-            if key == "name":
-                valuelist.append(self.name)
+            valuelist.append(self.get_stat(key))
 
         return valuelist
 
@@ -1004,13 +1066,13 @@ class ShieldEquip(Obj):
         Obj.__init__(self, name, description, stackable=False)
         self.carac = {}
         self.carac["hand"] = 0  # nombre de mains nécessaires à l'utilisation
-        self.carac["close"] = 0
-        self.carac["dist"] = 0
-        self.carac["mastery"] = 0
-        self.carac["mobi"] = 0
-        self.carac["vit"] = 0
-        self.carac["quality"] = ""
-        self.carac["solid"] = 0
+        self.carac["close"] = 0 # capactié à défendre au corps à corps
+        self.carac["dist"] = 0 # capacité à défendre contre les tirs
+        self.carac["mastery"] = 0 # maitrise du personnage sur cet objet
+        self.carac["mobi"] = 0 # influence du bouclier sur la mobilité
+        self.carac["vit"] = 0 # influence du bouclier sur la vitesse
+        self.carac["quality"] = ""  # qualité de l'équipement (influence la perte de solidité)
+        self.carac["solid"] = 0 # solidité restante de l'objet
 
     def upmastery(self, mastery):
         """ Méthode qui permet de modifier la maitrise du personnage avec cette arme """
@@ -1034,15 +1096,19 @@ class ShieldEquip(Obj):
         """ Méthode pour changer la qualité de l'arme """
         self.carac["quality"] = quality
 
+    def get_stat(self, key):
+
+        if key in self.carac.keys():
+            return self.carac[key]
+
+        else:
+            return Obj.get_stat(self, key)
+
     def get_stats_aslist(self, keylist):
         valuelist = []
 
         for key in keylist:
-            if key in self.carac.keys():
-                valuelist.append(self.carac[key])
-
-            if key == "name":
-                valuelist.append(self.name)
+            valuelist.append(self.get_stat(key))
 
         return valuelist
 
@@ -1081,9 +1147,21 @@ class Spell(object):
 
     def copy(self):
         """ Méthode pour dupliquer le sort """
-        new_spell = Competence()
+        new_spell = Spell()
         new_spell.__dict__ = self.__dict__.copy()
         return new_spell
+
+    def get_stats_aslist(self,keys):
+        valuelist=[]
+
+        for key in keys:
+            if key in self.__dict__.keys():
+                valuelist.append(self.__dict__[key])
+
+        return valuelist
+
+
+
 
     def __str__(self):
         return "Sort (élément {}) {} : {}".format(self.elem, self.name, self.effect)

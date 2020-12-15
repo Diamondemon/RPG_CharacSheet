@@ -51,7 +51,7 @@ class HomeFrame(Frame):
         """ Si un personnage a été sélectionné dans la liste, le définit comme personnage sélectionné
         et ouvre le panneau de consultation de personnage, en fermant le panneau d'accueil """
         if self.Char_list.curselection() !=():
-            self.master.CDF.selectedchar=self.master.characlist[self.Char_list.curselection()[0]] # le numéro du personnage dans la liste correspond au numéro du personnage sur l'affichage
+            self.set_selectedchar(self.Char_list.curselection()[0]) # le numéro du personnage dans la liste correspond au numéro du personnage sur l'affichage
             for i in self.master.grid_slaves():
                 i.grid_forget()
             self.master.children['!chardframe'].grid(row=0,column=0)
@@ -99,6 +99,10 @@ class HomeFrame(Frame):
     def grid_forget(self):
         Frame.grid_forget(self)
         self.Char_list.delete(0,"end")
+
+    def set_selectedchar(self,character):
+
+        self.master.set_selectedchar(character)
 
 
 
@@ -244,6 +248,9 @@ class CharDFrame(Frame):
         self.selectedchar.clearstats()
         self.NBK.refresh()
 
+    def get_selectedchar(self):
+        return self.selectedchar
+
     def GM_reinit_char(self):
         self.selectedchar.GM_clearstats()
         self.NBK.refresh()
@@ -268,6 +275,14 @@ class CharDFrame(Frame):
         for i in self.grid_slaves(column=1):
             i.grid_forget()
 
+    def set_selectedchar(self,character):
+        if type(character==pc.player):
+            self.selectedchar=character
+
+class CharMiscSubFrame(Frame):
+
+    def __init__(self, master=None,**kwargs):
+        Frame.__init__(self,master,kwargs)
 
 
 
@@ -306,6 +321,9 @@ class CharNotebook(ttk.Notebook):
         if self.master.selectedchar.mage:
             self.forget(4)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -332,6 +350,9 @@ class CharCaracFrame(Frame):
         for i in self.grid_slaves():
             i.grid_forget()
         self.BNDL.grid(row=0,column=0,sticky="N")
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -396,6 +417,9 @@ class CharAtkFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MATK.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -422,14 +446,19 @@ class CharAtkMFrame(Frame):
         self.add_stat.grid(row=1,column=1)
         self.Register_new.grid(row=2,column=0,columnspan=2)
 
+
+
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.ATK.refresh()
         # with open("characters","wb") as fichier:
         #     pk.Pickler(fichier).dump(self.master.master.master.master.characlist)
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -481,6 +510,9 @@ class CharDefFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MDEF.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -521,16 +553,19 @@ class CharDefMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.DEF.refresh()
 
     def register_third(self,event=None):
         """ Consomme un symbole d'armure pour l'assigner à une pièce d'équipement """
-        self.master.master.master.selectedchar.upstats("invested_armor",self.New_third.get(),self.statthird.get())
+        self.get_selectedchar().upstats("invested_armor",self.New_third.get(),self.statthird.get())
         self.New_third.set(0)
         self.master.BNDL.DEF.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -594,6 +629,9 @@ class CharPhyFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MPHY.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -637,14 +675,14 @@ class CharPhyMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.PHY.refresh()
 
     def register_third(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.thirdlist[self.statthird.current()],self.New_third.get())
+        self.get_selectedchar().upstats(self.thirdlist[self.statthird.current()],self.New_third.get())
         self.New_third.set(0)
         self.master.master.master.reload()
         self.master.BNDL.PHY.refresh()
@@ -653,6 +691,9 @@ class CharPhyMFrame(Frame):
         self.master.master.master.selectedchar.convert_init(1)
         self.master.BNDL.PHY.refresh()
         self.master.BNDL.ABI.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -708,6 +749,9 @@ class CharAbiFrame(LabelFrame):
         for i in self.master.master.grid_slaves(column=3):
             i.grid_forget()
         self.master.master.MABI.grid(row=0,column=3)
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
     def grid(self,**kwargs):
@@ -851,7 +895,7 @@ class CharAbiMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.ABI.refresh()
@@ -956,16 +1000,18 @@ class CharAbiMFrame(Frame):
 
 
     def add_sense(self,stat):
-        self.master.master.master.selectedchar.upstats(stat,1)
+        self.get_selectedchar().upstats(stat,1)
         self.refresh()
         self.master.BNDL.ABI.refresh()
 
     def invest_furtif(self,stat):
         """ Permet de consommer le tier 2 et obtenir du tier 3 """
-        self.master.master.master.selectedchar.upstats(stat,1)
+        self.get_selectedchar().upstats(stat,1)
         self.refresh()
         self.master.BNDL.ABI.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
     def grid(self,**kw):
         #self.refresh()
@@ -1022,6 +1068,9 @@ class CharSocFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MSOC.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -1050,10 +1099,13 @@ class CharSocMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.SOC.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1117,6 +1169,9 @@ class CharEthFrame(LabelFrame):
             i.grid_forget()
         self.master.master.METH.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -1145,13 +1200,15 @@ class CharEthMFrame(Frame):
 
     def register(self,event=None):
         """ On modifie les caractéristiques du personnage, grâce à l'xp, et on recharge le widget qui les affiche """
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.ETH.refresh()
         self.master.BNDL.ABI.refresh()
-        # with open("characters","wb") as fichier:
-        #     pk.Pickler(fichier).dump(self.master.master.master.master.characlist)
+
+    def get_selectedchar(self):
+
+        return self.master.get_selectedchar()
 
 
 
@@ -1174,6 +1231,9 @@ class CharSymbFrame(LabelFrame):
         for key in self.baselist:
             Label(self,text=self.master.master.master.master.selectedchar.secondstats["symb-"+key]).grid(row=i,column=1)
             i+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
@@ -1200,6 +1260,9 @@ class CharBundleFrame(Frame):
     def refresh(self):
         for i in self.grid_slaves():
             i.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
     def grid(self,**kwargs):
 
@@ -1274,6 +1337,9 @@ class CharUsefulFrame(Frame):
         self.CharThrF.refresh()
         self.PercFrame.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -1309,6 +1375,9 @@ class CharFirstSymbFrame(Frame):
             else:
                 Label(self,text=self.master.master.master.selectedchar.secondstats["symb-"+key]).grid(row=0,column=2*i+1,sticky="w")
             i+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1371,6 +1440,9 @@ class CharPercepFrame(Frame):
 
             j+=1
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -1425,6 +1497,9 @@ class CharStealthFrame(Frame):
 
             j+=1
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -1459,6 +1534,9 @@ class CharPercFrame(LabelFrame):
                     ttk.Separator(self,orient="vertical").grid(row=0,column=2*k-1,rowspan=4,sticky="ns",pady="2p")
             j+=1
 
+        def get_selectedchar(self):
+            return self.master.get_selectedchar()
+
 
 
 
@@ -1490,6 +1568,9 @@ class CharHiddenFrame(Frame):
         for stat in ["thievery","ambush","escape"]:
             Label(self,text=self.master.master.master.selectedchar.thirdstats["hidden_action"][stat]).grid(row=1,column=3*j+1)
             j+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1674,6 +1755,8 @@ class CharMelFrame(LabelFrame):
             item = self.grid_slaves(4, 6)
         item[0]["text"]=str(self.master.master.master.selectedchar.get_weapon(where, "melee").get_stats_aslist(["mastery"])[0])
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 class CharThrFrame(LabelFrame):
@@ -1871,6 +1954,9 @@ class CharThrFrame(LabelFrame):
             item = self.grid_slaves(4, col)
         item[0]["text"]=str(self.master.master.master.selectedchar.get_weapon(where, "throw").get_stats_aslist(["mastery"])[0])
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 class CharArmFrame(LabelFrame):
 
@@ -1950,6 +2036,9 @@ class CharArmFrame(LabelFrame):
                 for i in range(6):
                     self.Armor_View.set(item,str(i),value="...")
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 class CharUseCompetFrame(LabelFrame):
@@ -1966,6 +2055,9 @@ class CharUseCompetFrame(LabelFrame):
         for compet in self.master.master.master.selectedchar.competences:
             Message(self,text=compet.name+" : "+compet.effect,width=500).grid(row=i,column=0)
             i+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 ## Partie 4 Inventaire
@@ -2597,6 +2689,9 @@ class CharIFrame(Frame):
 
             self.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -3109,6 +3204,9 @@ class ObjCreatorFrame(Frame):
         # print(self.master.master.master.selectedchar.inventory)
         self.master.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -3442,6 +3540,9 @@ class CharCompetFrame(Frame):
         self.selected_compet.effect=self.modif_effect.get(0.0,"end")
         self.refresh_char()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -3583,8 +3684,8 @@ class CharSpellFrame(Frame):
         self.plus_lightning.grid(row=1,column=1)
         self.min_lightning=Button(self,text="-",image=self.lightning_image,compound="right",command=partial(self.modif_lightning,-1),state="disabled")
         self.min_lightning.grid(row=1,column=2,sticky="e")
-        self.suppr_choice=Button(self,text="Retirer",command=self.suppr)
-        self.suppr_choice.grid(row=2,column=1,columnspan=2)
+        self.remove_choice=Button(self, text="Retirer", command=self.remove_charspell)
+        self.remove_choice.grid(row=2, column=1, columnspan=2)
         # les sorts que le personnage a déjà
         self.CharSpell_view=ttk.Treeview(self,height=5)
         self.CharSpell_view["columns"]=("0","1","2","3")
@@ -3690,7 +3791,7 @@ class CharSpellFrame(Frame):
     def refresh(self,event=None):
         self.refresh_general()
         self.refresh_char()
-        self.suppr_choice["state"]="disabled"
+        self.remove_choice["state"]= "disabled"
         self.transfer_choice["state"]="disabled"
         self.plus_lightning["state"]="disabled"
         self.min_lightning["state"]="disabled"
@@ -3699,17 +3800,18 @@ class CharSpellFrame(Frame):
         """ Méthode qui rafraîchit la liste des sorts du personnage """
 
         self.spells_list=[]
+        print("oui")
 
         for key in self.elemlist:
             for kkey in self.subcateglist:
                 for i in self.CharSpell_view.get_children(key+kkey):
                     self.CharSpell_view.delete(i)
 
-        if self.master.master.selectedchar.spells:
+        if self.get_selectedchar().ismage():
             i=1
-            for key in self.master.master.selectedchar.spells.keys():
+            for key in self.get_selectedchar().get_spelllist():
                 self.spells_list.append(key)
-                self.CharSpell_view.insert(key.elem+key.subcateg,"end",i,text=key.name,values=[key.effect,key.description,key.cost,self.master.master.selectedchar.spells[key]])
+                self.CharSpell_view.insert(key.elem+key.subcateg,"end",i,text=key.name,values=[key.effect,key.description,key.cost,self.get_selectedchar().get_lightnings(key)])
 
                 i+=1
 
@@ -3732,29 +3834,29 @@ class CharSpellFrame(Frame):
                 i+=1
 
     def select_charspell(self,event):
-        """ Méthode qui est appelée quand on sélectionne une compétence, pour retirer la supprimer si besoin """
+        """ Méthode qui est appelée quand on sélectionne un sort, pour le transférer si besoin """
         if self.CharSpell_view.identify_row(event.y):
 
             try:
                 self.selected_charitem=int(self.CharSpell_view.identify_row(event.y))
-                self.suppr_choice["state"]="normal"
+                self.remove_choice["state"]= "normal"
                 self.plus_lightning["state"]="normal"
                 self.min_lightning["state"]="normal"
 
             except:
                 self.selected_charitem=None
-                self.suppr_choice["state"]="disabled"
+                self.remove_choice["state"]= "disabled"
                 self.plus_lightning["state"]="disabled"
                 self.min_lightning["state"]="disabled"
 
         else:
             self.selected_charitem=None
-            self.suppr_choice["state"]="disabled"
+            self.remove_choice["state"]= "disabled"
             self.plus_lightning["state"]="disabled"
             self.min_lightning["state"]="disabled"
 
     def select_spell(self,event):
-        """ Méthode qui est appelée quand on sélectionne une compétence, pour la transférer si besoin """
+        """ Méthode qui est appelée quand on sélectionne un sort, pour le transférer si besoin """
         if self.Spell_view.identify_row(event.y):
 
             try:
@@ -3770,25 +3872,34 @@ class CharSpellFrame(Frame):
             self.transfer_choice["state"]="disabled"
 
 
-    def suppr(self):
-        """ Méthode qui supprime la compétence sélectionnée """
+    def remove_charspell(self):
+        """ Méthode qui supprime le sort sélectionné """
         if type(self.selected_charitem)==int:
-            self.master.master.spelllist.pop(self.selected_item-1)
+            self.get_selectedchar().pop_spell(self.spells_list[self.selected_charitem-1])
             self.refresh_char()
             self.selected_charitem=None
-            self.suppr_choice["state"]="disabled"
+            self.remove_choice["state"]= "disabled"
 
     def modif_lightning(self,number):
         """ Méthode qui permet de consommer des éclairs """
         if self.selected_charitem:
+            print("key",number)
             selected_spell=self.spells_list[self.selected_charitem-1]
-            self.master.master.selectedchar.use_lightning(selected_spell,number)
+            self.get_selectedchar().use_lightning(selected_spell,number)
             self.refresh_char()
             self.master.CharCF.BNDL.ETH.refresh()
 
     def grid(self,**kw):
         Frame.grid(self,**kw)
         self.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
+    def get_spelllist(self):
+
+        return self.master.spelllist
+
 
 
 
@@ -3807,8 +3918,8 @@ class CharMenu(Menu):
         self.add_cascade(label="Changer de perso",menu=self.submenu_1)
         self.submenu_1.add_command(label="Créer",command=self.goto_create)
         self.submenu_1.add_separator()
-        for i in range(len(self.master.characlist)):
-            self.submenu_1.add_command(label=self.master.characlist[i].name,command=partial(self.goto_other,i))
+        for i in range(len(self.get_characlist())):
+            self.submenu_1.add_command(label=self.get_characlist()[i].get_name(),command=partial(self.goto_other,i))
         self.add_separator()
         self.add_command(label="Supprimer",command=self.goto_suppr)
         self.add_separator()
@@ -3825,6 +3936,10 @@ class CharMenu(Menu):
         for i in range(len(self.master.characlist)):
             self.submenu_1.add_command(label=self.master.characlist[i].name,command=partial(self.goto_other,i))
 
+    def get_characlist(self):
+
+        return self.master.get_characlist()
+
 
     def goto_create(self):
         """ Renvoie dans l'environnement de création de personnage"""
@@ -3839,7 +3954,7 @@ class CharMenu(Menu):
         for i in self.master.grid_slaves():
             i.grid_forget()
 
-        self.master.CDF.selectedchar=self.master.characlist[number]
+        self.set_selectedchar(number)
         self.master.children['!chardframe'].grid(row=0,column=0)
 
     def goto_suppr(self):
@@ -3857,6 +3972,10 @@ class CharMenu(Menu):
         for i in self.master.grid_slaves():
             i.grid_forget()
         self.master.children["!spellcreatorframe"].grid(row=0,column=0)
+
+    def set_selectedchar(self,character):
+
+        self.master.set_selectedchar(character)
 
 
 
@@ -3889,6 +4008,10 @@ class UI_Window(Tk):
         self.configure(menu=self.Menubar)
         self.protocol("WM_DELETE_WINDOW",self.destroy)
 
+    def add_character(self,newchar):
+
+        self.characlist.append(newchar)
+
     def destroy(self):
         """ Fonction de destruction de la fenêtre, on sauvegarde les personnages avant de la détruire """
         with open("characters","wb") as fichier:
@@ -3900,6 +4023,15 @@ class UI_Window(Tk):
         with open("spells","wb") as fichier:
             pk.Pickler(fichier).dump(self.spelllist)
         Tk.destroy(self)
+
+    def get_characlist(self):
+
+        return self.characlist
+
+
+    def set_selectedchar(self,number):
+
+        self.CDF.set_selectedchar(self.characlist[number])
         
     
         
