@@ -3871,7 +3871,6 @@ class CharSpellFrame(Frame):
             self.selected_item=None
             self.transfer_choice["state"]="disabled"
 
-
     def remove_charspell(self):
         """ Méthode qui supprime le sort sélectionné """
         if type(self.selected_charitem)==int:
@@ -3880,7 +3879,7 @@ class CharSpellFrame(Frame):
             self.selected_charitem=None
             self.remove_choice["state"]= "disabled"
 
-    def modif_lightning(self,number):
+    def modif_lightning(self, number):
         """ Méthode qui permet de consommer des éclairs """
         if self.selected_charitem:
             print("key",number)
@@ -3889,8 +3888,8 @@ class CharSpellFrame(Frame):
             self.refresh_char()
             self.master.CharCF.BNDL.ETH.refresh()
 
-    def grid(self,**kw):
-        Frame.grid(self,**kw)
+    def grid(self, **kw):
+        Frame.grid(self, **kw)
         self.refresh()
 
     def get_selectedchar(self):
@@ -3901,40 +3900,35 @@ class CharSpellFrame(Frame):
         return self.master.spelllist
 
 
-
-
-
 ## Fenêtre pricipale
-
-
 
 
 class CharMenu(Menu):
     """ Widget menu permettant d'accéder aux personnages ou la suppresion de personnage """
 
-    def __init__(self,master):
-        Menu.__init__(self,master)
-        self.submenu_1=Menu(self,tearoff=0)
-        self.add_cascade(label="Changer de perso",menu=self.submenu_1)
-        self.submenu_1.add_command(label="Créer",command=self.goto_create)
+    def __init__(self, master):
+        Menu.__init__(self, master)
+        self.submenu_1=Menu(self, tearoff=0)
+        self.add_cascade(label="Changer de perso", menu=self.submenu_1)
+        self.submenu_1.add_command(label="Créer", command=self.goto_create)
         self.submenu_1.add_separator()
         for i in range(len(self.get_characlist())):
-            self.submenu_1.add_command(label=self.get_characlist()[i].get_name(),command=partial(self.goto_other,i))
+            self.submenu_1.add_command(label=self.get_characlist()[i].get_name(), command=partial(self.goto_other, i))
         self.add_separator()
-        self.add_command(label="Supprimer",command=self.goto_suppr)
+        self.add_command(label="Supprimer", command=self.goto_suppr)
         self.add_separator()
-        self.add_command(label="Compétences",command=self.goto_compet)
+        self.add_command(label="Compétences", command=self.goto_compet)
         self.add_separator()
-        self.add_command(label="Sorts",command=self.goto_spell)
+        self.add_command(label="Sorts", command=self.goto_spell)
 
     def refresh(self):
         """ fonction pour rafraîchir la liste des personnages disponibles """
 
-        for i in range(2,2+len(self.submenu_1._tclCommands[1:])): # le séparateur occupe l'indice 1
-            self.submenu_1.delete(self.submenu_1.entrycget(i,"label"))
+        for i in range(2,2+len(self.submenu_1._tclCommands[1:])):  # le séparateur occupe l'indice 1
+            self.submenu_1.delete(self.submenu_1.entrycget(i, "label"))
 
         for i in range(len(self.master.characlist)):
-            self.submenu_1.add_command(label=self.master.characlist[i].name,command=partial(self.goto_other,i))
+            self.submenu_1.add_command(label=self.master.characlist[i].name, command=partial(self.goto_other, i))
 
     def get_characlist(self):
 
