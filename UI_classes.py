@@ -7,6 +7,7 @@ import numpy as np
 from functools import partial
 
 
+
 """import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -2308,7 +2309,7 @@ class CharIFrame(Frame):
         """ Arrête l'attente pour afficher le popup, et efface le popup s'il est présent """
         if self.id:
             self.after_cancel(self.id)
-            self.id=None
+            self.id = None
         self.Obj_pop.hideinfo()
         self.Melee_pop.hideinfo()
         self.Throw_pop.hideinfo()
