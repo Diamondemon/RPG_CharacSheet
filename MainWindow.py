@@ -6,6 +6,7 @@ from functools import partial
 import Perso_class as Pc
 import CharSFrame as CsF
 import CharCFrame as CcF
+import HomeFrame as Hf
 
 
 # Fenêtre pricipale
@@ -86,8 +87,12 @@ class UIWindow(QMainWindow):
         self.menubar = CharMenu(self)
         self.setWindowTitle(self.titre)
         self.setMenuBar(self.menubar)
+        self.HFrame = Hf.HomeFrame()
         self.CSFrame = CsF.CharSFrame()
         self.CCFrame = CcF.CharCFrame()
+
+        self.setCentralWidget(self.HFrame)
+        self.HFrame.charlist_reload()
 
     def generate(self, name: str, xp: int, mage: bool):
         character = Pc.player(name, xp, mage)  # on crée un joueur avec le nom et l'xp donnés
@@ -103,6 +108,9 @@ class UIWindow(QMainWindow):
     def goto_create(self):
         self.takeCentralWidget()
         self.setCentralWidget(self.CCFrame)
+
+    def goto_modify(self):
+        pass
 
     def goto_suppr(self):
         self.takeCentralWidget()
@@ -120,5 +128,4 @@ class UIWindow(QMainWindow):
             pk.Pickler(fichier).dump(self.characlist)
 
     def set_selectedchar(self, number):
-
         self.CDF.set_selectedchar(self.characlist[number])
