@@ -31,4 +31,3 @@ class CharSFrame(QWidget):
         if self.charac_list.currentRow() != -1:
             self.parent().pop(self.charac_list.currentRow())
             self.refresh()
-            self.parent().menubar.refresh()

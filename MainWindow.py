@@ -3,7 +3,9 @@ from PySide6.QtWidgets import (QMainWindow, QMenuBar)
 from PySide6.QtGui import QAction
 import pickle as pk
 from functools import partial
+import Perso_class as Pc
 import CharSFrame as CsF
+import CharCFrame as CcF
 
 
 # Fenêtre pricipale
@@ -36,7 +38,7 @@ class CharMenu(QMenuBar):
     @Slot()
     def goto_create(self):
         """ Envoie dans l'environnement de création de personnage"""
-        print("Panneau de création")
+        self.parent().goto_create()
 
     @Slot()
     def goto_other(self, number):
@@ -85,10 +87,22 @@ class UIWindow(QMainWindow):
         self.setWindowTitle(self.titre)
         self.setMenuBar(self.menubar)
         self.CSFrame = CsF.CharSFrame()
+        self.CCFrame = CcF.CharCFrame()
+
+    def generate(self, name: str, xp: int, mage: bool):
+        character = Pc.player(name, xp, mage)  # on crée un joueur avec le nom et l'xp donnés
+        self.characlist.append(character)
+        self.save_characlist()
+        self.menubar.refresh()
+        print(character)
 
     def get_characlist(self):
 
         return self.characlist
+
+    def goto_create(self):
+        self.takeCentralWidget()
+        self.setCentralWidget(self.CCFrame)
 
     def goto_suppr(self):
         self.takeCentralWidget()
@@ -98,9 +112,12 @@ class UIWindow(QMainWindow):
     def pop(self, index: int):
         if index < len(self.characlist):
             self.characlist.pop(index)
+            self.save_characlist()
+            self.menubar.refresh()
 
-            with open("characters", "wb") as fichier:
-                pk.Pickler(fichier).dump(self.master.characlist)
+    def save_characlist(self):
+        with open("characters", "wb") as fichier:
+            pk.Pickler(fichier).dump(self.characlist)
 
     def set_selectedchar(self, number):
 
