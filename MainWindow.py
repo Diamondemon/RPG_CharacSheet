@@ -1,5 +1,5 @@
 from PySide6.QtCore import Slot, SIGNAL
-from PySide6.QtWidgets import (QMainWindow, QMenuBar, QGridLayout)
+from PySide6.QtWidgets import (QMainWindow, QMenuBar)
 from PySide6.QtGui import QAction
 import pickle as pk
 from functools import partial
@@ -13,17 +13,17 @@ class CharMenu(QMenuBar):
 
     def __init__(self, master):
         QMenuBar.__init__(self, master)
-        self.menu_perso = self.addMenu("Changer de perso")
-        self.action_create = QAction("Créer", self)
+        self.menu_perso = self.addMenu(self.tr("Changer de perso"))
+        self.action_create = QAction(self.tr("Créer"), self)
         self.menu_perso.addAction(self.action_create)
         self.connect(self.action_create, SIGNAL("triggered()"), self.goto_create)
         self.menu_perso.addSeparator()
         for i in enumerate(self.get_characlist()):
             self.menu_perso.addAction(i[1].get_name(), partial(self.goto_other, i[0]))
 
-        self.addAction("Supprimer", self.goto_suppr)
-        self.addAction("Compétences", self.goto_compet)
-        self.addAction("Sorts", self.goto_spell)
+        self.addAction(self.tr("Supprimer"), self.goto_suppr)
+        self.addAction(self.tr("Compétences"), self.goto_compet)
+        self.addAction(self.tr("Sorts"), self.goto_spell)
 
     def get_characlist(self):
         """Method to get the list of characters from the main window"""
@@ -53,6 +53,12 @@ class CharMenu(QMenuBar):
     def goto_suppr(self):
         """ Emmène vers la page de suppresion des personnages """
         self.parent().goto_suppr()
+
+    def refresh(self):
+        while len(self.menu_perso.actions()) > 2:
+            self.menu_perso.removeAction(self.menu_perso.actions()[-1])
+        for i in enumerate(self.get_characlist()):
+            self.menu_perso.addAction(i[1].get_name(), partial(self.goto_other, i[0]))
 
     def set_selectedchar(self, character):
 
@@ -85,10 +91,17 @@ class UIWindow(QMainWindow):
         return self.characlist
 
     def goto_suppr(self):
+        self.takeCentralWidget()
         self.setCentralWidget(self.CSFrame)
         self.CSFrame.refresh()
+
+    def pop(self, index: int):
+        if index < len(self.characlist):
+            self.characlist.pop(index)
+
+            with open("characters", "wb") as fichier:
+                pk.Pickler(fichier).dump(self.master.characlist)
 
     def set_selectedchar(self, number):
 
         self.CDF.set_selectedchar(self.characlist[number])
-
