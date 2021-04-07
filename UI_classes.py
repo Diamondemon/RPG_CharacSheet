@@ -3997,3 +3997,8 @@ class UI_Window(Tk):
     def set_selectedchar(self, number):
 
         self.CDF.set_selectedchar(self.characlist[number])
+
+if __name__ == "__main__":
+    window = UI_Window()
+
+    window.mainloop()

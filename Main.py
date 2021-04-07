@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QApplication
 import sys
 
 chdir(path.dirname(__file__))
-from UI_classes import UI_Window
 from MainWindow import UIWindow as UI_W
 
 if not path.exists("characters"):

@@ -8,6 +8,7 @@ import CharSFrame as CsF
 import CharCFrame as CcF
 import HomeFrame as Hf
 import CompetFrame as Cf
+import SpellFrame as Sf
 
 
 # Fenêtre pricipale
@@ -100,7 +101,8 @@ class UIWindow(QMainWindow):
         self.HFrame = Hf.HomeFrame()
         self.CSFrame = CsF.CharSFrame()
         self.CCFrame = CcF.CharCFrame()
-        self.CoCFrame = Cf.CompetCreatorFrame()
+        self.CompCFrame = Cf.CompetCreatorFrame()
+        self.SpellCFrame = Sf.SpellCreatorFrame()
 
         self.setCentralWidget(self.HFrame)
         self.HFrame.charlist_reload()
@@ -119,6 +121,14 @@ class UIWindow(QMainWindow):
 
         return self.characlist
 
+    def goto_compet(self):
+        """
+        Method called to display the CompetCreatorFrame (competence creator) as the central widget
+        :return: None
+        """
+        self.takeCentralWidget()
+        self.setCentralWidget(self.CompetCFrame)
+
     def goto_create(self):
         """
         Method called to display the CharCFrame (character creator) as the central widget
@@ -126,14 +136,6 @@ class UIWindow(QMainWindow):
         """
         self.takeCentralWidget()
         self.setCentralWidget(self.CCFrame)
-
-    def goto_compet(self):
-        """
-            Method called to display the CompetCreatorFrame (competence creator) as the central widget
-            :return: None
-        """
-        self.takeCentralWidget()
-        self.setCentralWidget(self.CoCFrame)
 
     def goto_home(self):
         """
@@ -150,6 +152,14 @@ class UIWindow(QMainWindow):
         :return: None
         """
         pass
+
+    def goto_spell(self):
+        """
+
+        :return: None
+        """
+        self.takeCentralWidget()
+        self.setCentralWidget(self.SpellCFrame)
 
     def goto_suppr(self):
         """
