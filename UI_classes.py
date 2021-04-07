@@ -3203,157 +3203,151 @@ class ObjCreatorFrame(Frame):
         return self.master.get_selectedchar()
 
 
-
-
-## Partie 6 Compétences
+# Partie 6 Compétences
 
 class CompetCreatorFrame(Frame):
     """ Widget de création des compétences """
 
-    def __init__(self,master,**kw):
-        Frame.__init__(self,master,**kw)
-        Label(self,text="Créer une compétence").grid(row=0,column=0,sticky="w",columnspan=2)
-        self.categlist=["Lore","Mélée","Jet","Combat vétéran","Armure"]
-        self.Name_var=StringVar()
+    def __init__(self, master, **kw):
+        Frame.__init__(self, master, **kw)
+        Label(self, text="Créer une compétence").grid(row=0, column=0, sticky="w", columnspan=2)
+        self.categlist = ["Lore", "Mélée", "Jet", "Combat vétéran", "Armure"]
+        self.Name_var = StringVar()
+        self.selected_item = None
 
-        Label(self,text="Catégorie").grid(row=1,column=0,sticky="w")
-        Label(self,text="Sous-catégorie").grid(row=1,column=1,sticky="w")
-        Label(self,text="Intitulé").grid(row=1,column=2)
-        Label(self,text="Effets").grid(row=1,column=3,sticky="w")
+        Label(self, text="Catégorie").grid(row=1, column=0, sticky="w")
+        Label(self, text="Sous-catégorie").grid(row=1, column=1, sticky="w")
+        Label(self, text="Intitulé").grid(row=1, column=2)
+        Label(self, text="Effets").grid(row=1, column=3, sticky="w")
 
-        self.Categ_entry=ttk.Combobox(self,values=self.categlist,state="readonly")
+        self.Categ_entry = ttk.Combobox(self, values=self.categlist, state="readonly")
         self.Categ_entry.current(0)
-        self.Subcateg_entry=ttk.Combobox(self,values=[],state="disabled")
-        self.Name_entry=Entry(self,textvariable=self.Name_var)
-        self.Effect_entry=Text(self,width=100,height=5)
-        self.Register_choice=Button(self,text="Enregistrer",command=self.register)
-        self.suppr_choice=Button(self,text="Supprimer",command=self.suppr,state="disabled")
+        self.Subcateg_entry = ttk.Combobox(self, values=[], state="disabled")
+        self.Name_entry = Entry(self, textvariable=self.Name_var)
+        self.Effect_entry = Text(self, width=100, height=5)
+        self.Register_choice = Button(self, text="Enregistrer", command=self.register)
+        self.suppr_choice = Button(self, text="Supprimer", command=self.suppr, state="disabled")
 
-        self.Categ_entry.grid(row=2,column=0,sticky="n",padx='4p')
-        self.Subcateg_entry.grid(row=2,column=1,sticky="n",padx='4p')
-        self.Name_entry.grid(row=2,column=2,sticky="n",padx='4p')
-        self.Effect_entry.grid(row=2,column=3,padx='4p')
-        self.Register_choice.grid(row=1,column=4,rowspan=2,padx='4p')
-        self.suppr_choice.grid(row=3,column=5,padx='4p')
+        self.Categ_entry.grid(row=2, column=0, sticky="n", padx='4p')
+        self.Subcateg_entry.grid(row=2, column=1, sticky="n", padx='4p')
+        self.Name_entry.grid(row=2, column=2, sticky="n", padx='4p')
+        self.Effect_entry.grid(row=2, column=3, padx='4p')
+        self.Register_choice.grid(row=1, column=4, rowspan=2, padx='4p')
+        self.suppr_choice.grid(row=3, column=5, padx='4p')
 
-        self.Categ_entry.bind("<<ComboboxSelected>>",self.subcateg_roll)
+        self.Categ_entry.bind("<<ComboboxSelected>>", self.subcateg_roll)
 
         # les compétences qui existent déjà
         self.Compet_view=ttk.Treeview(self)
-        self.Compet_view["columns"]=("0","1")
-        self.Compet_view.heading("#0",text="Catégorie")
-        self.Compet_view.heading("0",text="Nom")
-        self.Compet_view.heading("1",text="Effet")
-        self.Compet_view.column("#0",width=110)
-        self.Compet_view.column("0",width=200)
-        self.Compet_view.column("1",width=1000)
+        self.Compet_view["columns"] = ("0", "1")
+        self.Compet_view.heading("#0", text="Catégorie")
+        self.Compet_view.heading("0", text="Nom")
+        self.Compet_view.heading("1", text="Effet")
+        self.Compet_view.column("#0", width=110)
+        self.Compet_view.column("0", width=200)
+        self.Compet_view.column("1", width=1000)
         # les catégories
         for key in self.categlist:
-            self.Compet_view.insert("","end",key,text=key)
+            self.Compet_view.insert("", "end", key, text=key)
 
-        for key in ["Mains nues","Une main","Doubles","Deux mains","Bouclier"]:
-            self.Compet_view.insert("Mélée","end",key,text=key)
+        for key in ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]:
+            self.Compet_view.insert("Mélée", "end", key, text=key)
 
-        for key in ["Lancer","Arc","Arbalète"]:
-            self.Compet_view.insert("Jet","end",key,text=key)
+        for key in ["Lancer", "Arc", "Arbalète"]:
+            self.Compet_view.insert("Jet", "end", key, text=key)
 
-        self.Compet_view.grid(row=3,column=0,columnspan=5,pady="8p",sticky="w")
-        self.Compet_view.bind("<Button-1>",func=self.select_compet)
+        self.Compet_view.grid(row=3, column=0, columnspan=5, pady="8p", sticky="w")
+        self.Compet_view.bind("<Button-1>", func=self.select_compet)
 
-    def subcateg_roll(self,event=None):
+    def subcateg_roll(self, event=None):
         """ Méthode pour faire changer les sous-catégories proposées en fonction de la catégorie choisie """
-        val=self.Categ_entry.get()
+        val = self.Categ_entry.get()
 
-        if val =="Mélée":
-            self.Subcateg_entry["values"]=["Mains nues","Une main","Doubles","Deux mains","Bouclier"]
+        if val == "Mélée":
+            self.Subcateg_entry["values"] = ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]
             self.Subcateg_entry.current(0)
-            self.Subcateg_entry["state"]="readonly"
+            self.Subcateg_entry["state"] = "readonly"
 
-        elif val=="Jet":
-            self.Subcateg_entry["values"]=["Lancer","Arc","Arbalète"]
-            self.Subcateg_entry["state"]="readonly"
+        elif val == "Jet":
+            self.Subcateg_entry["values"] = ["Lancer", "Arc", "Arbalète"]
+            self.Subcateg_entry["state"] = "readonly"
             self.Subcateg_entry.current(0)
 
-        elif val=="Armure":
+        elif val == "Armure":
             self.Subcateg_entry.set("")
-            self.Subcateg_entry["values"]=[]
-            self.Subcateg_entry["state"]="disabled"
+            self.Subcateg_entry["values"] = []
+            self.Subcateg_entry["state"] = "disabled"
 
         else:
             self.Subcateg_entry.set("")
-            self.Subcateg_entry["values"]=[]
-            self.Subcateg_entry["state"]="disabled"
-
-
+            self.Subcateg_entry["values"] = []
+            self.Subcateg_entry["state"] = "disabled"
 
     def register(self):
         """ Méthode qui crée la nouvelle compétence """
-        new_compet=pc.Competence(self.Categ_entry.get(),self.Subcateg_entry.get(),self.Name_var.get(),self.Effect_entry.get(0.0,"end"))
+        new_compet = pc.Competence(self.Categ_entry.get(), self.Subcateg_entry.get(), self.Name_var.get(), self.Effect_entry.get(0.0, "end"))
 
         self.master.competlist.append(new_compet)
         if new_compet.subcateg:
-            self.Compet_view.insert(new_compet.subcateg,"end",(len(self.master.competlist)),values=[new_compet.name,new_compet.effect])
+            self.Compet_view.insert(new_compet.subcateg, "end", (len(self.master.competlist)), values=[new_compet.name, new_compet.effect])
         else:
-            self.Compet_view.insert(new_compet.categ,"end",(len(self.master.competlist)),values=[new_compet.name,new_compet.effect])
+            self.Compet_view.insert(new_compet.categ, "end", (len(self.master.competlist)), values=[new_compet.name, new_compet.effect])
 
     def refresh(self):
         """ Méthode qui rafraîchit la liste des compétences """
 
-        for key in ["Lore","Mains nues","Une main","Doubles","Deux mains","Bouclier","Lancer","Arc","Arbalète","Combat vétéran","Armure"]:
+        for key in ["Lore", "Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier", "Lancer", "Arc", "Arbalète", "Combat vétéran", "Armure"]:
             for i in self.Compet_view.get_children(key):
                 self.Compet_view.delete(i)
 
         if self.master.competlist:
-            i=1
+            i = 1
             for key in self.master.competlist:
                 if key.subcateg:
-                    self.Compet_view.insert(key.subcateg,"end",i,values=[key.name,key.effect])
+                    self.Compet_view.insert(key.subcateg, "end", i, values=[key.name, key.effect])
                 else:
-                    self.Compet_view.insert(key.categ,"end",i,values=[key.name,key.effect])
+                    self.Compet_view.insert(key.categ, "end", i, values=[key.name, key.effect])
 
-                i+=1
+                i += 1
 
     def select_compet(self,event):
         """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
         if self.Compet_view.identify_row(event.y):
 
             try:
-                self.selected_item=int(self.Compet_view.identify_row(event.y))
-                self.suppr_choice["state"]="normal"
+                self.selected_item = int(self.Compet_view.identify_row(event.y))
+                self.suppr_choice["state"] = "normal"
 
             except:
-                self.selected_item=None
-                self.suppr_choice["state"]="disabled"
+                self.selected_item = None
+                self.suppr_choice["state"] = "disabled"
 
         else:
-            self.selected_item=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_item = None
+            self.suppr_choice["state"] = "disabled"
 
     def suppr(self):
         """ Méthode qui supprime la compétence sélectionnée """
-        if type(self.selected_item)==int:
+        if type(self.selected_item) == int:
             self.master.competlist.pop(self.selected_item-1)
             self.refresh()
-            self.selected_item=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_item = None
+            self.suppr_choice["state"] = "disabled"
 
-    def grid(self,**kw):
-        Frame.grid(self,**kw)
+    def grid(self, **kw):
+        Frame.grid(self, **kw)
         self.refresh()
-
-
 
 
 class CharCompetFrame(Frame):
     """ Widget pour attribuer des compétences au personnage """
 
-    def __init__(self,master,**kw):
-        Frame.__init__(self,master,**kw)
-        self.selected_item=None
-        self.selected_charitem=None
-        self.modif_compet=None
-        self.categlist=["Lore","Mélée","Jet","Combat vétéran","Armure"]
-
+    def __init__(self, master, **kw):
+        Frame.__init__(self, master, **kw)
+        self.selected_item = None
+        self.selected_charitem = None
+        self.modif_compet = None
+        self.categlist = ["Lore", "Mélée", "Jet", "Combat vétéran", "Armure"]
 
         # les compétences du personnage
 

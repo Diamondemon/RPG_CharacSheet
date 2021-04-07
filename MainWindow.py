@@ -16,6 +16,7 @@ class CharMenu(QMenuBar):
 
     def __init__(self, master):
         QMenuBar.__init__(self, master)
+        self.addAction(self.tr("Accueil"), self.goto_home)
         self.menu_perso = self.addMenu(self.tr("Changer de perso"))
         self.action_create = QAction(self.tr("Créer"), self)
         self.menu_perso.addAction(self.action_create)
@@ -40,6 +41,14 @@ class CharMenu(QMenuBar):
     def goto_create(self):
         """ Envoie dans l'environnement de création de personnage"""
         self.parent().goto_create()
+
+    @Slot()
+    def goto_home(self):
+        """
+
+        :return: None
+        """
+        self.parent().goto_home()
 
     @Slot()
     def goto_other(self, number):
@@ -95,27 +104,61 @@ class UIWindow(QMainWindow):
         self.HFrame.charlist_reload()
 
     def generate(self, name: str, xp: int, mage: bool):
-        character = Pc.player(name, xp, mage)  # on crée un joueur avec le nom et l'xp donnés
+        character = Pc.player(name, xp, mage)  # create a character with the specified name and experience
         self.characlist.append(character)
         self.save_characlist()
         self.menubar.refresh()
-        print(character)
 
     def get_characlist(self):
+        """
+        Getter for the characlist attribute
+        :return: Reference to the list of characters
+        """
 
         return self.characlist
 
     def goto_create(self):
+        """
+        Method called to display the CharCFrame (character creator) as the central widget
+        :return: None
+        """
         self.takeCentralWidget()
         self.setCentralWidget(self.CCFrame)
 
+    def goto_home(self):
+        """
+        Method called to display the HomeFrame as the central widget
+        :return: None
+        """
+        self.takeCentralWidget()
+        self.setCentralWidget(self.HFrame)
+        self.HFrame.charlist_reload()
+
     def goto_modify(self):
+        """
+
+        :return: None
+        """
         pass
 
     def goto_suppr(self):
+        """
+
+        :return: None
+        """
         self.takeCentralWidget()
         self.setCentralWidget(self.CSFrame)
         self.CSFrame.refresh()
+
+    def import_char(self, characters_list: list[Pc.player]):
+        """
+        Method called to add characters to the list
+        :param characters_list: list of characters
+        :return: None
+        """
+        self.characlist += characters_list
+        self.save_characlist()
+        self.menubar.refresh()
 
     def pop(self, index: int):
         if index < len(self.characlist):

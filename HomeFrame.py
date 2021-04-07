@@ -15,8 +15,8 @@ class HomeFrame(QWidget):
 
         self.Char_create = QPushButton(self.tr("Créer un personnage"))  # bouton de création de personnage
         self.Char_import = QPushButton(self.tr("Importer un personnage"))  # bouton d'import de personnage
-        self.Char_modif = QPushButton(self.tr("Consulter le personnage"))  # bouton de consultation/modification de personnage
-        self.Char_export = QPushButton(self.tr("Exporter le personnage"))  # bouton de consultation/modification de personnage
+        self.Char_modif = QPushButton(self.tr("Consulter le personnage"))  # bouton de modification de personnage
+        self.Char_export = QPushButton(self.tr("Exporter le personnage"))  # bouton d'exportation de personnage
         self.Char_list = QListWidget()  # liste de choix du personnage à consulter
 
         self.grid.addWidget(self.Char_create, 0, 1)
@@ -29,43 +29,53 @@ class HomeFrame(QWidget):
         self.connect(self.Char_import, SIGNAL("clicked()"), self.import_char)
         self.connect(self.Char_modif, SIGNAL("clicked()"), self.modify_char)
         self.connect(self.Char_export, SIGNAL("clicked()"), self.export_char)
-        self.connect(self.Char_list, SIGNAL("itemDoubleClicked()"), self.modify_char) # QListWidgetItem *
+        self.connect(self.Char_list, SIGNAL("itemDoubleClicked()"), self.modify_char)  # QListWidgetItem *
 
     @Slot()
     def create_char(self):
-        """ Ouvre le panneau de création de personnage"""
+        """
+        Method called to open the pannel for creating characters
+        :return: None
+        """
         self.parent().goto_create()
 
     @Slot()
-    def modify_char(self, event=None):
-        """ Si un personnage a été sélectionné dans la liste, le définit comme personnage sélectionné
-        et ouvre le panneau de consultation de personnage, en fermant le panneau d'accueil """
-        if self.Char_list.curselection() != ():
-            self.set_selectedchar(self.Char_list.curselection()[0])  # le numéro du personnage dans la liste correspond au numéro du personnage sur l'affichage
-            for i in self.master.grid_slaves():
-                i.grid_forget()
+    def modify_char(self):
+        """
+        Method called to display the full characteristics of the selected character
+        :return: None
+        """
+        if self.Char_list.currentRow() != -1:
+            self.set_selectedchar(self.Char_list.currentRow())  # indexes in list and ListWidget are equal
             self.parent().goto_modify()
 
     @Slot()
     def import_char(self):
-        """ permet d'importer des personnages dans la liste """
+        """
+        Method called to import characters created by other users
+        :return: None
+        """
 
         # on demande le fichier de personnage à importer
         filenames = QFileDialog.getOpenFileNames(self, self.tr("Choisissez le fichier de personnage"),
                                                  path.dirname(__file__), self.tr("Tous fichiers (*)"))
-
-        if filenames:
+        if filenames[0]:
+            perso_list = []
             for filename in filenames[0]:
                 with open(filename, "rb") as fichier:
-                    # si le fichier importé est bien celui d'un personnage, on le stocke dans la liste des personnages
+                    # if file contains a character, it is added to the list in order to be imported
                     perso = pk.Unpickler(fichier).load()
                     if type(perso) == Pc.player:
-                        self.parent().characlist.append(perso)
+                        perso_list.append(perso)
+            self.parent().import_char(perso_list)
             self.charlist_reload()
-            self.parent().menubar.refresh()
 
     @Slot()
     def export_char(self):
+        """
+        Method called to export characters created to share them with other users
+        :return: None
+        """
         if self.Char_list.currentRow() != -1:
             perso = self.get_characlist()[self.Char_list.currentRow()]
             filename = QFileDialog.getSaveFileName(self, self.tr("Choisissez le fichier de personnage"),
@@ -78,14 +88,26 @@ class HomeFrame(QWidget):
                     pk.Pickler(fichier).dump(perso)
 
     def charlist_reload(self):
+        """
+        Method called to refresh the ListWidget
+        :return: None
+        """
         self.Char_list.clear()
         for i in self.get_characlist():
             self.Char_list.addItem(i.get_name())
 
     def set_selectedchar(self, number: int):
+        """
+        Method called to set the selected character for display, amongthe list
+        :param number: index of the character to load
+        :return: None
+        """
         self.parent().set_selectedchar(number)
 
     def get_characlist(self):
-        """Method to get the list of characters from the main window"""
+        """
+        Method to get the list of characters from the main window
+        :return: list of Pc.player
+        """
         return self.parent().get_characlist()
 
