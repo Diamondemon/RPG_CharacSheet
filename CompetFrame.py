@@ -1,5 +1,6 @@
 from PySide6.QtCore import Slot, SIGNAL
-from PySide6.QtWidgets import (QGridLayout, QWidget, QLabel, QComboBox, QLineEdit, QTextEdit, QPushButton, QTreeWidget, QTreeWidgetItem)
+from PySide6.QtWidgets import (QGridLayout, QWidget, QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton,
+                               QTreeWidget, QTreeWidgetItem)
 import Perso_class as Pc
 
 
@@ -22,9 +23,10 @@ class CompetCreatorFrame(QWidget):
         self.Categ_entry.addItems(self.categlist)
         self.Categ_entry.setCurrentIndex(0)
         self.Subcateg_entry = QComboBox()
+        self.Subcateg_entry.setEditable(False)
         self.Subcateg_entry.setDisabled(True)
         self.Name_entry = QLineEdit()
-        self.Effect_entry = QTextEdit()
+        self.Effect_entry = QPlainTextEdit()
 
         self.Register_choice = QPushButton(self.tr("Enregistrer"))
         self.suppr_choice = QPushButton(self.tr("Supprimer"))
@@ -37,7 +39,7 @@ class CompetCreatorFrame(QWidget):
         self.grid.addWidget(self.Register_choice, 1, 4, 2, 1)
         self.grid.addWidget(self.suppr_choice, 3, 5)
 
-        self.connect(self.Categ_entry, SIGNAL("activated()"), self.subcateg_roll)
+        self.connect(self.Categ_entry, SIGNAL("currentIndexChanged(int)"), self.subcateg_roll)
         self.connect(self.Register_choice, SIGNAL("clicked()"), self.register)
         self.connect(self.suppr_choice, SIGNAL("clicked()"), self.suppr)
 
@@ -46,60 +48,54 @@ class CompetCreatorFrame(QWidget):
         self.Compet_view.setHeaderLabels(["Catégorie", "Nom", "Effet"])
         self.grid.addWidget(self.Compet_view, 3, 0, 1, 5)
 
-        a = []
+        itemlist = []
         for key in self.categlist:
-            a.append(QTreeWidgetItem([key, "", ""]))
+            itemlist.append(QTreeWidgetItem([self.tr(key), "", ""]))
 
         for key in ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]:
-            a[1].addChild(QTreeWidgetItem([key, "", ""]))
+            itemlist[1].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
 
         for key in ["Lancer", "Arc", "Arbalète"]:
-            a[2].addChild(QTreeWidgetItem([key, "", ""]))
+            itemlist[2].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
 
-        self.Compet_view.addTopLevelItems(a)
-        """self.Compet_view.grid(row=3, column=0, columnspan=5, pady="8p", sticky="w")
+        self.Compet_view.addTopLevelItems(itemlist)
+        """
         self.Compet_view.bind("<Button-1>", func=self.select_compet)"""
 
     @Slot()
-    def subcateg_roll(self, event=None):
+    def subcateg_roll(self):
         """ Méthode pour faire changer les sous-catégories proposées en fonction de la catégorie choisie """
-        val = self.Categ_entry.get()
+        val = self.Categ_entry.currentText()
 
         if val == "Mélée":
-            self.Subcateg_entry["values"] = ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]
-            self.Subcateg_entry.current(0)
-            self.Subcateg_entry["state"] = "readonly"
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.addItems(["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"])
+            self.Subcateg_entry.setCurrentIndex(0)
+            self.Subcateg_entry.setDisabled(False)
 
         elif val == "Jet":
-            self.Subcateg_entry["values"] = ["Lancer", "Arc", "Arbalète"]
-            self.Subcateg_entry["state"] = "readonly"
-            self.Subcateg_entry.current(0)
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.addItems(["Lancer", "Arc", "Arbalète"])
+            self.Subcateg_entry.setCurrentIndex(0)
+            self.Subcateg_entry.setDisabled(False)
 
         elif val == "Armure":
-            self.Subcateg_entry.set("")
-            self.Subcateg_entry["values"] = []
-            self.Subcateg_entry["state"] = "disabled"
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.setDisabled(True)
 
         else:
-            self.Subcateg_entry.set("")
-            self.Subcateg_entry["values"] = []
-            self.Subcateg_entry["state"] = "disabled"
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.setDisabled(True)
 
     @Slot()
     def register(self):
         """ Méthode qui crée la nouvelle compétence """
-        new_compet = Pc.Competence(self.Categ_entry.get(), self.Subcateg_entry.get(), self.Name_entry.text(),
-                                   self.Effect_entry.get(0.0, "end"))
+        self.parent().generate_competence(self.Categ_entry.currentText(), self.Subcateg_entry.currentText(),
+                                          self.Name_entry.text(), self.Effect_entry.toPlainText())
 
-        self.parent().competlist.append(new_compet)
-        """if new_compet.subcateg:
-            self.Compet_view.insert(new_compet.subcateg, "end", (len(self.master.competlist)), values=[new_compet.name, new_compet.effect])
-        else:
-            self.Compet_view.insert(new_compet.categ, "end", (len(self.master.competlist)), values=[new_compet.name, new_compet.effect])"""
-
-    @Slot()
     def refresh(self):
         """ Méthode qui rafraîchit la liste des compétences """
+        pass
 
         """for key in ["Lore", "Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier", "Lancer", "Arc", "Arbalète", "Combat vétéran", "Armure"]:
             for i in self.Compet_view.get_children(key):
@@ -115,8 +111,11 @@ class CompetCreatorFrame(QWidget):
 
                 i += 1"""
 
-    def select_compet(self, event):
+    @Slot()
+    def select_compet(self):
         """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
+        pass
+
         """if self.Compet_view.identify_row(event.y):
 
             try:
@@ -131,6 +130,7 @@ class CompetCreatorFrame(QWidget):
             self.selected_item = None
             self.suppr_choice["state"] = "disabled"""""
 
+    @Slot()
     def suppr(self):
         """ Méthode qui supprime la compétence sélectionnée """
         if type(self.selected_item) == int:

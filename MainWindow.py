@@ -113,6 +113,11 @@ class UIWindow(QMainWindow):
         self.save_characlist()
         self.menubar.refresh()
 
+    def generate_competence(self, categ: str, subcateg: str, name: str, effect: str):
+        new_compet = Pc.Competence(categ, subcateg, name, effect)
+        self.competlist.append(new_compet)
+        self.save_competlist()
+
     def get_characlist(self):
         """
         Getter for the characlist attribute
@@ -120,6 +125,22 @@ class UIWindow(QMainWindow):
         """
 
         return self.characlist
+
+    def get_competlist(self):
+        """
+        Getter for the competlist attribute
+        :return: Reference to the list of competences
+        """
+
+        return self.competlist
+
+    def get_spelllist(self):
+        """
+        Getter for the spelllist attribute
+        :return: Reference to the list of spells
+        """
+
+        return self.spelllist
 
     def goto_compet(self):
         """
@@ -190,5 +211,9 @@ class UIWindow(QMainWindow):
         with open("characters", "wb") as fichier:
             pk.Pickler(fichier).dump(self.characlist)
 
-    def set_selectedchar(self, number):
+    def save_competlist(self):
+        with open("competences", "wb") as fichier:
+            pk.Pickler(fichier).dump(self.competlist)
+
+    def set_selectedchar(self, number: int):
         self.CDF.set_selectedchar(self.characlist[number])
