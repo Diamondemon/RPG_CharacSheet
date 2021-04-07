@@ -127,7 +127,7 @@ class UIWindow(QMainWindow):
         :return: None
         """
         self.takeCentralWidget()
-        self.setCentralWidget(self.CompetCFrame)
+        self.setCentralWidget(self.CompCFrame)
 
     def goto_create(self):
         """
