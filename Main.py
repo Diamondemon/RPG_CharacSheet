@@ -28,6 +28,6 @@ if __name__ == "__main__":
     window.show()
     sys.exit(app.exec_())
 
-""" window = UI_Window()
+    """window = UI_Window()
 
-window.mainloop()"""
+    window.mainloop()"""

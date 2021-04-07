@@ -7,6 +7,7 @@ import Perso_class as Pc
 import CharSFrame as CsF
 import CharCFrame as CcF
 import HomeFrame as Hf
+import CompetFrame as Cf
 
 
 # Fenêtre pricipale
@@ -35,7 +36,7 @@ class CharMenu(QMenuBar):
 
     @Slot()
     def goto_compet(self):
-        print("Panneau des compétences")
+        self.parent().goto_compet()
 
     @Slot()
     def goto_create(self):
@@ -99,6 +100,7 @@ class UIWindow(QMainWindow):
         self.HFrame = Hf.HomeFrame()
         self.CSFrame = CsF.CharSFrame()
         self.CCFrame = CcF.CharCFrame()
+        self.CoCFrame = Cf.CompetCreatorFrame()
 
         self.setCentralWidget(self.HFrame)
         self.HFrame.charlist_reload()
@@ -124,6 +126,14 @@ class UIWindow(QMainWindow):
         """
         self.takeCentralWidget()
         self.setCentralWidget(self.CCFrame)
+
+    def goto_compet(self):
+        """
+            Method called to display the CompetCreatorFrame (competence creator) as the central widget
+            :return: None
+        """
+        self.takeCentralWidget()
+        self.setCentralWidget(self.CoCFrame)
 
     def goto_home(self):
         """
