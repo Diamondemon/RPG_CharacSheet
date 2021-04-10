@@ -20,6 +20,7 @@ class CompetCreatorFrame(QWidget):
         self.grid.addWidget(QLabel(self.tr("Effets")), 1, 3)
 
         self.Categ_entry = QComboBox()
+        self.Categ_entry.setEditable(False)
         self.Categ_entry.addItems(self.categlist)
         self.Categ_entry.setCurrentIndex(0)
         self.Subcateg_entry = QComboBox()

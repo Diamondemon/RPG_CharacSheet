@@ -9,6 +9,7 @@ import CharCFrame as CcF
 import HomeFrame as Hf
 import CompetFrame as Cf
 import SpellFrame as Sf
+import CharDisplayFrame as CdF
 
 
 # Fenêtre pricipale
@@ -61,7 +62,7 @@ class CharMenu(QMenuBar):
 
     @Slot()
     def goto_spell(self):
-        print("Panneau des sorts")
+        self.parent().goto_spell()
 
     @Slot()
     def goto_suppr(self):
@@ -103,9 +104,11 @@ class UIWindow(QMainWindow):
         self.CCFrame = CcF.CharCFrame()
         self.CompCFrame = Cf.CompetCreatorFrame()
         self.SpellCFrame = Sf.SpellCreatorFrame()
+        self.CharDFrame = CdF.CharDisplayFrame()
 
         self.setCentralWidget(self.HFrame)
         self.HFrame.charlist_reload()
+
 
     def generate(self, name: str, xp: int, mage: bool):
         character = Pc.player(name, xp, mage)  # create a character with the specified name and experience
@@ -172,7 +175,9 @@ class UIWindow(QMainWindow):
 
         :return: None
         """
-        pass
+        self.takeCentralWidget()
+        self.setCentralWidget(self.CharDFrame)
+        self.CharDFrame.refresh()
 
     def goto_spell(self):
         """
@@ -216,4 +221,4 @@ class UIWindow(QMainWindow):
             pk.Pickler(fichier).dump(self.competlist)
 
     def set_selectedchar(self, number: int):
-        self.CDF.set_selectedchar(self.characlist[number])
+        self.CharDFrame.set_selectedchar(self.characlist[number])
