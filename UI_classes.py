@@ -563,8 +563,6 @@ class CharDefMFrame(Frame):
         return self.master.get_selectedchar()
 
 
-
-
 class CharPhyFrame(LabelFrame):
     """ Widget d'affichage des caractéristiques physiques du personnage"""
 

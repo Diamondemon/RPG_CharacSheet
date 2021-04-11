@@ -2,6 +2,7 @@ from PySide6.QtCore import SIGNAL
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
 import Perso_class as Pc
+from CharNotebook import CharNotebook
 
 
 class CharDisplayFrame(QWidget):
@@ -35,22 +36,20 @@ class CharDisplayFrame(QWidget):
         self.subFrame_1.connect(self.plus_xp, SIGNAL("clicked()"), self.add_xp)
         self.subFrame_1.connect(self.plus_GM, SIGNAL("clicked()"), self.add_GM)
 
+        self.grid.addWidget(self.subFrame_1, 0, 0, 1, 1)
+
         self.restat_choice = QPushButton(self.tr("Restat"))
         self.connect(self.restat_choice, SIGNAL("clicked()"), self.reinit_char)
-        self.grid.addWidget(self.restat_choice, 1, 0)
+        self.grid.addWidget(self.restat_choice, 1, 0, 2, 1)
         self.GM_restat_choice = QPushButton(self.tr("Restat MJ"))
         self.connect(self.GM_restat_choice, SIGNAL("clicked()"), self.GM_reinit_char)
-        self.grid.addWidget(self.GM_restat_choice, 2, 0)
+        self.grid.addWidget(self.GM_restat_choice, 2, 0, 2, 1)
 
-        self.grid.addWidget(self.subFrame_1, 0, 0)
+        """self.legal_scale = Scale(self.subFrame_1, label="Légal", orient="horizontal", from_=-50, to=50, length=150,
+                                 tickinterval=25, showvalue='yes', command=self.legal_onMove)"""
 
-
-        """
-        self.legal_scale = Scale(self.subFrame_1, label="Légal", orient="horizontal", from_=-50, to=50, length=150,
-                                 tickinterval=25, showvalue='yes', command=self.legal_onMove)
-
-
-        self.NBK = CharNotebook(self)"""
+        self.NBK = CharNotebook(self)
+        self.grid.addWidget(self.NBK, 0, 1, 5, 1)
 
     def refresh(self, event=None):
         self.subFrame_1.layout().addWidget(QLabel(str(self.selectedchar.get_name())), 0, 1)
@@ -93,3 +92,4 @@ class CharDisplayFrame(QWidget):
     def set_selectedchar(self, character):
         if type(character == Pc.player):
             self.selectedchar = character
+
