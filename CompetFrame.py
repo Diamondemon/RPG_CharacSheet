@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, SIGNAL
+from PySide6.QtCore import Slot, SIGNAL, Qt
 from PySide6.QtWidgets import (QGridLayout, QWidget, QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
 import Perso_class as Pc
@@ -46,22 +46,15 @@ class CompetCreatorFrame(QWidget):
 
         # les compétences qui existent déjà
         self.Compet_view = QTreeWidget()
-        self.Compet_view.setHeaderLabels(["Catégorie", "Nom", "Effet"])
+        self.Compet_view.setHeaderLabels(["Catégorie", "Nom", "Effet", "Id"])
+        self.Compet_view.hideColumn(3)
         self.grid.addWidget(self.Compet_view, 3, 0, 1, 5)
 
-        itemlist = []
-        for key in self.categlist:
-            itemlist.append(QTreeWidgetItem([self.tr(key), "", ""]))
+        self.connect(self.Compet_view, SIGNAL("itemSelectionChanged()"), self.select_compet)
 
-        for key in ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]:
-            itemlist[1].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
-
-        for key in ["Lancer", "Arc", "Arbalète"]:
-            itemlist[2].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
-
-        self.Compet_view.addTopLevelItems(itemlist)
         """
         self.Compet_view.bind("<Button-1>", func=self.select_compet)"""
+
 
     @Slot()
     def subcateg_roll(self):
@@ -91,51 +84,75 @@ class CompetCreatorFrame(QWidget):
     @Slot()
     def register(self):
         """ Méthode qui crée la nouvelle compétence """
-        self.parent().generate_competence(self.Categ_entry.currentText(), self.Subcateg_entry.currentText(),
-                                          self.Name_entry.text(), self.Effect_entry.toPlainText())
+        if self.Name_entry.text() and self.Effect_entry.toPlainText():
+            if self.Effect_entry.toPlainText().endswith("\n"):
+                text = self.Effect_entry.toPlainText()[:-1]
+            else:
+                text = self.Effect_entry.toPlainText()
+            self.parent().generate_competence(self.Categ_entry.currentText(), self.Subcateg_entry.currentText(),
+                                              self.Name_entry.text(), text)
+            self.refresh()
 
     def refresh(self):
-        """ Méthode qui rafraîchit la liste des compétences """
-        pass
+        """
+        Méthode qui rafraîchit la liste des compétences
+        :return: None
+        """
 
-        """for key in ["Lore", "Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier", "Lancer", "Arc", "Arbalète", "Combat vétéran", "Armure"]:
-            for i in self.Compet_view.get_children(key):
-                self.Compet_view.delete(i)
+        self.Compet_view.clear()
+        itemlist = []
+        for key in self.categlist:
+            itemlist.append(QTreeWidgetItem([self.tr(key), "", ""]))
 
-        if self.parent().competlist:
-            i = 1
-            for key in self.parent().competlist:
+        for key in ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]:
+            itemlist[1].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
+
+        for key in ["Lancer", "Arc", "Arbalète"]:
+            itemlist[2].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
+
+        self.Compet_view.addTopLevelItems(itemlist)
+
+        competlist = self.parent().get_competlist()
+        if competlist:
+            i = 0
+            for key in competlist:
+                super_tree_item = self.Compet_view.findItems(key.categ, Qt.MatchExactly, 0)[0]
                 if key.subcateg:
-                    self.Compet_view.insert(key.subcateg, "end", i, values=[key.name, key.effect])
-                else:
-                    self.Compet_view.insert(key.categ, "end", i, values=[key.name, key.effect])
+                    if key.categ == "Mélée":
+                        tree_item = super_tree_item.child(["Mains nues", "Une main", "Doubles", "Deux mains",
+                                                           "Bouclier"].index(key.subcateg))
+                    else:
+                        tree_item = super_tree_item.child(["Lancer", "Arc", "Arbalète"].index(key.subcateg))
 
-                i += 1"""
+                    tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+                else:
+                    super_tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+                i += 1
+        self.Compet_view.expandAll()
 
     @Slot()
     def select_compet(self):
         """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
-        pass
+        selected_items = self.Compet_view.selectedItems()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            if item.text(3):
+                try:
+                    self.selected_item = int(item.text(3))
+                    self.suppr_choice.setDisabled(False)
 
-        """if self.Compet_view.identify_row(event.y):
+                except ValueError:
+                    self.selected_item = None
+                    self.suppr_choice.setDisabled(True)
 
-            try:
-                self.selected_item = int(self.Compet_view.identify_row(event.y))
-                self.suppr_choice["state"] = "normal"
-
-            except:
+            else:
                 self.selected_item = None
-                self.suppr_choice["state"] = "disabled"
-
-        else:
-            self.selected_item = None
-            self.suppr_choice["state"] = "disabled"""""
+                self.suppr_choice.setDisabled(True)
 
     @Slot()
     def suppr(self):
         """ Méthode qui supprime la compétence sélectionnée """
         if type(self.selected_item) == int:
-            self.parent().competlist.pop(self.selected_item-1)
-            self.refresh()
+            self.parent().pop_compet(self.selected_item)
             self.selected_item = None
-            self.suppr_choice["state"] = "disabled"
+            self.suppr_choice.setDisabled(True)

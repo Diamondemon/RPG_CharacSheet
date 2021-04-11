@@ -109,7 +109,6 @@ class UIWindow(QMainWindow):
         self.setCentralWidget(self.HFrame)
         self.HFrame.charlist_reload()
 
-
     def generate(self, name: str, xp: int, mage: bool):
         character = Pc.player(name, xp, mage)  # create a character with the specified name and experience
         self.characlist.append(character)
@@ -152,6 +151,7 @@ class UIWindow(QMainWindow):
         """
         self.takeCentralWidget()
         self.setCentralWidget(self.CompCFrame)
+        self.CompCFrame.refresh()
 
     def goto_create(self):
         """
@@ -211,6 +211,12 @@ class UIWindow(QMainWindow):
             self.characlist.pop(index)
             self.save_characlist()
             self.menubar.refresh()
+
+    def pop_compet(self, index: int):
+        if index < len(self.competlist):
+            self.competlist.pop(index)
+            self.save_competlist()
+            self.CompCFrame.refresh()
 
     def save_characlist(self):
         with open("characters", "wb") as fichier:

@@ -29,7 +29,7 @@ class HomeFrame(QWidget):
         self.connect(self.Char_import, SIGNAL("clicked()"), self.import_char)
         self.connect(self.Char_modif, SIGNAL("clicked()"), self.modify_char)
         self.connect(self.Char_export, SIGNAL("clicked()"), self.export_char)
-        self.connect(self.Char_list, SIGNAL("itemDoubleClicked()"), self.modify_char)  # QListWidgetItem *
+        self.connect(self.Char_list, SIGNAL("itemDoubleClicked(QListWidgetItem *)"), self.modify_char)
 
     @Slot()
     def create_char(self):
