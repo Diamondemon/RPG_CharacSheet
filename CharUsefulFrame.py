@@ -7,6 +7,9 @@ from CharStealthFrame import CharStealthFrame
 from CharHiddenFrame import CharHiddenFrame
 from CharUseCompetFrame import CharUseCompetFrame
 from CharMelFrame import CharMelFrame
+from CharThrFrame import CharThrFrame
+from CharArmFrame import CharArmFrame
+from CharPercFrame import CharPercFrame
 
 
 class CharUsefulFrame(QWidget):
@@ -15,6 +18,8 @@ class CharUsefulFrame(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
         self.grid = QGridLayout(self)
+        self.setMinimumHeight(900)
+        self.setMinimumWidth(1000)
 
         self.CharFSymF = CharFirstSymbFrame(self)
         self.grid.addWidget(self.CharFSymF, 0, 0)
@@ -37,18 +42,18 @@ class CharUsefulFrame(QWidget):
         self.grid.addWidget(separator, 0, 3, 9, 1)
 
         self.CharMelF = CharMelFrame(self)
-        self.grid.addWidget(self.CharUCompF, 0, 4, 2, 1)
+        self.grid.addWidget(self.CharMelF, 0, 4, 2, 1)
 
-        """self.CharThrF = CharThrFrame(self, text=" Jet ")
-        self.CharThrF.grid(row=2, column=4, sticky="we", padx="4p", ipadx='2p', ipady='2p')
+        self.CharThrF = CharThrFrame(self)
+        self.grid.addWidget(self.CharThrF, 2, 4, 2, 1)
 
-        self.CharArmF = CharArmFrame(self, text=" Armure ")
-        self.CharArmF.grid(row=3, column=4, sticky="we", padx="4p", ipadx='2p', ipady='2p', rowspan=3)
+        self.CharArmF = CharArmFrame(self)
+        self.grid.addWidget(self.CharArmF, 4, 4, 2, 1)
 
-        self.PercFrame = CharPercFrame(self, text=" Pourcentages ", relief="groove")
-        self.PercFrame.grid(row=6, column=4, padx="4p", pady="4p", sticky="we")
+        self.PercFrame = CharPercFrame(self)
+        self.grid.addWidget(self.PercFrame, 6, 4, 2, 1)
 
-        self.bind("<Visibility>", func=self.refresh)"""
+        """self.bind("<Visibility>", func=self.refresh)"""
 
     def refresh(self, event=None):
         self.CharFSymF.refresh()

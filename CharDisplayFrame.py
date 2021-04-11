@@ -15,6 +15,7 @@ class CharDisplayFrame(QWidget):
         self.selectedchar = None
         self.selected = ""  # Partie des caractéristiques sélectionnée
         self.subFrame_1 = QWidget(self)
+        self.subFrame_1.setMaximumWidth(250)
         self.subFrame_1.setLayout(QGridLayout(self))
         self.subFrame_1.layout().addWidget(QLabel(self.tr("Personnage")), 0, 0)
         self.subFrame_1.layout().addWidget(QLabel(self.tr("Xp totale")), 1, 0)

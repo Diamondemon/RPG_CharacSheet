@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (QGroupBox, QGridLayout)
+from PySide6.QtGui import QPixmap
 
 
 class CharMelFrame(QGroupBox):
@@ -8,19 +9,20 @@ class CharMelFrame(QGroupBox):
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 
-        """self.mastery_image = ImageTk.PhotoImage(Image.open("Images/symb-mastery.png").resize((10, 10), Image.ANTIALIAS))
+        self.mastery_image = QPixmap("./Images/symb-perception.png")
+        self.mastery_image = self.mastery_image.scaled(10, 10)
 
-        for i in range(1, 9):
-            self.grid_columnconfigure(i, weight=1)
+        """for i in range(1, 9):
+            self.grid_columnconfigure(i, weight=1)"""
 
     def refresh(self):
-        "" Fonction pour rafraîchir les équipements de mélée du personnage ""
+        """ Fonction pour rafraîchir les équipements de mélée du personnage """
         Meleelist = ["dgt_tr", "dgt_ctd", "estoc", "vit", "mastery", "quality", "solid"]
         Shieldlist = ["close", "dist", "mobi", "vit", "mastery", "quality", "solid"]
         for i in self.grid_slaves():
             i.destroy()
 
-        i = 1
+        """i = 1
         # si l'objet est équipé, on met ses caractéristiques, sinon, on met des "..."
         # disjonction de cas si c'est une arme ou un bouclier
         if self.master.master.master.selectedchar.playerequipment["left_melee"]:
@@ -212,7 +214,7 @@ class CharMelFrame(QGroupBox):
             else:
                 for i in range(1, 9):
                     Label(self, text="...").grid(row=3, column=i)
-                    Label(self, text="...").grid(row=4, column=i)
+                    Label(self, text="...").grid(row=4, column=i)"""
 
     def up_mastery(self, where, number):
         self.master.master.master.selectedchar.playerequipment[where + "_melee"].upmastery(number)
@@ -225,4 +227,4 @@ class CharMelFrame(QGroupBox):
             self.master.master.master.selectedchar.get_weapon(where, "melee").get_stats_aslist(["mastery"])[0])
 
     def get_selectedchar(self):
-        return self.master.get_selectedchar()"""
+        return self.master.get_selectedchar()
