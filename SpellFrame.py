@@ -69,7 +69,6 @@ class SpellCreatorFrame(QWidget):
 
         """self.Spell_view.bind("<Button-1>", func=self.select_spell)"""
 
-
     def register(self):
         """ Méthode qui crée le nouveau sort """
         new_spell = Pc.Spell(self.Elem_entry.get(), self.Subcateg_entry.get(), self.Name_entry.text(), self.Effect_entry.get(0.0, "end"), self.Description_entry.get(0.0, "end"), self.Cost_entry.text())
