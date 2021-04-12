@@ -2,6 +2,7 @@ from PySide6.QtCore import SIGNAL, Qt, Slot
 from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
+import MW
 
 
 class SpellCreatorFrame(QWidget):
@@ -63,15 +64,19 @@ class SpellCreatorFrame(QWidget):
 
         self.connect(self.Spell_view, SIGNAL("itemSelectionChanged()"), self.select_spell)
 
+    def parent(self) -> MW.UIWindow:
+
+        return QWidget.parent(self)
+
     @Slot()
     def register(self):
         """
         Méthode qui crée le nouveau sort
         :return: None
         """
-        self.parent().generate_spelllist(self.Elem_entry.currentText(), self.Subcateg_entry.currentText(),
-                                         self.Name_entry.text(), self.Effect_entry.toPlainText(),
-                                         self.Description_entry.toPlainText(), self.Cost_entry.text())
+        self.parent().generate_spell(self.Elem_entry.currentText(), self.Subcateg_entry.currentText(),
+                                     self.Name_entry.text(), self.Effect_entry.toPlainText(),
+                                     self.Description_entry.toPlainText(), self.Cost_entry.text())
 
         key = self.parent().get_spelllist()[-1]
         i = len(self.parent().get_spelllist()) - 1

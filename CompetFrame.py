@@ -1,6 +1,7 @@
 from PySide6.QtCore import Slot, SIGNAL, Qt
 from PySide6.QtWidgets import (QGridLayout, QWidget, QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
+import MW
 
 
 class CompetCreatorFrame(QWidget):
@@ -50,6 +51,10 @@ class CompetCreatorFrame(QWidget):
         self.grid.addWidget(self.Compet_view, 3, 0, 1, 5)
 
         self.connect(self.Compet_view, SIGNAL("itemSelectionChanged()"), self.select_compet)
+
+    def parent(self) -> MW.UIWindow:
+
+        return QWidget.parent(self)
 
     def refresh(self):
         """
