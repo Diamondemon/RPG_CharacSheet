@@ -8,7 +8,7 @@ import Perso_class as Pc
 
 
 class HomeFrame(QWidget):
-    """ Widget to create a new character """
+    """ Widget to select and manage characters """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -36,6 +36,7 @@ class HomeFrame(QWidget):
     def charlist_reload(self):
         """
         Method called to refresh the ListWidget
+
         :return: None
         """
         self.Char_list.clear()
@@ -45,7 +46,8 @@ class HomeFrame(QWidget):
     @Slot()
     def create_char(self):
         """
-        Method called to open the pannel for creating characters
+        Slot called to open the pannel for creating characters
+
         :return: None
         """
         self.parent().goto_create()
@@ -53,7 +55,8 @@ class HomeFrame(QWidget):
     @Slot()
     def export_char(self):
         """
-        Method called to export characters created to share them with other users
+        Slot called to export characters created to share them with other users
+
         :return: None
         """
         if self.Char_list.currentRow() != -1:
@@ -69,7 +72,8 @@ class HomeFrame(QWidget):
 
     def get_characlist(self):
         """
-        Method to get the list of characters from the main window
+        Method to get the list of characters from the main window*
+
         :return: list of Pc.player
         """
         return self.parent().get_characlist()
@@ -77,7 +81,8 @@ class HomeFrame(QWidget):
     @Slot()
     def import_char(self):
         """
-        Method called to import characters created by other users
+        Slot called to import characters created by other users
+
         :return: None
         """
 
@@ -98,7 +103,8 @@ class HomeFrame(QWidget):
     @Slot()
     def modify_char(self):
         """
-        Method called to display the full characteristics of the selected character
+        Slot called to display the full characteristics of the selected character
+
         :return: None
         """
         if self.Char_list.currentRow() != -1:
@@ -106,12 +112,17 @@ class HomeFrame(QWidget):
             self.parent().goto_modify()
 
     def parent(self) -> MW.UIWindow:
+        """
+        Method called to get the parent widget (the main window)
 
+        :return: the reference to the parent
+        """
         return QWidget.parent(self)
 
     def set_selectedchar(self, number: int):
         """
         Method called to set the selected character for display, amongthe list
+
         :param number: index of the character to load
         :return: None
         """

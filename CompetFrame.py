@@ -53,12 +53,17 @@ class CompetCreatorFrame(QWidget):
         self.connect(self.Compet_view, SIGNAL("itemSelectionChanged()"), self.select_compet)
 
     def parent(self) -> MW.UIWindow:
+        """
+        Method called to get the parent widget (the main window)
 
+        :return: the reference to the parent
+        """
         return QWidget.parent(self)
 
     def refresh(self):
         """
         Méthode qui rafraîchit la liste des compétences
+
         :return: None
         """
 
@@ -97,6 +102,7 @@ class CompetCreatorFrame(QWidget):
     def register(self):
         """
         Méthode qui crée la nouvelle compétence
+
         :return: None
         """
         if self.Name_entry.text() and self.Effect_entry.toPlainText():
@@ -125,6 +131,7 @@ class CompetCreatorFrame(QWidget):
     def select_compet(self):
         """
         Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin
+
         :return: None
         """
         selected_items = self.Compet_view.selectedItems()
@@ -146,7 +153,8 @@ class CompetCreatorFrame(QWidget):
     @Slot()
     def subcateg_roll(self):
         """
-        Méthode pour faire changer les sous-catégories proposées en fonction de la catégorie choisie
+        Slot called to change proposed subcategories according to the selected category
+
         :return: None
         """
         val = self.Categ_entry.currentText()
@@ -174,7 +182,8 @@ class CompetCreatorFrame(QWidget):
     @Slot()
     def suppr(self):
         """
-        Méthode qui supprime la compétence sélectionnée
+        Slot called to delete the selected spell
+
         :return: None
         """
         if type(self.selected_item) == int:

@@ -65,13 +65,18 @@ class SpellCreatorFrame(QWidget):
         self.connect(self.Spell_view, SIGNAL("itemSelectionChanged()"), self.select_spell)
 
     def parent(self) -> MW.UIWindow:
+        """
+        Method called to get the parent widget (the main window)
 
+        :return: the reference to the parent
+        """
         return QWidget.parent(self)
 
     @Slot()
     def register(self):
         """
         Méthode qui crée le nouveau sort
+
         :return: None
         """
         self.parent().generate_spell(self.Elem_entry.currentText(), self.Subcateg_entry.currentText(),
@@ -87,9 +92,9 @@ class SpellCreatorFrame(QWidget):
     def refresh(self):
         """
         Méthode qui rafraîchit la liste des sorts
+
         :return: None
         """
-
         self.Spell_view.clear()
         itemlist = []
         for key in self.elemlist:
@@ -116,9 +121,9 @@ class SpellCreatorFrame(QWidget):
     def select_spell(self):
         """
         Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin
+
         :return: None
         """
-
         selected_items = self.Spell_view.selectedItems()
         if len(selected_items) == 1:
             item = selected_items[0]
@@ -139,6 +144,7 @@ class SpellCreatorFrame(QWidget):
     def suppr(self):
         """
         Méthode qui supprime la compétence sélectionnée
+
         :return: None
         """
         if type(self.selected_item) == int:
