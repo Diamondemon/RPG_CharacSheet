@@ -1,6 +1,6 @@
 from PySide6.QtCore import SIGNAL
-from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
-                               QTreeWidget, QTreeWidgetItem)
+from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QSlider, QComboBox, QPushButton)
+from PySide6.QtGui import Qt
 import Perso_class as Pc
 from CharNotebook import CharNotebook
 
@@ -31,6 +31,12 @@ class CharDisplayFrame(QWidget):
         self.New_GM = QLineEdit()
         self.New_GM.setText("0")
         self.subFrame_1.layout().addWidget(self.New_GM, 8, 0)
+        self.subFrame_1.layout().addWidget(QLabel(self.tr("Légal")), 9, 0)
+        self.legal_scale = QSlider(Qt.Horizontal)
+        self.legal_scale.setRange(-50, 50)
+        self.legal_scale.setSingleStep(25)
+        self.legal_scale.setValue(17)
+        self.subFrame_1.layout().addWidget(self.legal_scale, 10, 0, 1, 2)
 
         self.plus_xp = QPushButton(self.tr("+"))
         self.plus_GM = QPushButton(self.tr("+"))
@@ -46,8 +52,6 @@ class CharDisplayFrame(QWidget):
         self.connect(self.GM_restat_choice, SIGNAL("clicked()"), self.GM_reinit_char)
         self.grid.addWidget(self.GM_restat_choice, 2, 0, 2, 1)
 
-        """self.legal_scale = Scale(self.subFrame_1, label="Légal", orient="horizontal", from_=-50, to=50, length=150,
-                                 tickinterval=25, showvalue='yes', command=self.legal_onMove)"""
 
         self.NBK = CharNotebook(self)
         self.grid.addWidget(self.NBK, 0, 1, 5, 1)
@@ -65,7 +69,7 @@ class CharDisplayFrame(QWidget):
         self.subFrame_1.layout().addWidget(self.plus_xp, 5, 1)
         self.subFrame_1.layout().addWidget(self.plus_GM, 8, 1)
         """self.legal_scale.set(self.selectedchar.passivestats["legal"][0])
-        self.legal_scale.grid(row=9, column=0, columnspan=2)
+        self.legal_scale.grid(row=10, column=0, columnspan=2)
         self.NBK.CharCF.BNDL.SYM.refresh()"""
 
     def legal_onMove(self, value):
