@@ -21,6 +21,9 @@ class UIWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.titre = "Solo Leveling"
+        # maxheight = self.screen().availableSize().height()
+        # print(maxheight)
+        # self.setMaximumHeight(maxheight)
 
         with open("characters", "rb") as fichier:
             self.characlist = pk.Unpickler(fichier).load()

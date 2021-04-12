@@ -1,8 +1,9 @@
-from PySide6.QtCore import SIGNAL
-from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QSlider, QComboBox, QPushButton)
-from PySide6.QtGui import Qt
+from PySide6.QtCore import SIGNAL, Slot
+from PySide6.QtWidgets import (QWidget, QGridLayout, QPushButton)
 import Perso_class as Pc
 from CharNotebook import CharNotebook
+from CharBaseFrame import CharBaseFrame
+import MW
 
 
 class CharDisplayFrame(QWidget):
@@ -12,89 +13,71 @@ class CharDisplayFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
-        self.selectedchar = None
+        self.selectedchar: Pc.player = None
         self.selected = ""  # Partie des caractéristiques sélectionnée
-        self.subFrame_1 = QWidget(self)
-        self.subFrame_1.setMaximumWidth(250)
-        self.subFrame_1.setLayout(QGridLayout(self))
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Personnage")), 0, 0)
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Xp totale")), 1, 0)
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Xp restante")), 2, 0)
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Force")), 3, 0)
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Gagner de l'xp")), 4, 0)
-        self.New_xp = QLineEdit()
-        self.New_xp.setText("0")
-        self.subFrame_1.layout().addWidget(self.New_xp, 5, 0)
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Gain MJ")), 6, 0)
-        self.GM_wheel = QComboBox()
-        self.GM_wheel.setEditable(False)
-        self.New_GM = QLineEdit()
-        self.New_GM.setText("0")
-        self.subFrame_1.layout().addWidget(self.New_GM, 8, 0)
-        self.subFrame_1.layout().addWidget(QLabel(self.tr("Légal")), 9, 0)
-        self.legal_scale = QSlider(Qt.Horizontal)
-        self.legal_scale.setRange(-50, 50)
-        self.legal_scale.setSingleStep(25)
-        self.legal_scale.setValue(17)
-        self.subFrame_1.layout().addWidget(self.legal_scale, 10, 0, 1, 2)
 
-        self.plus_xp = QPushButton(self.tr("+"))
-        self.plus_GM = QPushButton(self.tr("+"))
-        self.subFrame_1.connect(self.plus_xp, SIGNAL("clicked()"), self.add_xp)
-        self.subFrame_1.connect(self.plus_GM, SIGNAL("clicked()"), self.add_GM)
+        self.baseFrame = CharBaseFrame()
 
-        self.grid.addWidget(self.subFrame_1, 0, 0, 1, 1)
+        self.connect(self.baseFrame.get_plus_xp(), SIGNAL("clicked()"), self.add_xp)
+        self.connect(self.baseFrame.get_plus_gm(), SIGNAL("clicked()"), self.add_GM)
+
+        self.grid.addWidget(self.baseFrame, 0, 0, 1, 1)
 
         self.restat_choice = QPushButton(self.tr("Restat"))
         self.connect(self.restat_choice, SIGNAL("clicked()"), self.reinit_char)
-        self.grid.addWidget(self.restat_choice, 1, 0, 2, 1)
+        self.grid.addWidget(self.restat_choice, 1, 0)
+
         self.GM_restat_choice = QPushButton(self.tr("Restat MJ"))
         self.connect(self.GM_restat_choice, SIGNAL("clicked()"), self.GM_reinit_char)
-        self.grid.addWidget(self.GM_restat_choice, 2, 0, 2, 1)
-
+        self.grid.addWidget(self.GM_restat_choice, 2, 0)
 
         self.NBK = CharNotebook(self)
-        self.grid.addWidget(self.NBK, 0, 1, 5, 1)
+        self.grid.addWidget(self.NBK, 0, 1, 3, 1)
 
-    def refresh(self, event=None):
-        self.subFrame_1.layout().addWidget(QLabel(str(self.selectedchar.get_name())), 0, 1)
-        self.subFrame_1.layout().addWidget(QLabel(str(self.selectedchar.totalxp)), 1, 1)
-        self.subFrame_1.layout().addWidget(QLabel(str(self.selectedchar.xp)), 2, 1)
-        self.subFrame_1.layout().addWidget(QLabel(str(self.selectedchar.secondstats["symb-strength"][0]) + "/" + str(
-            self.selectedchar.secondstats["symb-strength"][1]) + " (" + str(
-            self.selectedchar.secondstats["symb-strength"][2]) + ")"), 3, 1)
-        self.GM_wheel.addItems(list(self.selectedchar.GMstats.keys()))
-        self.GM_wheel.setCurrentIndex(0)
-        self.subFrame_1.layout().addWidget(self.GM_wheel, 7, 0, 1, 2)
-        self.subFrame_1.layout().addWidget(self.plus_xp, 5, 1)
-        self.subFrame_1.layout().addWidget(self.plus_GM, 8, 1)
-        """self.legal_scale.set(self.selectedchar.passivestats["legal"][0])
-        self.legal_scale.grid(row=10, column=0, columnspan=2)
-        self.NBK.CharCF.BNDL.SYM.refresh()"""
+    @Slot()
+    def add_GM(self):
+        self.selectedchar.GM_gain(self.baseFrame.get_gmwheel_text(), self.baseFrame.get_new_gm())
+        self.baseFrame.refresh(self.selectedchar)
+        self.parent().save_characlist()
 
-    def legal_onMove(self, value):
-        self.selectedchar.change_passive("legal", int(value))
-
-    def add_xp(self, event=None):
-        self.selectedchar.upxp(int(self.New_xp.text()))
-        self.refresh()
-
-    def add_GM(self, event=None):
-        self.selectedchar.GM_gain(self.GM_wheel.currentText(), int(self.New_GM.text()))
-        self.refresh()
-
-    def reinit_char(self):
-        self.selectedchar.clearstats()
-        self.NBK.refresh()
+    @Slot()
+    def add_xp(self):
+        self.selectedchar.upxp(self.baseFrame.get_new_xp())
+        self.baseFrame.refresh(self.selectedchar)
+        self.parent().save_characlist()
 
     def get_selectedchar(self):
         return self.selectedchar
 
     def GM_reinit_char(self):
         self.selectedchar.GM_clearstats()
+        self.parent().save_characlist()
         self.NBK.refresh()
 
-    def set_selectedchar(self, character):
-        if type(character == Pc.player):
-            self.selectedchar = character
+    def legal_onMove(self, value: int):
+        self.selectedchar.change_passive("legal", value)
+        self.parent().save_characlist()
 
+    def parent(self) -> MW.UIWindow:
+        """
+        Method called to get the parent widget (the main window)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)
+
+    def refresh(self):
+
+        if self.selectedchar:
+            self.baseFrame.refresh(self.selectedchar)
+            """self.legal_scale.set(self.selectedchar.passivestats["legal"][0])
+            self.legal_scale.grid(row=10, column=0, columnspan=2)
+            self.NBK.CharCF.BNDL.SYM.refresh()"""
+
+    def reinit_char(self):
+        self.selectedchar.clearstats()
+        self.parent().save_characlist()
+        # self.NBK.refresh()
+
+    def set_selectedchar(self, character: Pc.player):
+        self.selectedchar = character
