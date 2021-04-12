@@ -51,43 +51,6 @@ class CompetCreatorFrame(QWidget):
 
         self.connect(self.Compet_view, SIGNAL("itemSelectionChanged()"), self.select_compet)
 
-    @Slot()
-    def subcateg_roll(self):
-        """ Méthode pour faire changer les sous-catégories proposées en fonction de la catégorie choisie """
-        val = self.Categ_entry.currentText()
-
-        if val == "Mélée":
-            self.Subcateg_entry.clear()
-            self.Subcateg_entry.addItems(["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"])
-            self.Subcateg_entry.setCurrentIndex(0)
-            self.Subcateg_entry.setDisabled(False)
-
-        elif val == "Jet":
-            self.Subcateg_entry.clear()
-            self.Subcateg_entry.addItems(["Lancer", "Arc", "Arbalète"])
-            self.Subcateg_entry.setCurrentIndex(0)
-            self.Subcateg_entry.setDisabled(False)
-
-        elif val == "Armure":
-            self.Subcateg_entry.clear()
-            self.Subcateg_entry.setDisabled(True)
-
-        else:
-            self.Subcateg_entry.clear()
-            self.Subcateg_entry.setDisabled(True)
-
-    @Slot()
-    def register(self):
-        """ Méthode qui crée la nouvelle compétence """
-        if self.Name_entry.text() and self.Effect_entry.toPlainText():
-            if self.Effect_entry.toPlainText().endswith("\n"):
-                text = self.Effect_entry.toPlainText()[:-1]
-            else:
-                text = self.Effect_entry.toPlainText()
-            self.parent().generate_competence(self.Categ_entry.currentText(), self.Subcateg_entry.currentText(),
-                                              self.Name_entry.text(), text)
-            self.refresh()
-
     def refresh(self):
         """
         Méthode qui rafraîchit la liste des compétences
@@ -126,8 +89,39 @@ class CompetCreatorFrame(QWidget):
         self.Compet_view.expandAll()
 
     @Slot()
+    def register(self):
+        """
+        Méthode qui crée la nouvelle compétence
+        :return: None
+        """
+        if self.Name_entry.text() and self.Effect_entry.toPlainText():
+            if self.Effect_entry.toPlainText().endswith("\n"):
+                text = self.Effect_entry.toPlainText()[:-1]
+            else:
+                text = self.Effect_entry.toPlainText()
+            self.parent().generate_competence(self.Categ_entry.currentText(), self.Subcateg_entry.currentText(),
+                                              self.Name_entry.text(), text)
+
+            key = self.parent().get_competlist()[-1]
+            i = len(self.parent().get_competlist()) - 1
+            super_tree_item = self.Compet_view.findItems(key.categ, Qt.MatchExactly, 0)[0]
+            if key.subcateg:
+                if key.categ == "Mélée":
+                    tree_item = super_tree_item.child(["Mains nues", "Une main", "Doubles", "Deux mains",
+                                                       "Bouclier"].index(key.subcateg))
+                else:
+                    tree_item = super_tree_item.child(["Lancer", "Arc", "Arbalète"].index(key.subcateg))
+
+                tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+            else:
+                super_tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+
+    @Slot()
     def select_compet(self):
-        """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
+        """
+        Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin
+        :return: None
+        """
         selected_items = self.Compet_view.selectedItems()
         if len(selected_items) == 1:
             item = selected_items[0]
@@ -145,9 +139,41 @@ class CompetCreatorFrame(QWidget):
                 self.suppr_choice.setDisabled(True)
 
     @Slot()
+    def subcateg_roll(self):
+        """
+        Méthode pour faire changer les sous-catégories proposées en fonction de la catégorie choisie
+        :return: None
+        """
+        val = self.Categ_entry.currentText()
+
+        if val == "Mélée":
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.addItems(["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"])
+            self.Subcateg_entry.setCurrentIndex(0)
+            self.Subcateg_entry.setDisabled(False)
+
+        elif val == "Jet":
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.addItems(["Lancer", "Arc", "Arbalète"])
+            self.Subcateg_entry.setCurrentIndex(0)
+            self.Subcateg_entry.setDisabled(False)
+
+        elif val == "Armure":
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.setDisabled(True)
+
+        else:
+            self.Subcateg_entry.clear()
+            self.Subcateg_entry.setDisabled(True)
+
+    @Slot()
     def suppr(self):
-        """ Méthode qui supprime la compétence sélectionnée """
+        """
+        Méthode qui supprime la compétence sélectionnée
+        :return: None
+        """
         if type(self.selected_item) == int:
             self.parent().pop_compet(self.selected_item)
             self.selected_item = None
             self.suppr_choice.setDisabled(True)
+            self.refresh()

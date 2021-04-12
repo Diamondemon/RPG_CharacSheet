@@ -1,7 +1,7 @@
-from PySide6.QtCore import SIGNAL
+from PySide6.QtCore import SIGNAL, Qt, Slot
+from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
-import Perso_class as Pc
 
 
 class SpellCreatorFrame(QWidget):
@@ -37,6 +37,7 @@ class SpellCreatorFrame(QWidget):
         self.Description_entry = QPlainTextEdit()
         self.Cost_entry = QLineEdit()
         self.Cost_entry.setText("0")
+        self.Cost_entry.setValidator(QIntValidator(0, 9999, self))
 
         self.Register_choice = QPushButton(self.tr("Enregistrer"))
         self.Suppr_choice = QPushButton(self.tr("Supprimer"))
@@ -55,62 +56,88 @@ class SpellCreatorFrame(QWidget):
         self.connect(self.Suppr_choice, SIGNAL("clicked()"), self.suppr)
 
         self.Spell_view = QTreeWidget()
-        self.Spell_view.setHeaderLabels(["Elément", "Effet", "Description", "Coût"])
+        self.Spell_view.setHeaderLabels([self.tr("Elément"), self.tr("Nom"), self.tr("Effet"), self.tr("Description"),
+                                         self.tr("Coût"), self.tr("Id")])
+        self.Spell_view.hideColumn(5)
         self.grid.addWidget(self.Spell_view, 5, 0, 1, 4)
 
+        self.connect(self.Spell_view, SIGNAL("itemSelectionChanged()"), self.select_spell)
+
+    @Slot()
+    def register(self):
+        """
+        Méthode qui crée le nouveau sort
+        :return: None
+        """
+        self.parent().generate_spelllist(self.Elem_entry.currentText(), self.Subcateg_entry.currentText(),
+                                         self.Name_entry.text(), self.Effect_entry.toPlainText(),
+                                         self.Description_entry.toPlainText(), self.Cost_entry.text())
+
+        key = self.parent().get_spelllist()[-1]
+        i = len(self.parent().get_spelllist()) - 1
+        super_tree_item = self.Spell_view.findItems(key.elem, Qt.MatchExactly, 0)[0]
+        tree_item = super_tree_item.child(self.subcateglist.index(key.subcateg))
+        tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, key.description, key.cost, str(i)]))
+
+    def refresh(self):
+        """
+        Méthode qui rafraîchit la liste des sorts
+        :return: None
+        """
+
+        self.Spell_view.clear()
         itemlist = []
         for key in self.elemlist:
-            itemlist.append(QTreeWidgetItem([self.tr(key), "", "", ""]))
+            itemlist.append(QTreeWidgetItem([self.tr(key)]))
 
         for key in self.subcateglist:
-            itemlist[0].addChild(QTreeWidgetItem([self.tr(key), "", "", ""]))
+            for i in enumerate(itemlist):
+                i[1].addChild(QTreeWidgetItem([self.tr(key)]))
 
         self.Spell_view.addTopLevelItems(itemlist)
 
-        """self.Spell_view.bind("<Button-1>", func=self.select_spell)"""
-
-    def register(self):
-        """ Méthode qui crée le nouveau sort """
-        new_spell = Pc.Spell(self.Elem_entry.get(), self.Subcateg_entry.get(), self.Name_entry.text(), self.Effect_entry.get(0.0, "end"), self.Description_entry.get(0.0, "end"), self.Cost_entry.text())
-
-        self.parent().spelllist.append(new_spell)
-        self.Spell_view.insert(new_spell.elem+new_spell.subcateg, "end", (len(self.master.spelllist)), text=new_spell.name, values=[new_spell.effect, new_spell.description, new_spell.cost])
-
-    def refresh(self):
-        """ Méthode qui rafraîchit la liste des sorts """
-
-        for key in self.elemlist:
-            for kkey in self.subcateglist:
-                for i in self.Spell_view.get_children(key+kkey):
-                    self.Spell_view.delete(i)
-
-        if self.parent().spelllist:
-            i = 1
-            for key in self.parent().spelllist:
-                self.Spell_view.insert(key.elem+key.subcateg, "end", i, text=key.name, values=[key.effect,key.description,key.cost])
-
+        spelllist = self.parent().get_spelllist()
+        if spelllist:
+            i = 0
+            for key in spelllist:
+                super_tree_item = self.Spell_view.findItems(key.elem, Qt.MatchExactly, 0)[0]
+                tree_item = super_tree_item.child(self.subcateglist.index(key.subcateg))
+                tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, key.description, key.cost, str(i)]))
                 i += 1
 
-    def select_spell(self,event):
-        """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
-        if self.Spell_view.identify_row(event.y):
+        self.Spell_view.expandAll()
 
-            try:
-                self.selected_item = int(self.Spell_view.identify_row(event.y))
-                self.suppr_choice["state"] = "normal"
+    @Slot()
+    def select_spell(self):
+        """
+        Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin
+        :return: None
+        """
 
-            except:
+        selected_items = self.Spell_view.selectedItems()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            if item.text(3):
+                try:
+                    self.selected_item = int(item.text(5))
+                    self.Suppr_choice.setDisabled(False)
+
+                except ValueError:
+                    self.selected_item = None
+                    self.Suppr_choice.setDisabled(True)
+
+            else:
                 self.selected_item = None
-                self.suppr_choice["state"] = "disabled"
+                self.Suppr_choice.setDisabled(True)
 
-        else:
-            self.selected_item = None
-            self.suppr_choice["state"] = "disabled"
-
+    @Slot()
     def suppr(self):
-        """ Méthode qui supprime la compétence sélectionnée """
+        """
+        Méthode qui supprime la compétence sélectionnée
+        :return: None
+        """
         if type(self.selected_item) == int:
-            self.parent().spelllist.pop(self.selected_item-1)
-            self.refresh()
+            self.parent().pop_spell(self.selected_item)
             self.selected_item = None
-            self.suppr_choice["state"] = "disabled"
+            self.Suppr_choice.setDisabled(True)
+            self.refresh()

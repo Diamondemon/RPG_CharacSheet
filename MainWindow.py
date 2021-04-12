@@ -120,6 +120,11 @@ class UIWindow(QMainWindow):
         self.competlist.append(new_compet)
         self.save_competlist()
 
+    def generate_spell(self, elem: str, subcateg: str, name: str, effect: str, description: str, cost: int):
+        new_spell = Pc.Spell(elem, subcateg, name, effect, description, cost)
+        self.competlist.append(new_spell)
+        self.save_spelllist()
+
     def get_characlist(self):
         """
         Getter for the characlist attribute
@@ -186,6 +191,7 @@ class UIWindow(QMainWindow):
         """
         self.takeCentralWidget()
         self.setCentralWidget(self.SpellCFrame)
+        self.SpellCFrame.refresh()
 
     def goto_suppr(self):
         """
@@ -216,7 +222,11 @@ class UIWindow(QMainWindow):
         if index < len(self.competlist):
             self.competlist.pop(index)
             self.save_competlist()
-            self.CompCFrame.refresh()
+
+    def pop_spell(self, index: int):
+        if index < len(self.spelllist):
+            self.spelllist.pop(index)
+            self.save_spelllist()
 
     def save_characlist(self):
         with open("characters", "wb") as fichier:
@@ -225,6 +235,10 @@ class UIWindow(QMainWindow):
     def save_competlist(self):
         with open("competences", "wb") as fichier:
             pk.Pickler(fichier).dump(self.competlist)
+
+    def save_spelllist(self):
+        with open("competences", "wb") as fichier:
+            pk.Pickler(fichier).dump(self.spelllist)
 
     def set_selectedchar(self, number: int):
         self.CharDFrame.set_selectedchar(self.characlist[number])
