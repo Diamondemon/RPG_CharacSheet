@@ -5,8 +5,8 @@ from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBo
 class CharAtkMFrame(QWidget):
     """ Widget de modification des caractéristiques d'attaque du personnage"""
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
+    def __init__(self):
+        QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
         self.baselist = ["hands", "light", "medium", "heavy", "throw", "shield"]

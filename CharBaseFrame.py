@@ -52,10 +52,13 @@ class CharBaseFrame(QWidget):
         self.grid.addWidget(QLabel(self.tr("Légal")), 9, 0)
         self.legal_scale = QSlider(Qt.Horizontal)
         self.legal_scale.setRange(-50, 50)
-        self.legal_scale.setSingleStep(25)
+        self.legal_scale.setSingleStep(1)
         self.legal_scale.setValue(0)
         self.legal_scale.setTracking(True)
         self.grid.addWidget(self.legal_scale, 10, 0, 1, 2)
+
+        self.legal_display = QLabel()
+        self.grid.addWidget(self.legal_display, 9, 1)
 
     def get_gmwheel_text(self):
         """
@@ -96,6 +99,14 @@ class CharBaseFrame(QWidget):
         :return: reference to the button
         """
         return self.plus_xp
+
+    def get_slider(self):
+        """
+        Method called to get the reference to the legal slider
+
+        :return: reference to the slider
+        """
+        return self.legal_scale
     
     def refresh(self, selectedchar: Pc.player):
         """
@@ -116,3 +127,6 @@ class CharBaseFrame(QWidget):
         self.GM_wheel.setCurrentIndex(0)
 
         self.legal_scale.setValue(selectedchar.passivestats["legal"][0])
+
+    def set_legal_display(self, value: int):
+        self.legal_display.setText(str(value))

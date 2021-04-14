@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (QGroupBox, QGridLayout)
 
 
 class CharUseCompetFrame(QGroupBox):
+    """ Widget used to display the character's competences """
 
     def __init__(self, parent):
         QGroupBox.__init__(self, " Compétences ", parent)

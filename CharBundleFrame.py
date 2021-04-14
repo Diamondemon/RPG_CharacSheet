@@ -7,13 +7,14 @@ from CharAbiFrame import CharAbiFrame
 from CharSocFrame import CharSocFrame
 from CharEthFrame import CharEthFrame
 from CharSymbFrame import CharSymbFrame
+import CCaF
 
 
 class CharBundleFrame(QWidget):
     """ Widget d'affichage de toutes les caractéristiques """
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
+    def __init__(self):
+        QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
         self.ATK = CharAtkFrame(self)
@@ -32,13 +33,12 @@ class CharBundleFrame(QWidget):
         self.grid.addWidget(self.SYM, 0, 2, 4, 1)
 
     def refresh(self):
-        for i in self.grid_slaves():
-            i.refresh()
+        self.ATK.refresh()
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
 
-    def grid(self,**kwargs):
+    def grid(self):
 
         for i in self.grid_slaves():
             i.grid_forget()
@@ -54,4 +54,11 @@ class CharBundleFrame(QWidget):
             self.SOC.grid(row=2,column=1,padx="4p",sticky="NEW",pady="2p",ipadx="4p",ipady="4p")
         self.SYM.grid(row=0,column=2,rowspan=4,padx="4p",sticky="NSEW",pady="2p",ipadx="4p",ipady="4p")
         self.refresh()
-        # Frame.grid(self, kwargs)
+
+    def parent(self) -> CCaF.CharCaracFrame:
+        """
+        Method called to get the parent widget (the main window)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)

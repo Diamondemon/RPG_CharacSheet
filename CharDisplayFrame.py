@@ -20,6 +20,7 @@ class CharDisplayFrame(QWidget):
 
         self.connect(self.baseFrame.get_plus_xp(), SIGNAL("clicked()"), self.add_xp)
         self.connect(self.baseFrame.get_plus_gm(), SIGNAL("clicked()"), self.add_GM)
+        self.connect(self.baseFrame.get_slider(), SIGNAL("valueChanged(int)"), self.legal_onMove)
 
         self.grid.addWidget(self.baseFrame, 0, 0, 1, 1)
 
@@ -31,7 +32,7 @@ class CharDisplayFrame(QWidget):
         self.connect(self.GM_restat_choice, SIGNAL("clicked()"), self.GM_reinit_char)
         self.grid.addWidget(self.GM_restat_choice, 2, 0)
 
-        self.NBK = CharNotebook(self)
+        self.NBK = CharNotebook()
         self.grid.addWidget(self.NBK, 0, 1, 3, 1)
 
     @Slot()
@@ -57,6 +58,7 @@ class CharDisplayFrame(QWidget):
     def legal_onMove(self, value: int):
         self.selectedchar.change_passive("legal", value)
         self.parent().save_characlist()
+        self.baseFrame.set_legal_display(value)
 
     def parent(self) -> MW.UIWindow:
         """
@@ -70,6 +72,7 @@ class CharDisplayFrame(QWidget):
 
         if self.selectedchar:
             self.baseFrame.refresh(self.selectedchar)
+            self.NBK.refresh()
             """self.legal_scale.set(self.selectedchar.passivestats["legal"][0])
             self.legal_scale.grid(row=10, column=0, columnspan=2)
             self.NBK.CharCF.BNDL.SYM.refresh()"""

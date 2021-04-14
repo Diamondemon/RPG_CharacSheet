@@ -9,8 +9,6 @@ class CharArmFrame(QGroupBox):
         QGroupBox.__init__(self, " Armure ", parent)
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
-        self.setMinimumHeight(300)
-        self.setMinimumWidth(850)
 
         self.threshold_types = ["Arm. Légère", "Arm. Moyenne", "Arm. Lourde"]
         self.Threshold_View = QTreeWidget()

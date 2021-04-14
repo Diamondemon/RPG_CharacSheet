@@ -15,11 +15,9 @@ from CharPercFrame import CharPercFrame
 class CharUsefulFrame(QWidget):
     """ Fiche personnage résumée """
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
+    def __init__(self):
+        QWidget.__init__(self)
         self.grid = QGridLayout(self)
-        self.setMinimumHeight(900)
-        self.setMinimumWidth(1000)
 
         self.CharFSymF = CharFirstSymbFrame(self)
         self.grid.addWidget(self.CharFSymF, 0, 0)

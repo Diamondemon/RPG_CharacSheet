@@ -784,6 +784,10 @@ class player(object):
 
         return self.spells.keys()
 
+    def get_basestats(self):
+
+        return self.basestats
+
     def get_weapon(self, side, weapontype):
         """
         :param weapontype: "melee" or "throw" weapon

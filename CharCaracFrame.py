@@ -1,20 +1,20 @@
-from PySide6.QtCore import SIGNAL
-from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
-                               QTreeWidget, QTreeWidgetItem)
+from PySide6.QtWidgets import (QWidget, QGridLayout)
 from CharAtkMFrame import CharAtkMFrame
 from CharBundleFrame import CharBundleFrame
+import CNbk
 
 
 class CharCaracFrame(QWidget):
     """Affichage des statistiques d'un personnage"""
 
     def __init__(self, parent):
-        QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent=parent)
         self.grid = QGridLayout(self)
-
-        self.BNDL = CharBundleFrame(self)
+        self.parent1 = parent
+        self.BNDL = CharBundleFrame()
         self.grid.addWidget(self.BNDL, 0, 0)
-        self.MATK = CharAtkMFrame(self)
+        self.MATK = CharAtkMFrame()
+        print(self.parent1)
 
         """self.MDEF = CharDefMFrame(self)
 
@@ -27,9 +27,10 @@ class CharCaracFrame(QWidget):
         self.METH = CharEthMFrame(self)"""
 
     def refresh(self):
-        for i in self.grid_slaves():
-            i.grid_forget()
-        self.BNDL.grid(row=0, column=0, sticky="N")
+        self.BNDL.refresh()
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
+
+    def parent(self) -> CNbk.CharNotebook:
+        return
