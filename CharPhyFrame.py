@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtGui import (QPixmap)
+from PySide6.QtGui import (QMouseEvent)
 
 import CBF
 
@@ -47,6 +47,31 @@ class CharPhyFrame(QGroupBox):
             self.grid.addWidget(bar, 2 * i + 1, 0)
             i += 1
 
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def mousePressEvent(self, event: QMouseEvent):
+        """
+        Method called when a mouse button is pressed on while above the frame. Calls the method to modify the physical
+        statistics of the character
+
+        :return: None
+        """
+        self.parent().modify_phy()
+
+    def parent(self) -> CBF.CharBundleFrame:
+        """
+        Method called to get the parent widget (the charBundleFrame)
+
+        :return: the reference to the parent
+        """
+        return QGroupBox.parent(self)
+
     def refresh(self):
         """
         Method called to refresh all the information displayed on the frame
@@ -60,8 +85,7 @@ class CharPhyFrame(QGroupBox):
         i = 0
         for key in self.secondlist:
             if key == "ability":
-                self.labels[i].setText("= " + str(secondstats["symb-ability"][0]) + " " +
-                                       str(secondstats["symb-ability"][1]))
+                self.labels[i].setText("= " + str(secondstats["symb-ability"]))
             else:
                 self.labels[i].setText("= " + str(secondstats["symb-mobility"]))
             i += 1
@@ -70,19 +94,3 @@ class CharPhyFrame(QGroupBox):
             self.progressBars[key].setValue(basestats[key][0])
         for key in self.thirdlist:
             self.progressBars[key].setValue(thirdstats[key][0])
-
-    def get_selectedchar(self):
-        """
-        Method called to get the character selected to display
-
-        :return: character (Perso_class.player)
-        """
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CBF.CharBundleFrame:
-        """
-        Method called to get the parent widget (the charBundleFrame)
-
-        :return: the reference to the parent
-        """
-        return QGroupBox.parent(self)

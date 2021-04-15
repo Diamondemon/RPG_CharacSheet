@@ -1,5 +1,6 @@
 from PySide6.QtCore import SIGNAL
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton)
+import CCaF
 
 
 class CharAtkMFrame(QWidget):
@@ -8,14 +9,15 @@ class CharAtkMFrame(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
-
+        self.setMaximumHeight(150)
+        self.setMaximumWidth(300)
         self.baselist = ["hands", "light", "medium", "heavy", "throw", "shield"]
 
         self.grid.addWidget(QLabel(self.tr("Utiliser l'XP")), 0, 0)
 
         self.statlist = QComboBox()
-        self.statlist.addItems(["Mains nues", "Armes légères", "Armes moyennes", "Armes lourdes",
-                               "Armes de jet", "Bouclier"])
+        for key in ["Mains nues", "Armes légères", "Armes moyennes", "Armes lourdes", "Armes de jet", "Bouclier"]:
+            self.statlist.addItem(self.tr(key))
         self.statlist.setEditable(False)
         self.statlist.setCurrentIndex(0)
         self.add_stat = QLineEdit()
@@ -39,3 +41,11 @@ class CharAtkMFrame(QWidget):
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
+
+    def parent(self) -> CCaF.CharCaracFrame:
+        """
+        Method called to get the parent widget (the carac frame)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)

@@ -1,33 +1,56 @@
-from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
-from PySide6.QtGui import (QPixmap)
+from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout)
+from PySide6.QtSvgWidgets import QSvgWidget
+import CBF
 
 
 class CharSymbFrame(QGroupBox):
     """ Widget d'affichage des caractéristiques d'attaque du personnage"""
 
-    def __init__(self, parent):
-        QGroupBox.__init__(self, " Bignous ", parent)
+    def __init__(self):
+        QGroupBox.__init__(self, " Bignous ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 
         self.baselist = ["parry", "armor", "ability", "mobility", "perception", "stealth", "init", "T", "ps_T", "S",
                          "light", "mental", "luck", "charisma", "trading", "lightning", "sensi", "aura"]
-        i = 0
+
         self.images = {}
+        self.labels = []
 
-        for key in self.baselist:
-            self.images[key] = QPixmap("./Images/symb-" + key + ".png")
-            self.images[key] = self.images[key].scaled(12, 15)
-            self.grid.addWidget(QLabel(pixmap=self.images[key]), i, 0)
-            self.grid.addWidget(QLabel("= "), i, 1)
-            i += 1
-
-    def refresh(self):
         i = 0
         for key in self.baselist:
-            """Label(self, text=self.master.master.master.master.selectedchar.secondstats["symb-" + key]).grid(row=i,
-                                                                                                            column=1)"""
+            self.images[key] = QSvgWidget("./Images/symb-" + key + ".svg")
+            self.images[key].setFixedSize(12, 15)
+            self.grid.addWidget(self.images[key], i, 0)
+            self.labels.append(QLabel("= "))
+            self.grid.addWidget(self.labels[i], i, 1)
             i += 1
 
     def get_selectedchar(self):
-        return self.master.get_selectedchar()
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CBF.CharBundleFrame:
+        """
+        Method called to get the parent widget (the charBundleFrame)
+
+        :return: the reference to the parent
+        """
+        return QGroupBox.parent(self)
+
+    def refresh(self):
+        """
+        Method called to refresh all the information displayed on the frame
+
+        :return: None
+        """
+        i = 0
+        selectedchar = self.get_selectedchar()
+        secondstats = selectedchar.get_secondstats()
+        for key in self.baselist:
+            self.labels[i].setText("= "+str(secondstats["symb-"+key]))
+            i += 1

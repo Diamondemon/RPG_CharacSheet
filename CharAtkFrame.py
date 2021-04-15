@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
 from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtGui import QMouseEvent
 import CBF
 
 
@@ -40,6 +41,31 @@ class CharAtkFrame(QGroupBox):
             self.grid.addWidget(bar, 2 * i + 1, 0)
             i += 1
 
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def mousePressEvent(self, event: QMouseEvent):
+        """
+        Method called when a mouse button is pressed on while above the frame. Calls the method to modify the offensive
+        statistics of the character
+
+        :return: None
+        """
+        self.parent().modify_atk()
+
+    def parent(self) -> CBF.CharBundleFrame:
+        """
+        Method called to get the parent widget (the charBundleFrame)
+
+        :return: the reference to the parent
+        """
+        return QGroupBox.parent(self)
+
     def refresh(self):
         """
         Method called to refresh all the information displayed on the frame
@@ -60,19 +86,3 @@ class CharAtkFrame(QGroupBox):
             self.progressBars[key].setValue(basestats[key][0])
 
             i += 1
-
-    def get_selectedchar(self):
-        """
-        Method called to get the character selected to display
-
-        :return: character (Perso_class.player)
-        """
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CBF.CharBundleFrame:
-        """
-        Method called to get the parent widget (the charBundleFrame)
-
-        :return: the reference to the parent
-        """
-        return QGroupBox.parent(self)
