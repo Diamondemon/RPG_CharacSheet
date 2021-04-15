@@ -21,7 +21,7 @@ class CharUsefulFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
-        self.CharFSymF = CharFirstSymbFrame(self)
+        self.CharFSymF = CharFirstSymbFrame()
         self.grid.addWidget(self.CharFSymF, 0, 0)
 
         self.CharPercepF = CharPercepFrame(self)
@@ -53,13 +53,9 @@ class CharUsefulFrame(QWidget):
         self.PercFrame = CharPercFrame(self)
         self.grid.addWidget(self.PercFrame, 6, 4, 2, 1)
 
-        """self.bind("<Visibility>", func=self.refresh)"""
-
     def refresh(self, event=None):
-        print(self.parentWidget())
-        """
         self.CharFSymF.refresh()
-        self.CharPercepF.refresh()
+        """self.CharPercepF.refresh()
         self.CharStealthF.refresh()
         self.CharHiddenF.refresh()
         self.CharUCompF.refresh()

@@ -1,3 +1,4 @@
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (QGroupBox, QGridLayout, QFrame, QTreeWidget, QTreeWidgetItem, QLabel)
 from PySide6.QtGui import (QPixmap, QIcon)
 import numpy as np
@@ -26,8 +27,8 @@ class CharArmFrame(QGroupBox):
 
         self.armor_attr = ["", "Nom", "Prot.", "Amort.", "Mobi.", "Vit.", "Sol.", "Casque"]
 
-        self.armor_image = QPixmap("Images/symb-armor.png")
-        self.armor_image = self.armor_image.scaled(12, 20)
+        self.armor_image = QSvgWidget("./Images/symb-armor.svg")
+        self.armor_image.setFixedSize(12, 20)
 
         self.Armorlist = ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
                           "Cuissots", "Grèves", "Solerets"]
