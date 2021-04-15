@@ -111,3 +111,65 @@ class CharBundleFrame(QWidget):
         self.SOC.refresh()
         self.ETH.refresh()
         self.SYM.refresh()
+
+    def refresh_abi(self):
+        """
+        Method called to refresh only the ability frame
+
+        :return: None
+        """
+        self.ABI.refresh()
+        self.SYM.refresh()
+
+    def refresh_atk(self):
+        """
+        Method called to refresh only the attack frame
+
+        :return: None
+        """
+        self.ATK.refresh()
+        self.SYM.refresh()
+
+    def refresh_base(self):
+        """
+        Method called to refresh the base frame of the CharDisplay
+
+        :return: None
+        """
+        self.parent().refresh_base()
+
+    def refresh_def(self):
+        """
+        Method called to refresh only the defense frame
+
+        :return: None
+        """
+        self.DEF.refresh()
+        self.SYM.refresh()
+
+    def refresh_eth(self):
+        """
+        Method called to refresh only the magic frame
+
+        :return: None
+        """
+        self.ETH.refresh()
+        self.SYM.refresh()
+
+    def refresh_phy(self):
+        """
+        Method called to refresh only the physical frame
+
+        :return: None
+        """
+        self.PHY.refresh()
+        self.SYM.refresh()
+
+    def refresh_soc(self):
+        """
+        Method called to refresh only the social frame
+
+        :return: None
+        """
+        self.SOC.refresh()
+        self.SYM.refresh()

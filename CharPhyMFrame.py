@@ -1,4 +1,5 @@
 from PySide6.QtCore import SIGNAL
+from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton)
 import CCaF
 
@@ -23,6 +24,7 @@ class CharPhyMFrame(QWidget):
         self.statlist.setCurrentIndex(0)
         self.add_stat = QLineEdit()
         self.add_stat.setText("0")
+        self.add_stat.setValidator(QIntValidator(0, 200, self))
         self.Register_new = QPushButton(self.tr("Ajouter"))
         self.connect(self.Register_new, SIGNAL("clicked()"), self.register)
 
@@ -33,6 +35,7 @@ class CharPhyMFrame(QWidget):
         self.statthird.setCurrentIndex(0)
         self.add_third = QLineEdit()
         self.add_third.setText("0")
+        self.add_third.setValidator(QIntValidator(0, 50, self))
         self.Register_third = QPushButton(self.tr("Ajouter"))
         self.connect(self.Register_third, SIGNAL("clicked()"), self.register_third)
 
@@ -49,29 +52,23 @@ class CharPhyMFrame(QWidget):
         self.connect(self.convert, SIGNAL("clicked()"), self.launch_convert)
         self.grid.addWidget(self.convert, 7, 0)
 
-    def register(self, event=None):
-        """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist,
-        et enregistre la nouvelle configuration du personnage"""
-        self.get_selectedchar().upstats(self.baselist[self.statlist.current()], self.New_carac.get())
-        self.New_carac.set(0)
-        self.master.master.master.reload()
-        self.master.BNDL.PHY.refresh()
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
 
-    def register_third(self, event=None):
-        """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist,
-        et enregistre la nouvelle configuration du personnage"""
-        self.get_selectedchar().upstats(self.thirdlist[self.statthird.current()], self.New_third.get())
-        self.New_third.set(0)
-        self.master.master.master.reload()
-        self.master.BNDL.PHY.refresh()
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
 
     def launch_convert(self):
-        self.master.master.master.selectedchar.convert_init(1)
-        self.master.BNDL.PHY.refresh()
-        self.master.BNDL.ABI.refresh()
+        """
+        Method called to convert ability points into initiative
 
-    def get_selectedchar(self):
-        return self.parent().get_selectedchar()
+        :return: None
+        """
+        self.get_selectedchar().convert_init(1)
+        self.parent().refresh_phy()
+        self.parent().refresh_abi()
 
     def parent(self) -> CCaF.CharCaracFrame:
         """
@@ -80,3 +77,23 @@ class CharPhyMFrame(QWidget):
         :return: the reference to the parent
         """
         return QWidget.parent(self)
+
+    def register(self):
+        """
+        Method that turns experience points into the selected caracteristic and registers the new stats
+
+        :return: None
+        """
+        self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
+        self.parent().refresh_phy()
+        self.parent().refresh_base()
+
+    def register_third(self):
+        """
+        Method called to consume strength and enhance physical resistance
+
+        :return: None
+        """
+        self.get_selectedchar().upstats(self.thirdlist[self.statthird.currentIndex()], int(self.add_third.text()))
+        self.parent().refresh_phy()
+        self.parent().refresh_base()

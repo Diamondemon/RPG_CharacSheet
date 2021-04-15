@@ -1,4 +1,5 @@
 from PySide6.QtCore import SIGNAL
+from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton)
 import CCaF
 
@@ -12,6 +13,8 @@ class CharDefMFrame(QWidget):
         self.setMaximumHeight(200)
         self.setMaximumWidth(300)
         self.baselist = ["armor"]
+        self.thirdlist = ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
+                          "Cuissots", "Grèves", "Solerets"]
 
         self.grid.addWidget(QLabel(self.tr("Utiliser l'XP")), 0, 0, 1, 2)
         self.grid.addWidget(QLabel(self.tr("Utiliser l'Armure")), 3, 0, 1, 2)
@@ -22,18 +25,19 @@ class CharDefMFrame(QWidget):
         self.statlist.setCurrentIndex(0)
         self.add_stat = QLineEdit()
         self.add_stat.setText("0")
+        self.add_stat.setValidator(QIntValidator(0, 200, self))
         self.Register_new = QPushButton(self.tr("Ajouter"))
         self.connect(self.Register_new, SIGNAL("clicked()"), self.register)
 
         self.statthird = QComboBox()
-        for key in ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
-                    "Cuissots", "Grèves", "Solerets"]:
+        for key in self.thirdlist:
             self.statthird.addItem(self.tr(key))
         self.statthird.setEditable(False)
         self.statthird.setCurrentIndex(0)
 
         self.add_third = QLineEdit()
         self.add_third.setText("0")
+        self.add_third.setValidator(QIntValidator(0, 10, self))
         self.Register_third = QPushButton(self.tr("Ajouter"))
         self.connect(self.Register_third, SIGNAL("clicked()"), self.register_third)
 
@@ -45,21 +49,12 @@ class CharDefMFrame(QWidget):
         self.grid.addWidget(self.add_third, 4, 1)
         self.grid.addWidget(self.Register_third, 5, 0, 1, 2)
 
-    def register(self, event=None):
-        """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist,
-        et enregistre la nouvelle configuration du personnage"""
-        self.get_selectedchar().upstats(self.baselist[self.statlist.current()], self.New_carac.get())
-        self.New_carac.set(0)
-        self.master.master.master.reload()
-        self.master.BNDL.DEF.refresh()
-
-    def register_third(self, event=None):
-        """ Consomme un symbole d'armure pour l'assigner à une pièce d'équipement """
-        self.get_selectedchar().upstats("invested_armor", self.New_third.get(), self.statthird.get())
-        self.New_third.set(0)
-        self.master.BNDL.DEF.refresh()
-
     def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
         return self.parent().get_selectedchar()
 
     def parent(self) -> CCaF.CharCaracFrame:
@@ -69,3 +64,23 @@ class CharDefMFrame(QWidget):
         :return: the reference to the parent
         """
         return QWidget.parent(self)
+
+    def register(self):
+        """
+        Method that turns experience points into the selected caracteristic and registers the new stats
+
+        :return: None
+        """
+        self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
+        self.parent().refresh_def()
+        self.parent().refresh_base()
+
+    def register_third(self):
+        """
+        Consumes an armor symbol to give it to a piece of equipment
+
+        :return: None
+        """
+        self.get_selectedchar().upstats("invested_armor", int(self.add_third.text()),
+                                        self.thirdlist[self.statthird.currentIndex()])
+        self.parent().refresh_def()

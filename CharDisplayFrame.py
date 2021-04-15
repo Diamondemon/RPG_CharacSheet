@@ -77,6 +77,14 @@ class CharDisplayFrame(QWidget):
             self.legal_scale.grid(row=10, column=0, columnspan=2)
             self.NBK.CharCF.BNDL.SYM.refresh()"""
 
+    def refresh_base(self):
+        """
+        Method called to refresh only the base frame
+
+        :return: None
+        """
+        self.baseFrame.refresh(self.selectedchar)
+
     def reinit_char(self):
         self.selectedchar.clearstats()
         self.parent().save_characlist()

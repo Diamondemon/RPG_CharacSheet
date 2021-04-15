@@ -1,4 +1,5 @@
 from PySide6.QtCore import SIGNAL
+from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton)
 import CCaF
 
@@ -22,6 +23,7 @@ class CharEthMFrame(QWidget):
         self.statlist.setCurrentIndex(0)
         self.add_stat = QLineEdit()
         self.add_stat.setText("0")
+        self.add_stat.setValidator(QIntValidator(0, 200, self))
         self.Register_new = QPushButton(self.tr("Ajouter"))
         self.connect(self.Register_new, SIGNAL("clicked()"), self.register)
 
@@ -29,15 +31,12 @@ class CharEthMFrame(QWidget):
         self.grid.addWidget(self.add_stat, 1, 1)
         self.grid.addWidget(self.Register_new, 2, 0, 1, 2)
 
-    def register(self,event=None):
-        """ On modifie les caractéristiques du personnage, grâce à l'xp, et on recharge le widget qui les affiche """
-        self.get_selectedchar().upstats(self.baselist[self.statlist.current()], self.New_carac.get())
-        self.New_carac.set(0)
-        self.master.master.master.reload()
-        self.master.BNDL.ETH.refresh()
-        self.master.BNDL.ABI.refresh()
-
     def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
         return self.parent().get_selectedchar()
 
     def parent(self) -> CCaF.CharCaracFrame:
@@ -47,3 +46,14 @@ class CharEthMFrame(QWidget):
         :return: the reference to the parent
         """
         return QWidget.parent(self)
+
+    def register(self):
+        """
+        Method that turns experience points into the selected caracteristic and registers the new stats
+
+        :return: None
+        """
+        self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
+        self.parent().refresh_eth()
+        self.parent().refresh_abi()
+        self.parent().refresh_base()

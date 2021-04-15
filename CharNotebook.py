@@ -30,6 +30,14 @@ class CharNotebook(QTabWidget):
         """if self.parent().get_selectedchar().ismage():
             self.CharSpellF.refresh()"""
 
+    def refresh_base(self):
+        """
+        Method called to refresh the base frame of the CharDisplay
+
+        :return: None
+        """
+        self.parent().refresh_base()
+
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
 

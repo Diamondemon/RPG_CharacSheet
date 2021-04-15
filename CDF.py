@@ -32,6 +32,14 @@ class CharDisplayFrame:
 
         pass
 
+    def refresh_base(self):
+        """
+        Method called to refresh only the base frame
+
+        :return: None
+        """
+        pass
+
     def reinit_char(self):
         pass
 

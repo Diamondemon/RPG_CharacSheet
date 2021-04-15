@@ -135,7 +135,7 @@ class player(object):
                 for kkey in self.thirdstats[key].keys():
                     self.GMstats[kkey] = 0
 
-    def upstats(self, stat, number=0, location=None):
+    def upstats(self, stat: str, number: int=0, location: str=None):
         """ Méthode qui permet de consommer des points d'expérience afin d'augmenter les points dans une statistique de tier 1, ou consommer des
         statistiques de Tier 2 pour augmenter celles de Tier 3"""
 
@@ -1177,9 +1177,6 @@ class Spell(object):
                 valuelist.append(self.__dict__[key])
 
         return valuelist
-
-
-
 
     def __str__(self):
         return "Sort (élément {}) {} : {}".format(self.elem, self.name, self.effect)

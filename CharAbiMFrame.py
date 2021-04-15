@@ -1,7 +1,9 @@
 from PySide6.QtCore import SIGNAL
+from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton, QFrame)
 from functools import partial
 import CCaF
+import numpy as np
 
 
 class CharAbiMFrame(QWidget):
@@ -18,6 +20,10 @@ class CharAbiMFrame(QWidget):
                            ["ennemies", "threat", "curse"]]
         self.furtiflist = [["ground", "moving", "assassination"], ["shadow", "not-moving", "identity"],
                            ["smell", "disguise", "nature-field"]]
+        self.labels = np.zeros((8, 3), dtype=QLabel)
+        for i in range(8):
+            for j in range(3):
+                self.labels[i, j] = QLabel("0")
 
         self.grid.addWidget(QLabel(self.tr("Utiliser l'XP")), 0, 0, 1, 12)
 
@@ -28,6 +34,7 @@ class CharAbiMFrame(QWidget):
         self.statlist.setCurrentIndex(0)
         self.add_stat = QLineEdit()
         self.add_stat.setText("0")
+        self.add_stat.setValidator(QIntValidator(0, 200, self))
         self.Register_new = QPushButton(self.tr("Ajouter"))
         self.connect(self.Register_new, SIGNAL("clicked()"), self.register)
 
@@ -93,7 +100,7 @@ class CharAbiMFrame(QWidget):
             for stat in self.perceplist[j]:
                 self.addlist[stat] = QPushButton(self.tr("+"))
                 self.addlist[stat].setDisabled(True)
-                self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.invest_furtif,stat))
+                self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.invest_furtif, stat))
                 self.grid.addWidget(self.addlist[stat], i, 4 * j + 3, 1, 1)
                 i += 1
 
@@ -153,15 +160,43 @@ class CharAbiMFrame(QWidget):
             self.grid.addWidget(self.addlist[stat], 22, 4 * j + 3, 1, 1)
             j += 1
 
-    def register(self, event=None):
-        """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist,
-        et enregistre la nouvelle configuration du personnage"""
-        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
-        self.New_carac.set(0)
-        self.master.master.master.reload()
-        self.master.BNDL.ABI.refresh()
-        self.refresh()
+    def add_sense(self, stat):
+        """
+        Method called to add points to the senses of the character
 
+        :param stat: sense to invest points into
+        :return: None
+        """
+        self.get_selectedchar().upstats(stat, 1)
+        self.refresh()
+        self.parent().refresh_abi()
+
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def invest_furtif(self, stat):
+        """
+        Method called to consume stealth points
+
+        :param stat: the target stat to put the points into
+        :return: None
+        """
+        self.get_selectedchar().upstats(stat, 1)
+        self.refresh()
+        self.parent().refresh_abi()
+
+    def parent(self) -> CCaF.CharCaracFrame:
+        """
+        Method called to get the parent widget (the carac frame)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)
 
     def refresh(self):
 
@@ -258,24 +293,13 @@ class CharAbiMFrame(QWidget):
             Label(self.hiddenFrame,text=self.master.master.master.selectedchar.thirdstats["hidden_action"][stat]).grid(row=1,column=3*j+1)
             j+=1"""
 
-    def add_sense(self, stat):
-        self.get_selectedchar().upstats(stat, 1)
-        self.refresh()
-        self.master.BNDL.ABI.refresh()
-
-    def invest_furtif(self, stat):
-        """ Permet de consommer le tier 2 et obtenir du tier 3 """
-        self.get_selectedchar().upstats(stat, 1)
-        self.refresh()
-        self.master.BNDL.ABI.refresh()
-
-    def get_selectedchar(self):
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CCaF.CharCaracFrame:
+    def register(self):
         """
-        Method called to get the parent widget (the carac frame)
+        Method that turns experience points into the selected caracteristic and registers the new stats
 
-        :return: the reference to the parent
+        :return: None
         """
-        return QWidget.parent(self)
+        self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
+        self.parent().refresh_abi()
+        self.parent().refresh_base()
+        self.refresh()
