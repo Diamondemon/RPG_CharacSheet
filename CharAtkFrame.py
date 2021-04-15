@@ -1,6 +1,5 @@
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
-from PySide6.QtGui import (QPixmap, QPicture, QImage)
+from PySide6.QtSvgWidgets import QSvgWidget
 import CBF
 
 
@@ -13,21 +12,20 @@ class CharAtkFrame(QGroupBox):
         self.setLayout(self.grid)
 
         self.baselist = ["hands", "light", "medium", "heavy", "throw", "shield"]
-        self.images = {
-            "mastery": QPixmap("./Images/symb-mastery.png"),
-            "parry": QPixmap("./Images/symb-parry.png")}
+
+        self.images = {"parry": QSvgWidget("./Images/symb-parry.svg")}
+        self.images["parry"].setFixedSize(12, 15)
+        for key in self.baselist[:-1]:
+            self.images["mastery-"+key] = QSvgWidget("./Images/symb-mastery.svg")
+            self.images["mastery-"+key].setFixedSize(10, 10)
+
         self.progressBars = {}
         i = 0
         for key in self.baselist[:-1]:
-            if i == 0:
-                label = QLabel()
-                label.setPixmap(self.images["mastery"].scaled(20, 20, mode=Qt.SmoothTransformation))
-                self.grid.addWidget(label, 2 * i, 2)
-            else:
-                self.grid.addWidget(QLabel(pixmap=self.images["mastery"].scaled(10, 10, mode=Qt.SmoothTransformation)), 2 * i, 2)
+            self.grid.addWidget(self.images["mastery-"+key], 2 * i, 2)
             self.grid.addWidget(QLabel("= "), 2 * i, 3)
             i += 1
-        self.grid.addWidget(QLabel(pixmap=self.images["parry"].scaled(12, 15)), 2 * i, 2)
+        self.grid.addWidget(self.images["parry"], 2 * i, 2)
         self.grid.addWidget(QLabel("= "), 2 * i, 3)
 
         i = 0

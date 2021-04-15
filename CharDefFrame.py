@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
 from PySide6.QtGui import (QPixmap)
+from PySide6.QtSvgWidgets import QSvgWidget
 
 
 class CharDefFrame(QGroupBox):
@@ -12,7 +13,8 @@ class CharDefFrame(QGroupBox):
 
         self.baselist = ["armor"]
         self.images = {
-            "armor": QPixmap("./Images/symb-armor.png")}
+            "armor": QSvgWidget("./Images/symb-armor.svg")}
+        self.images["armor"].setFixedSize(12, 20)
 
         self.grid.addWidget(QLabel("Armure"), 0, 0)
         bar = QProgressBar(format="%v", minimum=0, maximum=200, value=90)
@@ -20,7 +22,7 @@ class CharDefFrame(QGroupBox):
                           "{ background-color: pink;}"
                           "QProgressBar {text-align : right; color: black; }")
         self.grid.addWidget(bar, 1, 0)
-        self.grid.addWidget(QLabel(pixmap=self.images["armor"].scaled(12, 20)), 0, 1)
+        self.grid.addWidget(self.images["armor"], 0, 1)
         self.grid.addWidget(QLabel("= "), 0, 2)
         self.grid.addWidget(QLabel("Palier d'armure"), 2, 0)
 

@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
 from PySide6.QtGui import (QPixmap)
+from PySide6.QtSvgWidgets import QSvgWidget
 
 
 class CharAbiFrame(QGroupBox):
@@ -16,8 +17,13 @@ class CharAbiFrame(QGroupBox):
                          "light": (12, 15), "mental": (12, 12)}
         self.images = {}
         for key in self.secondlist:
-            self.images[key] = QPixmap("./Images/symb-" + key + ".png")
-            self.images[key] = self.images[key].scaled(self.sizelist[key][0], self.sizelist[key][1])
+            if key == "perception":
+                self.images[key] = QSvgWidget("./Images/symb-perception.svg")
+                self.images[key].setFixedSize(self.sizelist[key][0], self.sizelist[key][1])
+            else:
+                self.images[key] = QPixmap("./Images/symb-" + key + ".png")
+
+                self.images[key] = self.images[key].scaled(self.sizelist[key][0], self.sizelist[key][1])
 
         i = 0
         for key in ["Perception", "Furtivité", "Réflexes", "Intelligence", "Résistance mentale"]:
@@ -28,8 +34,12 @@ class CharAbiFrame(QGroupBox):
                               "QProgressBar {text-align : right; color: black; }")
             self.grid.addWidget(bar, 2 * i + 1, 0)
             if i < 2:
-                self.grid.addWidget(QLabel(pixmap=self.images[self.secondlist[2 * i]]), 2 * i, 1)
-                self.grid.addWidget(QLabel("= "), 2 * i, 2)
+                if key == "Perception":
+                    self.grid.addWidget(self.images[key.lower()], 2*i, 1)
+                    self.grid.addWidget(QLabel("= "), 2 * i, 2)
+                else:
+                    self.grid.addWidget(QLabel(pixmap=self.images[self.secondlist[2 * i]]), 2 * i, 1)
+                    self.grid.addWidget(QLabel("= "), 2 * i, 2)
                 self.grid.addWidget(QLabel(pixmap=self.images[self.secondlist[2 * i + 1]]), 2 * i + 1, 1)
                 self.grid.addWidget(QLabel("= "), 2 * i + 1, 2)
             else:
