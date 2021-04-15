@@ -13,8 +13,8 @@ import CCaF
 class CharBundleFrame(QWidget):
     """ Widget to display all the caracteristics of the character """
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
+    def __init__(self):
+        QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
         self.ATK = CharAtkFrame()

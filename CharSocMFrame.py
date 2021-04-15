@@ -3,20 +3,20 @@ from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBo
 import CCaF
 
 
-class CharAtkMFrame(QWidget):
-    """ Widget to modify the offensive abilities of the character """
+class CharSocMFrame(QWidget):
+    """ Widget to modify the social abilities of the character """
 
     def __init__(self):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
         self.setMaximumHeight(150)
         self.setMaximumWidth(300)
-        self.baselist = ["hands", "light", "medium", "heavy", "throw", "shield"]
+        self.baselist = ["charisma", "trading", "luck"]
 
         self.grid.addWidget(QLabel(self.tr("Utiliser l'XP")), 0, 0)
 
         self.statlist = QComboBox()
-        for key in ["Mains nues", "Armes légères", "Armes moyennes", "Armes lourdes", "Armes de jet", "Bouclier"]:
+        for key in ["Charisme", "Commerce", "Chance"]:
             self.statlist.addItem(self.tr(key))
         self.statlist.setEditable(False)
         self.statlist.setCurrentIndex(0)
@@ -32,12 +32,10 @@ class CharAtkMFrame(QWidget):
     def register(self, event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist,
         et enregistre la nouvelle configuration du personnage"""
-        self.get_selectedchar().upstats(self.baselist[self.statlist.current()], int(self.add_stat.text()))
-        self.add_stat.setText("0")
-        self.parent().parent().parent().reload()
-        self.parent().BNDL.ATK.refresh()
-        # with open("characters","wb") as fichier:
-        #     pk.Pickler(fichier).dump(self.master.master.master.master.characlist)
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()], self.New_carac.get())
+        self.New_carac.set(0)
+        self.master.master.master.reload()
+        self.master.BNDL.SOC.refresh()
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()

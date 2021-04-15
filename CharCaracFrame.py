@@ -1,6 +1,11 @@
 from PySide6.QtWidgets import (QWidget, QGridLayout)
 from CharAtkMFrame import CharAtkMFrame
 from CharBundleFrame import CharBundleFrame
+from CharDefMFrame import CharDefMFrame
+from CharPhyMFrame import CharPhyMFrame
+from CharAbiMFrame import CharAbiMFrame
+from CharSocMFrame import CharSocMFrame
+from CharEthMFrame import CharEthMFrame
 import CNbk
 
 
@@ -10,19 +15,30 @@ class CharCaracFrame(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
-        self.BNDL = CharBundleFrame(self)
+        self.BNDL = CharBundleFrame()
         self.grid.addWidget(self.BNDL, 0, 0)
         self.MATK = CharAtkMFrame()
+        self.grid.addWidget(self.MATK, 0, 1)
+        self.MDEF = CharDefMFrame()
+        self.grid.addWidget(self.MDEF, 0, 1)
+        self.MPHY = CharPhyMFrame()
+        self.grid.addWidget(self.MPHY, 0, 1)
+        self.MABI = CharAbiMFrame()
+        self.grid.addWidget(self.MABI, 0, 1)
+        self.MSOC = CharSocMFrame()
+        self.grid.addWidget(self.MSOC, 0, 1)
+        self.METH = CharEthMFrame()
+        self.grid.addWidget(self.METH, 0, 1)
 
-        """self.MDEF = CharDefMFrame(self)
+        self.clear()
 
-        self.MPHY = CharPhyMFrame(self)
-
-        self.MABI = CharAbiMFrame(self)
-
-        self.MSOC = CharSocMFrame(self)
-
-        self.METH = CharEthMFrame(self)"""
+    def clear(self):
+        self.MATK.hide()
+        self.MDEF.hide()
+        self.MPHY.hide()
+        self.MABI.hide()
+        self.MSOC.hide()
+        self.METH.hide()
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
@@ -33,7 +49,8 @@ class CharCaracFrame(QWidget):
 
         :return: None
         """
-        print("abi")
+        self.clear()
+        self.MABI.show()
 
     def modify_atk(self):
         """
@@ -41,7 +58,8 @@ class CharCaracFrame(QWidget):
 
         :return: None
         """
-        self.grid.addWidget(self.MATK, 0, 1)
+        self.clear()
+        self.MATK.show()
 
     def modify_def(self):
         """
@@ -49,7 +67,8 @@ class CharCaracFrame(QWidget):
 
         :return: None
         """
-        print("def")
+        self.clear()
+        self.MDEF.show()
 
     def modify_eth(self):
         """
@@ -57,7 +76,8 @@ class CharCaracFrame(QWidget):
 
         :return: None
         """
-        print("eth")
+        self.clear()
+        self.METH.show()
 
     def modify_phy(self):
         """
@@ -65,7 +85,8 @@ class CharCaracFrame(QWidget):
 
         :return: None
         """
-        print("phy")
+        self.clear()
+        self.MPHY.show()
 
     def modify_soc(self):
         """
@@ -73,7 +94,8 @@ class CharCaracFrame(QWidget):
 
         :return: None
         """
-        print("soc")
+        self.clear()
+        self.MSOC.show()
 
     def parent(self) -> CNbk.CharNotebook:
         """
