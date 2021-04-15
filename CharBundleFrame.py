@@ -34,26 +34,10 @@ class CharBundleFrame(QWidget):
 
     def refresh(self):
         self.ATK.refresh()
+        self.SOC.refresh()
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
-
-    def grid(self):
-
-        for i in self.grid_slaves():
-            i.grid_forget()
-        self.ATK.grid(row=0,column=0,rowspan=2,padx="4p",sticky="NEW",pady="2p",ipadx="4p",ipady="4p")
-        self.DEF.grid(row=0,column=1,padx="4p",sticky="NSEW",pady="2p",ipadx="4p",ipady="4p")
-        self.PHY.grid(row=1,column=1,padx="4p",sticky="NSEW",pady="2p",ipadx="4p",ipady="4p")
-        if self.master.master.master.selectedchar.mage:
-            self.ABI.grid(row=2,column=0,rowspan=2,sticky="NEW",padx="4p",pady="2p",ipadx="4p",ipady="4p")
-            self.SOC.grid(row=2,column=1,padx="4p",sticky="NSEW",pady="2p",ipadx="4p",ipady="4p")
-            self.ETH.grid(row=3,column=1,padx="4p",sticky="NSEW",pady="2p",ipadx="4p",ipady="4p")
-        else:
-            self.ABI.grid(row=2,column=0,sticky="NEW",padx="4p",pady="2p",ipadx="4p",ipady="4p")
-            self.SOC.grid(row=2,column=1,padx="4p",sticky="NEW",pady="2p",ipadx="4p",ipady="4p")
-        self.SYM.grid(row=0,column=2,rowspan=4,padx="4p",sticky="NSEW",pady="2p",ipadx="4p",ipady="4p")
-        self.refresh()
 
     def parent(self) -> CCaF.CharCaracFrame:
         """

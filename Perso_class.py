@@ -760,6 +760,10 @@ class player(object):
         """ Méthode pour récupérer le niveau de palier d'armure """
         return self.secondstats["armor-level"]
 
+    def get_basestats(self):
+
+        return self.basestats
+
     def get_current_armor(self, location):
         """ Méthode pour récupérer un des objets équipés"""
         return self.playerequipment[location]
@@ -780,13 +784,13 @@ class player(object):
 
         return self.name
 
+    def get_secondstats(self):
+
+        return self.secondstats
+
     def get_spelllist(self):
 
         return self.spells.keys()
-
-    def get_basestats(self):
-
-        return self.basestats
 
     def get_weapon(self, side, weapontype):
         """
