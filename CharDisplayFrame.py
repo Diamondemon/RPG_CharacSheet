@@ -32,7 +32,7 @@ class CharDisplayFrame(QWidget):
         self.connect(self.GM_restat_choice, SIGNAL("clicked()"), self.GM_reinit_char)
         self.grid.addWidget(self.GM_restat_choice, 2, 0)
 
-        self.NBK = CharNotebook()
+        self.NBK = CharNotebook(self)
         self.grid.addWidget(self.NBK, 0, 1, 3, 1)
 
     @Slot()

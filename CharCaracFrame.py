@@ -7,14 +7,12 @@ import CNbk
 class CharCaracFrame(QWidget):
     """Affichage des statistiques d'un personnage"""
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent=parent)
+    def __init__(self):
+        QWidget.__init__(self)
         self.grid = QGridLayout(self)
-        self.parent1 = parent
         self.BNDL = CharBundleFrame()
         self.grid.addWidget(self.BNDL, 0, 0)
         self.MATK = CharAtkMFrame()
-        print(self.parent1)
 
         """self.MDEF = CharDefMFrame(self)
 
@@ -33,4 +31,9 @@ class CharCaracFrame(QWidget):
         return self.parent().get_selectedchar()
 
     def parent(self) -> CNbk.CharNotebook:
-        return
+        """
+        Method called to get the parent widget (the Notebook)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget().parent()

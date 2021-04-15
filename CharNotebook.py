@@ -1,3 +1,4 @@
+from PySide6.QtCore import SIGNAL
 from PySide6.QtWidgets import (QWidget, QTabWidget)
 from CharCaracFrame import CharCaracFrame
 from CharUsefulFrame import CharUsefulFrame
@@ -6,10 +7,10 @@ import CDF
 
 class CharNotebook(QTabWidget):
 
-    def __init__(self):
-        QTabWidget.__init__(self)
+    def __init__(self, parent):
+        QTabWidget.__init__(self, parent)
 
-        self.CharCF = CharCaracFrame(self)
+        self.CharCF = CharCaracFrame()
         self.addTab(self.CharCF, "Caractéristiques")
         self.CharUF = CharUsefulFrame()
         self.addTab(self.CharUF, "Statistiques utiles")
@@ -21,9 +22,11 @@ class CharNotebook(QTabWidget):
         self.CharSpellF = CharSpellFrame(self)
         self.addTab(self.CharIF, "Inventaire")
         self.addTab(self.CharCompF, "Compétences")"""
+        self.connect(self, SIGNAL("currentChanged(int)"), self.refresh)
 
     def refresh(self):
         self.CharCF.refresh()
+        # self.CharUF.refresh()
         """if self.parent().get_selectedchar().ismage():
             self.CharSpellF.refresh()"""
 

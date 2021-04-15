@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
-from PySide6.QtGui import (QPixmap)
+from PySide6.QtGui import (QPixmap, QPicture, QImage)
 import CBF
 
 
@@ -16,11 +16,15 @@ class CharAtkFrame(QGroupBox):
         self.images = {
             "mastery": QPixmap("./Images/symb-mastery.png"),
             "parry": QPixmap("./Images/symb-parry.png")}
-        self.progressBars: dict[str, QProgressBar] = {}
-
+        self.progressBars = {}
         i = 0
         for key in self.baselist[:-1]:
-            self.grid.addWidget(QLabel(pixmap=self.images["mastery"].scaled(10, 10, mode=Qt.SmoothTransformation)), 2 * i, 2)
+            if i == 0:
+                label = QLabel()
+                label.setPixmap(self.images["mastery"].scaled(20, 20, mode=Qt.SmoothTransformation))
+                self.grid.addWidget(label, 2 * i, 2)
+            else:
+                self.grid.addWidget(QLabel(pixmap=self.images["mastery"].scaled(10, 10, mode=Qt.SmoothTransformation)), 2 * i, 2)
             self.grid.addWidget(QLabel("= "), 2 * i, 3)
             i += 1
         self.grid.addWidget(QLabel(pixmap=self.images["parry"].scaled(12, 15)), 2 * i, 2)

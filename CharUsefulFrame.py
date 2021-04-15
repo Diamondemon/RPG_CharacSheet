@@ -1,6 +1,8 @@
 from PySide6.QtCore import SIGNAL
 from PySide6.QtWidgets import (QWidget, QFrame, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
+
+import CNbk
 from CharFirstSymbFrame import CharFirstSymbFrame
 from CharPercepFrame import CharPercepFrame
 from CharStealthFrame import CharStealthFrame
@@ -54,6 +56,8 @@ class CharUsefulFrame(QWidget):
         """self.bind("<Visibility>", func=self.refresh)"""
 
     def refresh(self, event=None):
+        print(self.parentWidget())
+        """
         self.CharFSymF.refresh()
         self.CharPercepF.refresh()
         self.CharStealthF.refresh()
@@ -63,7 +67,15 @@ class CharUsefulFrame(QWidget):
         self.CharArmF.refresh()
         self.CharMelF.refresh()
         self.CharThrF.refresh()
-        self.PercFrame.refresh()
+        self.PercFrame.refresh()"""
 
     def get_selectedchar(self):
-        return self.master.get_selectedchar()
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CNbk.CharNotebook:
+        """
+        Method called to get the parent widget (the Notebook)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget().parent()
