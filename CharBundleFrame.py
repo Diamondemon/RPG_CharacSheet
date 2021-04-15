@@ -19,22 +19,25 @@ class CharBundleFrame(QWidget):
 
         self.ATK = CharAtkFrame()
         self.grid.addWidget(self.ATK, 0, 0, 2, 1)
-        self.DEF = CharDefFrame(self)
+        self.DEF = CharDefFrame()
         self.grid.addWidget(self.DEF, 0, 1)
-        self.PHY = CharPhyFrame(self)
+        self.PHY = CharPhyFrame()
         self.grid.addWidget(self.PHY, 1, 1)
         self.ABI = CharAbiFrame(self)
         self.grid.addWidget(self.ABI, 2, 0, 2, 1)
         self.SOC = CharSocFrame()
         self.grid.addWidget(self.SOC, 2, 1)
-        self.ETH = CharEthFrame(self)
+        self.ETH = CharEthFrame()
         self.grid.addWidget(self.ETH, 3, 1)
         self.SYM = CharSymbFrame(self)
         self.grid.addWidget(self.SYM, 0, 2, 4, 1)
 
     def refresh(self):
         self.ATK.refresh()
+        self.DEF.refresh()
+        self.PHY.refresh()
         self.SOC.refresh()
+        self.ETH.refresh()
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()

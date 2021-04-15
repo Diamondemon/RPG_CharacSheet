@@ -798,7 +798,7 @@ class player(object):
 
         return self.spells.keys()
 
-    def get_thirdlist(self):
+    def get_thirdstats(self):
 
         return self.thirdstats
 
