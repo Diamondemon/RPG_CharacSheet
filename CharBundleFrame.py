@@ -17,7 +17,7 @@ class CharBundleFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
-        self.ATK = CharAtkFrame(self)
+        self.ATK = CharAtkFrame()
         self.grid.addWidget(self.ATK, 0, 0, 2, 1)
         self.DEF = CharDefFrame(self)
         self.grid.addWidget(self.DEF, 0, 1)
@@ -25,7 +25,7 @@ class CharBundleFrame(QWidget):
         self.grid.addWidget(self.PHY, 1, 1)
         self.ABI = CharAbiFrame(self)
         self.grid.addWidget(self.ABI, 2, 0, 2, 1)
-        self.SOC = CharSocFrame(self)
+        self.SOC = CharSocFrame()
         self.grid.addWidget(self.SOC, 2, 1)
         self.ETH = CharEthFrame(self)
         self.grid.addWidget(self.ETH, 3, 1)

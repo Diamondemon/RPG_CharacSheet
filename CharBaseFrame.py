@@ -5,6 +5,7 @@ import Perso_class as Pc
 
 
 class CharBaseFrame(QWidget):
+    """ Widget used to display the basic information about the character """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -118,15 +119,22 @@ class CharBaseFrame(QWidget):
         self.nameLabel.setText(selectedchar.get_name())
         self.totalXpLabel.setText(str(selectedchar.totalxp))
         self.xpLabel.setText(str(selectedchar.xp))
-        self.strengthLabel.setText(str(selectedchar.secondstats["symb-strength"][0]) + "/" + str(
-            selectedchar.secondstats["symb-strength"][1]) + " (" + str(
-            selectedchar.secondstats["symb-strength"][2]) + ")")
+        secondstats = selectedchar.get_secondstats()
+        self.strengthLabel.setText(str(secondstats["symb-strength"][0]) + "/" + str(
+            secondstats["symb-strength"][1]) + " (" + str(
+            secondstats["symb-strength"][2]) + ")")
 
         self.GM_wheel.clear()
-        self.GM_wheel.addItems(list(selectedchar.GMstats.keys()))
+        self.GM_wheel.addItems(list(selectedchar.get_gmstats().keys()))
         self.GM_wheel.setCurrentIndex(0)
 
-        self.legal_scale.setValue(selectedchar.passivestats["legal"][0])
+        self.legal_scale.setValue(selectedchar.get_passivestats()["legal"][0])
 
     def set_legal_display(self, value: int):
+        """
+        Method called to set the value of legal level displayed inside the label
+
+        :param value: value to display
+        :return: None
+        """
         self.legal_display.setText(str(value))

@@ -6,8 +6,8 @@ import CBF
 class CharAtkFrame(QGroupBox):
     """ Widget to display the offensive abilities of the character """
 
-    def __init__(self, parent):
-        QGroupBox.__init__(self, " Combat ", parent)
+    def __init__(self):
+        QGroupBox.__init__(self, " Combat ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 
@@ -23,9 +23,9 @@ class CharAtkFrame(QGroupBox):
             else:
                 self.images["mastery-" + key] = QSvgWidget("./Images/symb-parry.svg")
                 self.images["mastery-" + key].setFixedSize(12, 15)
-            self.grid.addWidget(self.images["mastery-" + key], 2 * i, 2)
+            self.grid.addWidget(self.images["mastery-" + key], 2 * i, 1)
             self.labels.append(QLabel("= "))
-            self.grid.addWidget(self.labels[i], 2 * i, 3)
+            self.grid.addWidget(self.labels[i], 2 * i, 2)
             i += 1
 
         self.progressBars = {}
@@ -46,17 +46,20 @@ class CharAtkFrame(QGroupBox):
 
         :return: None
         """
+        selectedchar = self.get_selectedchar()
+        basestats = selectedchar.get_basestats()
+        secondstats = selectedchar.get_secondstats()
         i = 0
         for key in self.baselist:
             if key != "shield":
-                self.labels[i].setText("= " + str(self.get_selectedchar().get_secondstats()["symb-mastery"][key]))
+                self.labels[i].setText("= " + str(secondstats["symb-mastery"][key]))
 
             else:
-                self.labels[i].setText("= " + str(self.get_selectedchar().get_secondstats()["symb-parry"]))
-            i += 1
+                self.labels[i].setText("= " + str(secondstats["symb-parry"]))
 
-        for key in self.baselist:
-            self.progressBars[key].setValue(self.get_selectedchar().get_basestats()[key][0])
+            self.progressBars[key].setValue(basestats[key][0])
+
+            i += 1
 
     def get_selectedchar(self):
         """

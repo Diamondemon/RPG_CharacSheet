@@ -768,6 +768,9 @@ class player(object):
         """ Méthode pour récupérer un des objets équipés"""
         return self.playerequipment[location]
 
+    def get_gmstats(self):
+        return self.GMstats
+
     def get_invested_armor(self, location):
         """
         :param location: armor piece location
@@ -784,6 +787,9 @@ class player(object):
 
         return self.name
 
+    def get_passivestats(self):
+        return self.passivestats
+
     def get_secondstats(self):
 
         return self.secondstats
@@ -791,6 +797,10 @@ class player(object):
     def get_spelllist(self):
 
         return self.spells.keys()
+
+    def get_thirdlist(self):
+
+        return self.thirdstats
 
     def get_weapon(self, side, weapontype):
         """

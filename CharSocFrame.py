@@ -1,23 +1,29 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
-from PySide6.QtGui import (QPixmap)
 from PySide6.QtSvgWidgets import QSvgWidget
 import CBF
 
 
 class CharSocFrame(QGroupBox):
-    """ Widget d'affichage des caractéristiques d'attaque du personnage"""
+    """ Widget to display the social abilities of the character """
 
-    def __init__(self, parent):
-        QGroupBox.__init__(self, " Social ", parent)
+    def __init__(self):
+        QGroupBox.__init__(self, " Social ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 
         self.baselist = ["charisma", "trading", "luck"]
         self.sizelist = {"charisma": (12, 12), "trading": (15, 13), "luck": (12, 18)}
         self.images = {}
+        self.labels = []
+
+        i = 0
         for key in self.baselist:
             self.images[key] = QSvgWidget("./Images/symb-"+key+".svg")
             self.images[key].setFixedSize(self.sizelist[key][0], self.sizelist[key][1])
+            self.grid.addWidget(self.images[self.baselist[i]], 2*i, 1)
+            self.labels.append(QLabel("= "))
+            self.grid.addWidget(self.labels[i], 2 * i, 2)
+            i += 1
 
         self.progressBars = {}
         i = 0
@@ -30,33 +36,29 @@ class CharSocFrame(QGroupBox):
 
             self.progressBars[self.baselist[i]] = bar
             self.grid.addWidget(bar, 2 * i + 1, 0)
-            self.grid.addWidget(self.images[self.baselist[i]], 2*i, 1)
-            self.grid.addWidget(QLabel("= "), 2 * i, 2)
             i += 1
-
-        """self.bind("<Button-1>", func=self.modifychar)
-        for i in self.grid_slaves():
-            i.bind("<Button-1>", func=self.modifychar)"""
 
     def refresh(self):
         """
-        i = 1
-        for key in self.grid_slaves(column=2):
-            key["text"] = self.master.master.master.master.selectedchar.secondstats[
-                "symb-" + self.baselist[len(self.baselist) - i]]
-            i += 1
-        i = 1
-        """
-        for key in self.baselist:
-            self.progressBars[key].setValue(self.get_selectedchar().get_basestats()[key][0])
+        Method called to refresh all the information displayed on the frame
 
-    def modifychar(self, event=None):
-        """ Affiche la fenêtre de modification du personnage """
-        for i in self.master.master.grid_slaves(column=3):
-            i.grid_forget()
-        self.master.master.MSOC.grid(row=0, column=3)
+        :return: None
+        """
+        selectedchar = self.get_selectedchar()
+        basestats = selectedchar.get_basestats()
+        secondstats = selectedchar.get_secondstats()
+        i = 0
+        for key in self.baselist:
+            self.labels[i].setText("= " + str(secondstats["symb-"+key]))
+            self.progressBars[key].setValue(basestats[key][0])
+            i += 1
 
     def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
         return self.parent().get_selectedchar()
 
     def parent(self) -> CBF.CharBundleFrame:
