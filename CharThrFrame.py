@@ -4,8 +4,8 @@ from PySide6.QtGui import QPixmap
 
 class CharThrFrame(QGroupBox):
 
-    def __init__(self, parent):
-        QGroupBox.__init__(self, " Jet ", parent)
+    def __init__(self):
+        QGroupBox.__init__(self, " Jet ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 

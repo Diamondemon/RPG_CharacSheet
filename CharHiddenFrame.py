@@ -2,37 +2,48 @@ from PySide6.QtCore import SIGNAL
 from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout, QSplitter, QFrame)
 from PySide6.QtGui import (QPixmap, Qt)
 
+import CUF
+
 
 class CharHiddenFrame(QWidget):
     """ Widget qui affiche ce qui a été investi dans action dissimulée """
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
+    def __init__(self):
+        QWidget.__init__(self)
         self.grid = QGridLayout(self)
+        self.setMaximumHeight(60)
+
+        self.labels = []
 
         self.grid.addWidget(QLabel("Action dissimulée"), 0, 0)
 
         i = 0
         for key in ["Vol à la tire : ", "Embuscade : ", "Fuite : "]:
-            self.grid.addWidget(QLabel(key), 1, 3 * i)
+            self.grid.addWidget(QLabel(self.tr(key)), 1, 2 * i)
+            self.labels.append(QLabel(""))
+            self.grid.addWidget(self.labels[i], 1, 2 * i + 1)
             i += 1
 
-        """for i in range(2):
-            self.columnconfigure(3*i+2,weight=1)"""
-
-
-
     def refresh(self):
+        thirdstats = self.get_selectedchar().get_thirdstats()
 
-       """for i in self.grid_slaves():
-            info=i.grid_info()
-            if info["row"]==1 and info["column"] in [1,4,7]:
-                i.destroy()
-
-        j=0
-        for stat in ["thievery","ambush","escape"]:
-            Label(self,text=self.master.master.master.selectedchar.thirdstats["hidden_action"][stat]).grid(row=1,column=3*j+1)
-            j+=1"""
+        i = 0
+        for key in ["thievery", "ambush", "escape"]:
+            self.labels[i].setText(str(thirdstats["hidden_action"][key]))
+            i += 1
 
     def get_selectedchar(self):
-        return self.master.get_selectedchar()
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CUF.CharUsefulFrame:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget()

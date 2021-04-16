@@ -764,6 +764,10 @@ class player(object):
 
         return self.basestats
 
+    def get_competences(self):
+
+        return self.competences
+
     def get_current_armor(self, location):
         """ Méthode pour récupérer un des objets équipés"""
         return self.playerequipment[location]
@@ -789,6 +793,9 @@ class player(object):
 
     def get_passivestats(self):
         return self.passivestats
+
+    def get_percentages(self):
+        return self.percentages
 
     def get_secondstats(self):
 

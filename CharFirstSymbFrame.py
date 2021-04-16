@@ -3,6 +3,8 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout)
 from PySide6.QtGui import (QPixmap)
 
+import CUF
+
 
 class CharFirstSymbFrame(QWidget):
 
@@ -35,9 +37,14 @@ class CharFirstSymbFrame(QWidget):
             i += 1
 
     def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
         return self.parent().get_selectedchar()
 
-    def parent(self):
+    def parent(self) -> CUF.CharUsefulFrame:
         """
         Method called to get the parent widget (the CharUsefulFrame)
 

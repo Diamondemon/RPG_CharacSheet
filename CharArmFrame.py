@@ -6,8 +6,8 @@ import numpy as np
 
 class CharArmFrame(QGroupBox):
 
-    def __init__(self, parent):
-        QGroupBox.__init__(self, " Armure ", parent)
+    def __init__(self):
+        QGroupBox.__init__(self, " Armure ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 

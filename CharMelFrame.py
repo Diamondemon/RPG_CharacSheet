@@ -1,26 +1,24 @@
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (QGroupBox, QGridLayout)
 from PySide6.QtGui import QPixmap
+
+import CUF
 
 
 class CharMelFrame(QGroupBox):
 
-    def __init__(self, parent):
-        QGroupBox.__init__(self, " Mélée ", parent)
+    def __init__(self):
+        QGroupBox.__init__(self, " Mélée ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 
-        self.mastery_image = QPixmap("./Images/symb-perception.png")
-        self.mastery_image = self.mastery_image.scaled(10, 10)
-
-        """for i in range(1, 9):
-            self.grid_columnconfigure(i, weight=1)"""
+        self.mastery_image = QSvgWidget("./Images/symb-perception.png")
+        self.mastery_image.setFixedSize(10, 10)
 
     def refresh(self):
         """ Fonction pour rafraîchir les équipements de mélée du personnage """
         Meleelist = ["dgt_tr", "dgt_ctd", "estoc", "vit", "mastery", "quality", "solid"]
         Shieldlist = ["close", "dist", "mobi", "vit", "mastery", "quality", "solid"]
-        for i in self.grid_slaves():
-            i.destroy()
 
         """i = 1
         # si l'objet est équipé, on met ses caractéristiques, sinon, on met des "..."
@@ -227,4 +225,17 @@ class CharMelFrame(QGroupBox):
             self.master.master.master.selectedchar.get_weapon(where, "melee").get_stats_aslist(["mastery"])[0])
 
     def get_selectedchar(self):
-        return self.master.get_selectedchar()
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CUF.CharUsefulFrame:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget()
