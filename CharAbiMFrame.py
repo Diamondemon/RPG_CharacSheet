@@ -13,7 +13,7 @@ class CharAbiMFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
         self.setMaximumHeight(500)
-        self.setMaximumWidth(350)
+        self.setMaximumWidth(400)
         self.baselist = ["perception", "stealth", "reflex", "wit", "mental-res"]
         self.addlist = {}
         self.perceplist = [["intention", "thing-info", "bestiary"], ["trap", "find", "tracking"],
@@ -49,9 +49,9 @@ class CharAbiMFrame(QWidget):
         # sense
         self.grid.addWidget(QLabel(self.tr("Améliorer ses sens")), 4, 0, 1, 12)
 
-        i = 5
+        i = 0
         for key in ["Vue : ", "Ouïe : ", "Odorat : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 0, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), 5, 4*i, 1, 2)
             i += 1
 
         self.add_sight = QPushButton(self.tr("+"))
@@ -65,38 +65,38 @@ class CharAbiMFrame(QWidget):
         self.connect(self.add_smell, SIGNAL("clicked()"), partial(self.add_sense, "smell"))
 
         self.grid.addWidget(self.add_sight, 5, 3, 1, 1)
-        self.grid.addWidget(self.add_hearing, 6, 3, 1, 1)
-        self.grid.addWidget(self.add_smell, 7, 3, 1, 1)
+        self.grid.addWidget(self.add_hearing, 5, 7, 1, 1)
+        self.grid.addWidget(self.add_smell, 5, 11, 1, 1)
 
         separator1 = QFrame(self)
         separator1.setFrameShape(QFrame.HLine)
-        self.grid.addWidget(separator1, 8, 0, 1, 12)
+        self.grid.addWidget(separator1, 6, 0, 1, 12)
 
         # perception
-        self.grid.addWidget(QLabel(self.tr("Perception")), 9, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Perception")), 7, 0, 1, 12)
 
         i = 0
         for key in ["Indice : ", "Terrain : ", "Embuscade : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), 10, 4 * i, 1, 4)
+            self.grid.addWidget(QLabel(self.tr(key)), 8, 4 * i, 1, 4)
             i += 1
 
-        i = 11
+        i = 9
         for key in ["Intention : ", "Objet-info : ", "Bestiaire : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 0, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), i, 0, 1, 2)
             i += 1
 
-        i = 11
+        i = 9
         for key in ["Piège : ", "Trouver Objets : ", "Pistage : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 4, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), i, 4, 1, 2)
             i += 1
 
-        i = 11
+        i = 9
         for key in ["Adversaires : ", "Menace : ", "Malédiction : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 8, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), i, 8, 1, 2)
             i += 1
 
         for j in range(3):
-            i = 11
+            i = 9
             for stat in self.perceplist[j]:
                 self.addlist[stat] = QPushButton(self.tr("+"))
                 self.addlist[stat].setDisabled(True)
@@ -106,33 +106,33 @@ class CharAbiMFrame(QWidget):
 
         separator2 = QFrame(self)
         separator2.setFrameShape(QFrame.HLine)
-        self.grid.addWidget(separator2, 14, 0, 1, 12)
+        self.grid.addWidget(separator2, 12, 0, 1, 12)
 
         # stealth
-        self.grid.addWidget(QLabel(self.tr("Furtivité")), 15, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Furtivité")), 13, 0, 1, 12)
 
         i = 0
         for key in ["Silence : ", "Dissimulation : ", "Camouflage : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), 16, 4 * i, 1, 4)
+            self.grid.addWidget(QLabel(self.tr(key)), 14, 4 * i, 1, 4)
             i += 1
 
-        i = 17
+        i = 15
         for key in ["Sol : ", "Déplacement : ", "Assassinat : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 0, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), i, 0, 1, 2)
             i += 1
 
-        i = 17
+        i = 15
         for key in ["Ombre : ", "Immobilité : ", "Identité : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 4, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), i, 4, 1, 2)
             i += 1
 
-        i = 17
+        i = 15
         for key in ["Odeur : ", "Déguisement : ", "Nature/Terrain : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), i, 8, 1, 3)
+            self.grid.addWidget(QLabel(self.tr(key)), i, 8, 1, 2)
             i += 1
 
         for j in range(3):
-            i = 17
+            i = 15
             for stat in self.furtiflist[j]:
                 self.addlist[stat] = QPushButton(self.tr("+"))
                 self.addlist[stat].setDisabled(True)
@@ -142,14 +142,14 @@ class CharAbiMFrame(QWidget):
 
         separator3 = QFrame(self)
         separator3.setFrameShape(QFrame.HLine)
-        self.grid.addWidget(separator3, 20, 0, 1, 12)
+        self.grid.addWidget(separator3, 18, 0, 1, 12)
 
         # action dissimulée
-        self.grid.addWidget(QLabel(self.tr("Action dissimulée")), 21, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Action dissimulée")), 19, 0, 1, 12)
 
         i = 0
         for key in ["Vol à la tire : ", "Embuscade : ", "Fuite : "]:
-            self.grid.addWidget(QLabel(self.tr(key)), 22, 4 * i, 1, 4)
+            self.grid.addWidget(QLabel(self.tr(key)), 20, 4 * i, 1, 2)
             i += 1
 
         j = 0
@@ -157,8 +157,19 @@ class CharAbiMFrame(QWidget):
             self.addlist[stat] = QPushButton(self.tr("+"))
             self.addlist[stat].setDisabled(True)
             self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.invest_furtif, stat))
-            self.grid.addWidget(self.addlist[stat], 22, 4 * j + 3, 1, 1)
+            self.grid.addWidget(self.addlist[stat], 20, 4 * j + 3, 1, 1)
             j += 1
+
+        for i in range(8):
+            for j in range(3):
+                if i == 0:
+                    self.grid.addWidget(self.labels[i, j], 5, 4*j+2)
+                elif i < 4:
+                    self.grid.addWidget(self.labels[i, j], 8+i, 4*j+2)
+                elif i < 7:
+                    self.grid.addWidget(self.labels[i, j], 11+i, 4*j+2)
+                else:
+                    self.grid.addWidget(self.labels[i, j], 20, 4*j+2)
 
     def add_sense(self, stat):
         """
