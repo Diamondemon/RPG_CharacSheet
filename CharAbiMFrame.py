@@ -3,7 +3,6 @@ from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton, QFrame)
 from functools import partial
 import CCaF
-import numpy as np
 
 
 class CharAbiMFrame(QWidget):
@@ -16,14 +15,14 @@ class CharAbiMFrame(QWidget):
         self.setMaximumWidth(400)
         self.baselist = ["perception", "stealth", "reflex", "wit", "mental-res"]
         self.addlist = {}
+        self.labels = {}
         self.perceplist = [["intention", "thing-info", "bestiary"], ["trap", "find", "tracking"],
                            ["ennemies", "threat", "curse"]]
         self.furtiflist = [["ground", "moving", "assassination"], ["shadow", "not-moving", "identity"],
                            ["smell", "disguise", "nature-field"]]
-        self.labels = np.zeros((8, 3), dtype=QLabel)
-        for i in range(8):
-            for j in range(3):
-                self.labels[i, j] = QLabel("0")
+        self.point_labels = []
+        for i in range(4):
+            self.point_labels.append(QLabel(self.tr("Points restants : %n", "", 0)))
 
         self.grid.addWidget(QLabel(self.tr("Utiliser l'XP")), 0, 0, 1, 12)
 
@@ -47,33 +46,31 @@ class CharAbiMFrame(QWidget):
         self.grid.addWidget(separator, 3, 0, 1, 12)
 
         # sense
-        self.grid.addWidget(QLabel(self.tr("Améliorer ses sens")), 4, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Améliorer ses sens")), 4, 0, 1, 7)
+        self.grid.addWidget(self.point_labels[0], 4, 7, 1, 5)
 
         i = 0
         for key in ["Vue : ", "Ouïe : ", "Odorat : "]:
             self.grid.addWidget(QLabel(self.tr(key)), 5, 4*i, 1, 2)
             i += 1
 
-        self.add_sight = QPushButton(self.tr("+"))
-        self.add_sight.setDisabled(True)
-        self.connect(self.add_sight, SIGNAL("clicked()"), partial(self.add_sense, "sight"))
-        self.add_hearing = QPushButton(self.tr("+"))
-        self.add_hearing.setDisabled(True)
-        self.connect(self.add_hearing, SIGNAL("clicked()"), partial(self.add_sense, "hearing"))
-        self.add_smell = QPushButton(self.tr("+"))
-        self.add_smell.setDisabled(True)
-        self.connect(self.add_smell, SIGNAL("clicked()"), partial(self.add_sense, "smell"))
-
-        self.grid.addWidget(self.add_sight, 5, 3, 1, 1)
-        self.grid.addWidget(self.add_hearing, 5, 7, 1, 1)
-        self.grid.addWidget(self.add_smell, 5, 11, 1, 1)
+        i = 0
+        for stat in ["sight", "hearing", "smelling"]:
+            self.addlist[stat] = QPushButton(self.tr("+"))
+            self.addlist[stat].setDisabled(True)
+            self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.add_sense, stat))
+            self.grid.addWidget(self.addlist[stat], 5, 3+4*i)
+            self.labels[stat] = QLabel("0")
+            self.grid.addWidget(self.labels[stat], 5, 2+4*i)
+            i += 1
 
         separator1 = QFrame(self)
         separator1.setFrameShape(QFrame.HLine)
         self.grid.addWidget(separator1, 6, 0, 1, 12)
 
         # perception
-        self.grid.addWidget(QLabel(self.tr("Perception")), 7, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Perception")), 7, 0, 1, 7)
+        self.grid.addWidget(self.point_labels[1], 7, 7, 1, 5)
 
         i = 0
         for key in ["Indice : ", "Terrain : ", "Embuscade : "]:
@@ -101,7 +98,9 @@ class CharAbiMFrame(QWidget):
                 self.addlist[stat] = QPushButton(self.tr("+"))
                 self.addlist[stat].setDisabled(True)
                 self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.invest_furtif, stat))
-                self.grid.addWidget(self.addlist[stat], i, 4 * j + 3, 1, 1)
+                self.grid.addWidget(self.addlist[stat], i, 4 * j + 3)
+                self.labels[stat] = QLabel("0")
+                self.grid.addWidget(self.labels[stat], i, 4*j+2)
                 i += 1
 
         separator2 = QFrame(self)
@@ -109,7 +108,8 @@ class CharAbiMFrame(QWidget):
         self.grid.addWidget(separator2, 12, 0, 1, 12)
 
         # stealth
-        self.grid.addWidget(QLabel(self.tr("Furtivité")), 13, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Furtivité")), 13, 0, 1, 7)
+        self.grid.addWidget(self.point_labels[2], 13, 7, 1, 5)
 
         i = 0
         for key in ["Silence : ", "Dissimulation : ", "Camouflage : "]:
@@ -137,7 +137,9 @@ class CharAbiMFrame(QWidget):
                 self.addlist[stat] = QPushButton(self.tr("+"))
                 self.addlist[stat].setDisabled(True)
                 self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.invest_furtif, stat))
-                self.grid.addWidget(self.addlist[stat], i, 4 * j + 3, 1, 1)
+                self.grid.addWidget(self.addlist[stat], i, 4 * j + 3)
+                self.labels[stat] = QLabel("0")
+                self.grid.addWidget(self.labels[stat], i, 4*j+2)
                 i += 1
 
         separator3 = QFrame(self)
@@ -145,7 +147,8 @@ class CharAbiMFrame(QWidget):
         self.grid.addWidget(separator3, 18, 0, 1, 12)
 
         # action dissimulée
-        self.grid.addWidget(QLabel(self.tr("Action dissimulée")), 19, 0, 1, 12)
+        self.grid.addWidget(QLabel(self.tr("Action dissimulée")), 19, 0, 1, 7)
+        self.grid.addWidget(self.point_labels[3], 19, 7, 1, 5)
 
         i = 0
         for key in ["Vol à la tire : ", "Embuscade : ", "Fuite : "]:
@@ -158,18 +161,9 @@ class CharAbiMFrame(QWidget):
             self.addlist[stat].setDisabled(True)
             self.connect(self.addlist[stat], SIGNAL("clicked()"), partial(self.invest_furtif, stat))
             self.grid.addWidget(self.addlist[stat], 20, 4 * j + 3, 1, 1)
+            self.labels[stat] = QLabel("0")
+            self.grid.addWidget(self.labels[stat], 20, 4*j+2)
             j += 1
-
-        for i in range(8):
-            for j in range(3):
-                if i == 0:
-                    self.grid.addWidget(self.labels[i, j], 5, 4*j+2)
-                elif i < 4:
-                    self.grid.addWidget(self.labels[i, j], 8+i, 4*j+2)
-                elif i < 7:
-                    self.grid.addWidget(self.labels[i, j], 11+i, 4*j+2)
-                else:
-                    self.grid.addWidget(self.labels[i, j], 20, 4*j+2)
 
     def add_sense(self, stat):
         """
@@ -179,6 +173,7 @@ class CharAbiMFrame(QWidget):
         :return: None
         """
         self.get_selectedchar().upstats(stat, 1)
+        self.save_character()
         self.refresh()
         self.parent().refresh_abi()
 
@@ -198,6 +193,7 @@ class CharAbiMFrame(QWidget):
         :return: None
         """
         self.get_selectedchar().upstats(stat, 1)
+        self.save_character()
         self.refresh()
         self.parent().refresh_abi()
 
@@ -210,99 +206,84 @@ class CharAbiMFrame(QWidget):
         return QWidget.parent(self)
 
     def refresh(self):
-
         """
-        ""Fonction qui rafraichit toutes les zones de tier 3 ""
-        for i in self.senseFrame.grid_slaves():
-            info=i.grid_info()
-            if info["row"]>=1 and info["column"]==1:
-                i.destroy()
-            elif info["row"]==0 and info["column"]==3:
-                i.destroy()
+        Method called to refresh all the statistics and numbers displayed on screen
 
-        for i in self.stealthFrame.grid_slaves():
-            info=i.grid_info()
-            if info["row"]>=2 and info["column"] in [1,4,7]:
-                i.destroy()
-            elif info["row"]==0 and info["column"]==9:
-                i.destroy()
+        :return: None
+        """
 
-        for i in self.percepFrame.grid_slaves():
-            info=i.grid_info()
-            if info["row"]>=2 and info["column"] in [1,4,7]:
-                i.destroy()
-            elif info["row"]==0 and info["column"]==9:
-                i.destroy()
+        selectedchar = self.get_selectedchar()
+        secondstats = selectedchar.get_secondstats()
+        thirdstats = selectedchar.get_thirdstats()
 
-        # sens
-        if self.master.master.master.selectedchar.secondstats["symb-S"]:
-            Label(self.senseFrame,text="Points restants : "+str(self.master.master.master.selectedchar.secondstats["symb-S"])).grid(row=0,column=3,sticky="w")
-            self.add_sight["state"]="normal"
-            self.add_hearing["state"]="normal"
-            self.add_smell["state"]="normal"
+        self.point_labels[0].setText(self.tr("Points restants : %n", "", secondstats["symb-S"]))
+        self.point_labels[1].setText(self.tr("Points restants : %n", "", secondstats["symb-perception"]))
+        self.point_labels[2].setText(self.tr("Points restants : %n", "", secondstats["symb-T"] +
+                                             secondstats["symb-stealth"][0] + secondstats["symb-stealth"][1]))
+        self.point_labels[3].setText(self.tr("Points restants : %n", "", secondstats["symb-ability"][0] +
+                                             secondstats["symb-ps_T"][0] + secondstats["symb-T"]))
+
+        # senses
+        if secondstats["symb-S"]:
+            for key in ["sight", "hearing", "smelling"]:
+                self.addlist[key].setDisabled(False)
         else:
-            self.add_sight["state"]="disabled"
-            self.add_hearing["state"]="disabled"
-            self.add_smell["state"]="disabled"
+            for key in ["sight", "hearing", "smelling"]:
+                self.addlist[key].setDisabled(True)
 
-        i=1
-        for key in ["sight","hearing","smell"]:
-            Label(self.senseFrame,text=self.master.master.master.selectedchar.thirdstats[key]).grid(row=i,column=1)
-            i+=1
+        i = 0
+        for key in ["sight", "hearing", "smelling"]:
+            self.labels[key].setText(str(thirdstats[key]))
+            i += 1
 
-        # furtivité
-        if self.master.master.master.selectedchar.secondstats["symb-T"]+self.master.master.master.selectedchar.secondstats["symb-stealth"][0]+self.master.master.master.selectedchar.secondstats["symb-stealth"][1]:
-            Label(self.stealthFrame,text="Points restants : "+str(self.master.master.master.selectedchar.secondstats["symb-T"]+self.master.master.master.selectedchar.secondstats["symb-stealth"][0]+self.master.master.master.selectedchar.secondstats["symb-stealth"][1])).grid(row=0,column=9,sticky="w")
-            for j in range(3):
-                for key in self.furtiflist[j]:
-                    self.addlist[key]["state"]="normal"
+        # stealth
+        if secondstats["symb-T"] + secondstats["symb-stealth"][0] + secondstats["symb-stealth"][1]:
+            for i in range(3):
+                for key in self.furtiflist[i]:
+                    self.addlist[key].setDisabled(False)
         else:
-            for j in range(3):
-                for key in self.furtiflist[j]:
-                    self.addlist[key]["state"]="disabled"
+            for i in range(3):
+                for key in self.furtiflist[i]:
+                    self.addlist[key].setDisabled(True)
 
-        j=0
-        for key in ["silence","hiding","camo"]:
-            i=2
+        j = 0
+        for key in ["silence", "hiding", "camo"]:
+            i = 1
             for stat in self.furtiflist[j]:
-                Label(self.stealthFrame,text=self.master.master.master.selectedchar.thirdstats[key][stat]).grid(row=i,column=3*j+1)
-                i+=1
-
-            j+=1
+                self.labels[stat].setText(str(thirdstats[key][stat]))
+                i += 1
+            j += 1
 
         # perception
-        if self.master.master.master.selectedchar.secondstats["symb-perception"]:
-            Label(self.percepFrame,text="Points restants : "+str(self.master.master.master.selectedchar.secondstats["symb-perception"])).grid(row=0,column=9,sticky="w")
+        if secondstats["symb-perception"]:
             for j in range(3):
                 for key in self.perceplist[j]:
-                    self.addlist[key]["state"]="normal"
+                    self.addlist[key].setDisabled(False)
         else:
             for j in range(3):
                 for key in self.perceplist[j]:
-                    self.addlist[key]["state"]="disabled"
+                    self.addlist[key].setDisabled(True)
 
-        j=0
-        for key in ["clue","field","ambush"]:
-            i=2
+        j = 0
+        for key in ["clue", "field", "ambush"]:
+            i = 4
             for stat in self.perceplist[j]:
-                Label(self.percepFrame,text=self.master.master.master.selectedchar.thirdstats[key][stat]).grid(row=i,column=3*j+1)
-                i+=1
-
-            j+=1
+                self.labels[stat].setText(str(thirdstats[key][stat]))
+                i += 1
+            j += 1
 
         # action dissimulée
-        if self.master.master.master.selectedchar.secondstats["symb-ability"][0]+self.master.master.master.selectedchar.secondstats["symb-ps_T"][0]+self.master.master.master.selectedchar.secondstats["symb-T"]:
-            Label(self.hiddenFrame,text="Points restants : "+str(self.master.master.master.selectedchar.secondstats["symb-ability"][0]+self.master.master.master.selectedchar.secondstats["symb-ps_T"][0]+self.master.master.master.selectedchar.secondstats["symb-T"])).grid(row=0,column=9,sticky="w")
-            for key in ["thievery","ambush","escape"]:
-                self.addlist[key]["state"]="normal"
+        if secondstats["symb-ability"][0] + secondstats["symb-ps_T"][0] + secondstats["symb-T"]:
+            for key in ["thievery", "ambush", "escape"]:
+                self.addlist[key].setDisabled(False)
         else:
-            for key in ["thievery","ambush","escape"]:
-                self.addlist[key]["state"]="disabled"
+            for key in ["thievery", "ambush", "escape"]:
+                self.addlist[key].setDisabled(True)
 
-        j=0
-        for stat in ["thievery","ambush","escape"]:
-            Label(self.hiddenFrame,text=self.master.master.master.selectedchar.thirdstats["hidden_action"][stat]).grid(row=1,column=3*j+1)
-            j+=1"""
+        j = 0
+        for stat in ["thievery", "ambush", "escape"]:
+            self.labels[stat].setText(str(thirdstats["hidden_action"][stat]))
+            j += 1
 
     def register(self):
         """
@@ -313,4 +294,13 @@ class CharAbiMFrame(QWidget):
         self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
         self.parent().refresh_abi()
         self.parent().refresh_base()
+        self.save_character()
         self.refresh()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()

@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
+from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QMouseEvent
 import CBF
@@ -11,6 +12,7 @@ class CharSocFrame(QGroupBox):
         QGroupBox.__init__(self, " Social ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.setCursor(Qt.PointingHandCursor)
 
         self.baselist = ["charisma", "trading", "luck"]
         self.sizelist = {"charisma": (12, 12), "trading": (15, 13), "luck": (12, 18)}
@@ -75,6 +77,6 @@ class CharSocFrame(QGroupBox):
         secondstats = selectedchar.get_secondstats()
         i = 0
         for key in self.baselist:
-            self.labels[i].setText("= " + str(secondstats["symb-"+key]))
+            self.labels[i].setText(f'= {secondstats["symb-"+key]}')
             self.progressBars[key].setValue(basestats[key][0])
             i += 1

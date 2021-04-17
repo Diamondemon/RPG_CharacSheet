@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
+from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QMouseEvent
 import CBF
@@ -11,6 +12,7 @@ class CharAtkFrame(QGroupBox):
         QGroupBox.__init__(self, " Combat ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.setCursor(Qt.PointingHandCursor)
 
         self.baselist = ["hands", "light", "medium", "heavy", "throw", "shield"]
         self.images = {}
@@ -78,10 +80,10 @@ class CharAtkFrame(QGroupBox):
         i = 0
         for key in self.baselist:
             if key != "shield":
-                self.labels[i].setText("= " + str(secondstats["symb-mastery"][key]))
+                self.labels[i].setText(f'= {secondstats["symb-mastery"][key]}')
 
             else:
-                self.labels[i].setText("= " + str(secondstats["symb-parry"]))
+                self.labels[i].setText(f'= {secondstats["symb-parry"]}')
 
             self.progressBars[key].setValue(basestats[key][0])
 

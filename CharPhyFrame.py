@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
+from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import (QMouseEvent)
 
@@ -12,6 +13,7 @@ class CharPhyFrame(QGroupBox):
         QGroupBox.__init__(self, " Physique ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.setCursor(Qt.PointingHandCursor)
 
         self.baselist = ["training", "dexterity", "mobility"]
         self.secondlist = ["ability", "mobility"]
@@ -84,10 +86,7 @@ class CharPhyFrame(QGroupBox):
         thirdstats = selectedchar.get_thirdstats()
         i = 0
         for key in self.secondlist:
-            if key == "ability":
-                self.labels[i].setText("= " + str(secondstats["symb-ability"]))
-            else:
-                self.labels[i].setText("= " + str(secondstats["symb-mobility"]))
+            self.labels[i].setText(f'= {secondstats["symb-"+key]}')
             i += 1
 
         for key in self.baselist:

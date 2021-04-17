@@ -791,7 +791,7 @@ class CharAbiMFrame(Frame):
 
         self.add_sight=Button(self.senseFrame,text="+",command=partial(self.add_sense,"sight"),state="disabled")
         self.add_hearing=Button(self.senseFrame,text="+",command=partial(self.add_sense,"hearing"),state="disabled")
-        self.add_smell=Button(self.senseFrame,text="+",command=partial(self.add_sense,"smell"),state="disabled")
+        self.add_smell=Button(self.senseFrame,text="+",command=partial(self.add_sense,"smelling"),state="disabled")
 
         self.add_sight.grid(row=1,column=2,sticky="e")
         self.add_hearing.grid(row=2,column=2,sticky="e")
@@ -931,7 +931,7 @@ class CharAbiMFrame(Frame):
             self.add_smell["state"]="disabled"
 
         i=1
-        for key in ["sight","hearing","smell"]:
+        for key in ["sight","hearing","smelling"]:
             Label(self.senseFrame,text=self.master.master.master.selectedchar.thirdstats[key]).grid(row=i,column=1)
             i+=1
 
@@ -1420,7 +1420,7 @@ class CharPercepFrame(Frame):
                 i.destroy()
 
         i=2
-        for key in ["sight","hearing","smell"]:
+        for key in ["sight","hearing","smelling"]:
             Label(self,text=self.master.master.master.selectedchar.thirdstats[key]).grid(row=i,column=1)
             i+=1
 

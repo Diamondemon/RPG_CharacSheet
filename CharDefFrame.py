@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
+from PySide6.QtCore import Qt
 from PySide6.QtGui import (QMouseEvent)
 from PySide6.QtSvgWidgets import QSvgWidget
 
@@ -12,6 +13,7 @@ class CharDefFrame(QGroupBox):
         QGroupBox.__init__(self, " Armure ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.setCursor(Qt.PointingHandCursor)
 
         self.baselist = ["armor"]
         self.images = {}
@@ -30,7 +32,7 @@ class CharDefFrame(QGroupBox):
                                        "QProgressBar {margin-right: 20px; text-align : right; color: black; }")
         self.grid.addWidget(self.progressBar, 1, 0)
 
-        self.labels.append(QLabel(self.tr("Palier d'armure")))
+        self.labels.append(QLabel(self.tr("Palier d'armure = %n", "", 0)))
         self.grid.addWidget(self.labels[1], 2, 0)
 
     def get_selectedchar(self):
@@ -67,7 +69,7 @@ class CharDefFrame(QGroupBox):
         selectedchar = self.get_selectedchar()
         basestats = selectedchar.get_basestats()
         secondstats = selectedchar.get_secondstats()
-        self.labels[0].setText("= " + str(secondstats["symb-armor"]))
-        self.labels[1].setText("Palier d'armure = " + str(secondstats["armor-level"]))
+        self.labels[0].setText(f'= {secondstats["symb-armor"]}')
+        self.labels[1].setText(self.tr("Palier d'armure = %n", "", secondstats["armor-level"]))
 
         self.progressBar.setValue(basestats["armor"][0])

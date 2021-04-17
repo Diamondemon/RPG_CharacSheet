@@ -248,7 +248,7 @@ class UIWindow(QMainWindow):
 
     def set_selectedchar(self, number: int):
         """
-        Method called select the character to load and edit
+        Method called to select the character to load and edit
 
         :param number: index of the character to select
         :return: None

@@ -48,3 +48,11 @@ class CharNotebook(QTabWidget):
         :return: the reference to the parent
         """
         return QWidget.parent(self)
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()

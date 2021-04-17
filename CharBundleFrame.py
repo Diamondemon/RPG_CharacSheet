@@ -1,4 +1,3 @@
-from PySide6.QtCore import SIGNAL, Slot
 from PySide6.QtWidgets import (QWidget, QGridLayout)
 from CharAtkFrame import CharAtkFrame
 from CharDefFrame import CharDefFrame
@@ -29,10 +28,9 @@ class CharBundleFrame(QWidget):
         self.grid.addWidget(self.SOC, 2, 1)
         self.ETH = CharEthFrame()
         self.grid.addWidget(self.ETH, 3, 1)
+        self.ETH.hide()
         self.SYM = CharSymbFrame()
         self.grid.addWidget(self.SYM, 0, 2, 4, 1)
-
-        self.connect(self.ATK, SIGNAL("clicked()"), self.modify_atk)
 
     def get_selectedchar(self):
         """
@@ -109,7 +107,11 @@ class CharBundleFrame(QWidget):
         self.DEF.refresh()
         self.PHY.refresh()
         self.SOC.refresh()
-        self.ETH.refresh()
+        if self.get_selectedchar().ismage():
+            self.ETH.show()
+            self.ETH.refresh()
+        else:
+            self.ETH.hide()
         self.SYM.refresh()
 
     def refresh_abi(self):

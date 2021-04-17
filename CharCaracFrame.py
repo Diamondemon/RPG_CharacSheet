@@ -61,6 +61,7 @@ class CharCaracFrame(QWidget):
         """
         self.clear()
         self.MABI.show()
+        self.MABI.refresh()
 
     def modify_atk(self):
         """
@@ -122,6 +123,7 @@ class CharCaracFrame(QWidget):
         :return: None
         """
         self.BNDL.refresh()
+        self.MABI.refresh()
 
     def refresh_abi(self):
         """
@@ -178,3 +180,11 @@ class CharCaracFrame(QWidget):
         :return: None
         """
         self.BNDL.refresh_soc()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()

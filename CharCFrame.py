@@ -39,7 +39,7 @@ class CharCFrame(QWidget):
         """
         # Call the method of the mainwindow
         if self.Name_input.text():
-            self.parent().generate(self.Name_input.text(), self.xp_input.text(), self.mage_input.isChecked())
+            self.parent().generate(self.Name_input.text(), int(self.xp_input.text()), self.mage_input.isChecked())
 
     def parent(self) -> MW.UIWindow:
         """

@@ -75,7 +75,7 @@ class player(object):
         self.thirdstats["phys-res"] = [0, 200]
         self.thirdstats["sight"] = 0
         self.thirdstats["hearing"] = 0
-        self.thirdstats["smell"] = 0
+        self.thirdstats["smelling"] = 0
         self.thirdstats["silence"] = {"ground": 0, "moving": 0, "assassination": 0}
         self.thirdstats["hiding"] = {"shadow": 0, "not-moving": 0, "identity": 0}
         self.thirdstats["camo"] = {"smell": 0, "disguise": 0, "nature-field": 0}
@@ -163,7 +163,7 @@ class player(object):
                 self.secondstats["symb-armor"] -= number
                 self.thirdstats[stat][location] += number
 
-        elif stat in ["sight", "hearing", "smell"]:
+        elif stat in ["sight", "hearing", "smelling"]:
             if number <= self.secondstats["symb-S"]:
                 self.thirdstats[stat] += number
                 self.secondstats["symb-S"] -= number
@@ -240,7 +240,7 @@ class player(object):
                     self.thirdstats["hidden_action"][stat] += number
 
                 elif self.secondstats["symb-T"] > 0:
-                    self.secondstats["symb-T"] -= 0
+                    self.secondstats["symb-T"] -= number
                     self.secondstats["symb-ps_T"][1] += number
                     self.thirdstats["hidden_action"][stat] += number
 
@@ -422,7 +422,7 @@ class player(object):
                             self.basestats["sensitivity"][0] >= 160) + (self.basestats["sensitivity"][0] >= 170))
             self.secondstats["symb-S"] += self.GMstats["symb-S"]
             self.secondstats["symb-S"] -= (
-                        self.thirdstats["sight"] + self.thirdstats["hearing"] + self.thirdstats["smell"])
+                        self.thirdstats["sight"] + self.thirdstats["hearing"] + self.thirdstats["smelling"])
 
         elif stat in ["reflex", "stealth"]:
             # symbole T
@@ -552,7 +552,7 @@ class player(object):
             self.secondstats["symb-S"] += self.basestats["perception"][0] // 5
             self.secondstats["symb-S"] += self.GMstats["symb-S"]
             self.secondstats["symb-S"] -= (
-                        self.thirdstats["sight"] + self.thirdstats["hearing"] + self.thirdstats["smell"])
+                        self.thirdstats["sight"] + self.thirdstats["hearing"] + self.thirdstats["smelling"])
 
 
         elif stat == "aura":

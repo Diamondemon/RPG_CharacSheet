@@ -52,5 +52,5 @@ class CharSymbFrame(QGroupBox):
         selectedchar = self.get_selectedchar()
         secondstats = selectedchar.get_secondstats()
         for key in self.baselist:
-            self.labels[i].setText("= "+str(secondstats["symb-"+key]))
+            self.labels[i].setText(f'= {secondstats["symb-" + key]}')
             i += 1

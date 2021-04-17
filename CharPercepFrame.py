@@ -62,7 +62,7 @@ class CharPercepFrame(QWidget):
         thirdstats = self.get_selectedchar().get_thirdstats()
 
         i = 2
-        for key in ["sight", "hearing", "smell"]:
+        for key in ["sight", "hearing", "smelling"]:
             self.labels[i-2].setText(str(thirdstats[key]))
             i += 1
 

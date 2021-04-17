@@ -1,6 +1,7 @@
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
 from PySide6.QtGui import (QMouseEvent)
+from PySide6.QtCore import Qt
 
 import CBF
 
@@ -12,6 +13,7 @@ class CharEthFrame(QGroupBox):
         QGroupBox.__init__(self, " Ether ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.setCursor(Qt.PointingHandCursor)
 
         self.baselist = ["power", "mastery", "sensitivity"]
         self.secondlist = ["lightning", "sensi", "aura"]
@@ -83,7 +85,7 @@ class CharEthFrame(QGroupBox):
         secondstats = selectedchar.get_secondstats()
         i = 0
         for key in self.secondlist:
-            self.labels[i].setText("= " + str(secondstats["symb-" + key]))
+            self.labels[i].setText(f'= {secondstats["symb-" + key]}')
             i += 1
 
         for key in self.baselist:

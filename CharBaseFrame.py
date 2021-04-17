@@ -129,6 +129,7 @@ class CharBaseFrame(QWidget):
         self.GM_wheel.setCurrentIndex(0)
 
         self.legal_scale.setValue(selectedchar.get_passivestats()["legal"][0])
+        self.set_legal_display(selectedchar.get_passivestats()["legal"][0])
 
     def set_legal_display(self, value: int):
         """

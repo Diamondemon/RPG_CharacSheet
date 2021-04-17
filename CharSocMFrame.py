@@ -54,5 +54,14 @@ class CharSocMFrame(QWidget):
         :return: None
         """
         self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
+        self.save_character()
         self.parent().refresh_soc()
         self.parent().refresh_base()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()

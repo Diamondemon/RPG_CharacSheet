@@ -1,4 +1,5 @@
 from PySide6.QtGui import QMouseEvent
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGroupBox, QLabel, QGridLayout, QProgressBar)
 from PySide6.QtSvgWidgets import QSvgWidget
 import CBF
@@ -11,6 +12,7 @@ class CharAbiFrame(QGroupBox):
         QGroupBox.__init__(self, " Habileté ")
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.setCursor(Qt.PointingHandCursor)
 
         self.baselist = ["perception", "stealth", "reflex", "wit", "mental-res"]
         self.secondlist = ["perception", "S", "stealth", "T", "init", "light", "mental"]
@@ -86,8 +88,5 @@ class CharAbiFrame(QGroupBox):
 
         i = 0
         for key in self.secondlist:
-            if key != "stealth":
-                self.labels[i].setText("= "+str(secondstats["symb-"+key]))
-            else:
-                self.labels[i].setText("= "+str(secondstats["symb-"+key]))
+            self.labels[i].setText(f'= {secondstats["symb-" + key]}')
             i += 1

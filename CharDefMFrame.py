@@ -72,6 +72,7 @@ class CharDefMFrame(QWidget):
         :return: None
         """
         self.get_selectedchar().upstats(self.baselist[self.statlist.currentIndex()], int(self.add_stat.text()))
+        self.save_character()
         self.parent().refresh_def()
         self.parent().refresh_base()
 
@@ -83,4 +84,13 @@ class CharDefMFrame(QWidget):
         """
         self.get_selectedchar().upstats("invested_armor", int(self.add_third.text()),
                                         self.thirdlist[self.statthird.currentIndex()])
+        self.save_character()
         self.parent().refresh_def()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()
