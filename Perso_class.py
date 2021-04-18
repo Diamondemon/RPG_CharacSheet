@@ -116,7 +116,7 @@ class player(object):
         self.percentages["spell"] = 0
         self.percentages["magical-perception"] = 0
 
-        self.playerequipment = {"Heaume": None, "Spallières": None, "Brassards": None, "Avant-bras": None,
+        self.playerequipment: dict[str, ArmorEquip] = {"Heaume": None, "Spallières": None, "Brassards": None, "Avant-bras": None,
                                 "Plastron": None, "Jointures": None, "Tassette": None, "Cuissots": None, "Grèves": None,
                                 "Solerets": None, "left_melee": None, "right_melee": None, "left_throw": None,
                                 "right_throw": None}

@@ -185,6 +185,8 @@ class UIWindow(QMainWindow):
         self.save_characlist()
         self.menubar.refresh()
 
+    # def changeEvent(self, event:PySide6.QtCore.QEvent) -> None:
+
     def pop(self, index: int):
         """
         Method called to delete one character from the list

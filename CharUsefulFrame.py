@@ -1,6 +1,4 @@
-from PySide6.QtCore import SIGNAL
-from PySide6.QtWidgets import (QWidget, QFrame, QLabel, QGridLayout, QPlainTextEdit, QComboBox, QPushButton,
-                               QTreeWidget, QTreeWidgetItem)
+from PySide6.QtWidgets import (QWidget, QFrame, QGridLayout)
 
 import CNbk
 from CharFirstSymbFrame import CharFirstSymbFrame
@@ -51,20 +49,20 @@ class CharUsefulFrame(QWidget):
         self.grid.addWidget(self.CharThrF, 2, 4, 2, 1)
 
         self.CharArmF = CharArmFrame()
-        self.grid.addWidget(self.CharArmF, 4, 4, 2, 1)
+        self.grid.addWidget(self.CharArmF, 4, 4, 3, 1)
 
-    def refresh(self, event=None):
+    def refresh(self):
         self.CharFSymF.refresh()
         self.CharPercepF.refresh()
         self.CharStealthF.refresh()
         self.CharHiddenF.refresh()
         self.CharUCompF.refresh()
         self.PercFrame.refresh()
+        self.CharArmF.refresh()
 
-        """self.CharArmF.refresh()
+        """
         self.CharMelF.refresh()
         self.CharThrF.refresh()"""
-
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()

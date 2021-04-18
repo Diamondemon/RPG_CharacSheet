@@ -1,7 +1,8 @@
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import (QGroupBox, QGridLayout, QFrame, QTreeWidget, QTreeWidgetItem, QLabel)
-from PySide6.QtGui import (QPixmap, QIcon)
+from PySide6.QtWidgets import (QGroupBox, QGridLayout, QFrame, QTreeWidget, QTreeWidgetItem)
+from PySide6.QtGui import (QIcon)
 import numpy as np
+import CUF
 
 
 class CharArmFrame(QGroupBox):
@@ -13,7 +14,8 @@ class CharArmFrame(QGroupBox):
 
         self.threshold_types = ["Arm. Légère", "Arm. Moyenne", "Arm. Lourde"]
         self.Threshold_View = QTreeWidget()
-        self.Threshold_View.setHeaderLabels(["Palier d'armure 3", "Val. d'Arm.", "Vit.", "Mobi."])
+        self.Threshold_View.setHeaderLabels([self.tr("Palier d'armure %n", "", 0), self.tr("Val. d'Arm."),
+                                             self.tr("Vit."), self.tr("Mobi.")])
         self.grid.addWidget(self.Threshold_View, 0, 0, 1, 8)
 
         itemlist = []
@@ -25,7 +27,7 @@ class CharArmFrame(QGroupBox):
         separator.setFrameShape(QFrame.HLine)
         self.grid.addWidget(separator, 1, 0, 1, 8)
 
-        self.armor_attr = ["", "Nom", "Prot.", "Amort.", "Mobi.", "Vit.", "Sol.", "Casque"]
+        self.armor_attr = ["", "Nom", "Prot.", "Amort.", "Mobi.", "Vit.", "Sol.", ""]
 
         self.armor_image = QSvgWidget("./Images/symb-armor.svg")
         self.armor_image.setFixedSize(12, 20)
@@ -35,6 +37,7 @@ class CharArmFrame(QGroupBox):
 
         self.Armor_View = QTreeWidget()
         self.Armor_View.setHeaderLabels(self.armor_attr)
+        self.Armor_View.headerItem().setIcon(7, QIcon("./Images/symb-armor.png"))
         self.grid.addWidget(self.Armor_View, 2, 0, 1, 8)
 
         itemlist = []
@@ -42,33 +45,55 @@ class CharArmFrame(QGroupBox):
             itemlist.append(QTreeWidgetItem([self.tr(key), "", "", "", "", "", "", ""]))
         self.Armor_View.addTopLevelItems(itemlist)
 
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CUF.CharUsefulFrame:
+        """
+        Method called to get the parent widget (the Useful frame)
+
+        :return: the reference to the parent
+        """
+        return QGroupBox.parent(self)
+
     def refresh(self):
-        """palier = np.array([[[-10, -4, -8], [-8, -8, -10], [-4, -20, -12]], [[-8, -2, -6], [-4, -4, -6], [-2, -10, -10]],
+        """
+        Method called to refresh the armor equipments of the character along with it's compatibility with them
+
+        :return: None
+        """
+        palier = np.array([[[-10, -4, -8], [-8, -8, -10], [-4, -20, -12]], [[-8, -2, -6], [-4, -4, -6], [-2, -10, -10]],
                            [[-6, 0, -4], [-3, -4, -6], [-1, -8, -8]], [[-4, 0, -2], [-1, -4, -4], [0, -6, -6]],
                            [[-2, 0, 0], [0, -2, -2], [0, -4, -4]], [[0, 2, 0], [0, 0, -1], [0, -2, -2]],
                            [[0, 4, 0], [0, 2, -1], [2, 0, -2]], [[2, 6, 2], [4, 2, 1], [6, 0, 0]],
                            [[4, 8, 4], [6, 3, 2], [8, 0, 0]]])
-        armor_level = self.parent().parent().parent().selectedchar.get_armor_level()
-        self.Threshold_View.heading("#0", text="Palier d'armure " + str(armor_level))
+
+        selectedchar = self.get_selectedchar()
+        armor_level = selectedchar.get_armor_level()
+
+        header = self.Threshold_View.headerItem()
+        header.setText(0, self.tr("Palier d'armure %n", "", armor_level))
+        self.Threshold_View.clear()
         i = 0
-        for item in self.Threshold_View.get_children():
-            for j in range(3):
-                self.Threshold_View.set(item, column=str(j), value=("+" * int(palier[armor_level, i, j] > 0)) + str(
-                    palier[armor_level, i, j]))
+        for trio in palier[armor_level]:
+            key = self.Armorlist[i]
+            self.Threshold_View.addTopLevelItem(QTreeWidgetItem([self.tr(key), str(trio[0]), str(trio[1]),
+                                                                 str(trio[2])]))
             i += 1
 
-        for item in self.Armor_View.get_children():
-            self.Armor_View.set(item, "6", self.master.master.master.selectedchar.get_invested_armor(item))
-            linked_equip = self.master.master.master.selectedchar.get_current_armor(item)
+        self.Armor_View.clear()
+        for item in self.Armorlist:
+            invested_armor = str(selectedchar.get_invested_armor(item))
+            linked_equip = selectedchar.get_current_armor(item)
             if linked_equip:
-                valuelist = linked_equip.get_stats_aslist(["name", "prot", "amort", "mobi", "vit", "solid"])
-                for i in range(6):
-                    self.Armor_View.set(item, str(i), value=valuelist[i])
-
+                stats = linked_equip.get_stats_aslist(["name", "prot", "amort", "mobi", "vit", "solid"])
+                for i in range(1, 6):
+                    stats[i] = str(stats[i])
             else:
-
-                for i in range(6):
-                    self.Armor_View.set(item, str(i), value="...")"""
-
-    def get_selectedchar(self):
-        return self.master.get_selectedchar()
+                stats = ["..."]*6
+            self.Armor_View.addTopLevelItem(QTreeWidgetItem([self.tr(item)]+stats+[invested_armor]))

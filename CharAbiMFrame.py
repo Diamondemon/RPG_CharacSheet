@@ -12,7 +12,7 @@ class CharAbiMFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
         self.setMaximumHeight(500)
-        self.setMaximumWidth(400)
+        self.setMaximumWidth(460)
         self.baselist = ["perception", "stealth", "reflex", "wit", "mental-res"]
         self.addlist = {}
         self.labels = {}
