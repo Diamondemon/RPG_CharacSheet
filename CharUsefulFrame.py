@@ -59,9 +59,8 @@ class CharUsefulFrame(QWidget):
         self.CharUCompF.refresh()
         self.PercFrame.refresh()
         self.CharArmF.refresh()
-
-        """
         self.CharMelF.refresh()
+        """
         self.CharThrF.refresh()"""
 
     def get_selectedchar(self):

@@ -124,6 +124,8 @@ class CharCaracFrame(QWidget):
         """
         self.BNDL.refresh()
         self.MABI.refresh()
+        if not self.get_selectedchar().ismage():
+            self.METH.hide()
 
     def refresh_abi(self):
         """

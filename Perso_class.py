@@ -809,13 +809,12 @@ class player(object):
 
         return self.thirdstats
 
-    def get_weapon(self, side, weapontype):
+    def get_weapon(self, side: str, weapontype: str):
         """
         :param weapontype: "melee" or "throw" weapon
         :param side: "left" or "right" hand weapon
         :return: corresponding weapon
         """
-
         return self.playerequipment[side+"_"+weapontype]
 
     def ismage(self):
@@ -869,7 +868,7 @@ class Obj(object):
         self.description = description
         self.is_stackable = stackable
 
-    def get_stat(self,key):
+    def get_stat(self, key):
 
         if key in self.__dict__.keys():
             return self.__dict__[key]
@@ -881,8 +880,6 @@ class Obj(object):
             valuelist.append(self.get_stat(key))
 
         return valuelist
-
-
 
 
 class Cord(Obj):
