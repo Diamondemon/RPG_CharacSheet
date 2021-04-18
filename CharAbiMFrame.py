@@ -41,7 +41,7 @@ class CharAbiMFrame(QWidget):
         self.grid.addWidget(self.add_stat, 1, 6, 1, 6)
         self.grid.addWidget(self.Register_new, 2, 0, 1, 12)
 
-        separator = QFrame(self)
+        separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
         self.grid.addWidget(separator, 3, 0, 1, 12)
 
@@ -64,7 +64,7 @@ class CharAbiMFrame(QWidget):
             self.grid.addWidget(self.labels[stat], 5, 2+4*i)
             i += 1
 
-        separator1 = QFrame(self)
+        separator1 = QFrame()
         separator1.setFrameShape(QFrame.HLine)
         self.grid.addWidget(separator1, 6, 0, 1, 12)
 
@@ -103,7 +103,7 @@ class CharAbiMFrame(QWidget):
                 self.grid.addWidget(self.labels[stat], i, 4*j+2)
                 i += 1
 
-        separator2 = QFrame(self)
+        separator2 = QFrame()
         separator2.setFrameShape(QFrame.HLine)
         self.grid.addWidget(separator2, 12, 0, 1, 12)
 
@@ -142,7 +142,7 @@ class CharAbiMFrame(QWidget):
                 self.grid.addWidget(self.labels[stat], i, 4*j+2)
                 i += 1
 
-        separator3 = QFrame(self)
+        separator3 = QFrame()
         separator3.setFrameShape(QFrame.HLine)
         self.grid.addWidget(separator3, 18, 0, 1, 12)
 
