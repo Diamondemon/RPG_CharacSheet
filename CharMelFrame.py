@@ -64,6 +64,22 @@ class CharMelFrame(QGroupBox):
                 self.connect(self.leftlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "left", -1))
                 self.connect(self.rightlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "right", -1))
 
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CUF.CharUsefulFrame:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget()
+
     def refresh(self):
         """
         Method called to refresh the melee equipment of the character
@@ -140,7 +156,7 @@ class CharMelFrame(QGroupBox):
 
     def refresh_right(self, selectedchar: Pc.player):
         """
-        Method called to refresh tonly the melee equipment in the right hand of the character
+        Method called to refresh only the melee equipment in the right hand of the character
 
         :param selectedchar: the character displayed
         :return: None
@@ -193,6 +209,14 @@ class CharMelFrame(QGroupBox):
                 self.rightlist["equip_" + str(i)].setText("...")
                 self.rightlist["equip_" + str(i)].show()
 
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()
+
     def up_mastery(self, where: str, number: int):
         """
         Method called to manage the mastery the character has with its weapon
@@ -210,27 +234,3 @@ class CharMelFrame(QGroupBox):
             self.rightlist["equip_4"].setText(str(selectedchar.get_weapon(where, "melee").get_stat("mastery")))
 
         self.save_character()
-
-    def get_selectedchar(self):
-        """
-        Method called to get the character selected to display
-
-        :return: character (Perso_class.player)
-        """
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CUF.CharUsefulFrame:
-        """
-        Method called to get the parent widget (the CharUsefulFrame)
-
-        :return: the reference to the parent
-        """
-        return self.parentWidget()
-
-    def save_character(self):
-        """
-        Method called to save the character
-
-        :return: None
-        """
-        self.parent().save_character()
