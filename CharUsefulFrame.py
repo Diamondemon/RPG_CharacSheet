@@ -73,3 +73,11 @@ class CharUsefulFrame(QWidget):
         :return: the reference to the parent
         """
         return self.parentWidget().parent()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()

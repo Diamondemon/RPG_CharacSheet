@@ -17,3 +17,11 @@ class CharUsefulFrame:
         :return: the reference to the parent
         """
         pass
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        pass
