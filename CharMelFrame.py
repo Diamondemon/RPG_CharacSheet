@@ -7,6 +7,7 @@ import CUF
 
 
 class CharMelFrame(QGroupBox):
+    """ Widget to display the melee equipment of the character"""
 
     def __init__(self):
         QGroupBox.__init__(self, " Mélée ")
@@ -64,7 +65,11 @@ class CharMelFrame(QGroupBox):
                 self.connect(self.rightlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "right", -1))
 
     def refresh(self):
-        """ Fonction pour rafraîchir les équipements de mélée du personnage """
+        """
+        Method called to refresh the melee equipment of the character
+
+        :return: None
+        """
         meleelist = ["dgt_tr", "dgt_ctd", "estoc", "vit", "mastery", "quality", "solid"]
         shieldlist = ["close", "dist", "mobi", "vit", "mastery", "quality", "solid"]
 
@@ -129,6 +134,12 @@ class CharMelFrame(QGroupBox):
             self.refresh_right(selectedchar)
 
     def refresh_right(self, selectedchar: Pc.player):
+        """
+        Method called to refresh tonly the melee equipment in the right hand of the character
+
+        :param selectedchar: the character displayed
+        :return: None
+        """
         meleelist = ["dgt_tr", "dgt_ctd", "estoc", "vit", "mastery", "quality", "solid"]
         shieldlist = ["close", "dist", "mobi", "vit", "mastery", "quality", "solid"]
 
@@ -172,7 +183,14 @@ class CharMelFrame(QGroupBox):
                 self.rightlist["equip_" + str(i)].setText("...")
                 self.rightlist["equip_" + str(i)].show()
 
-    def up_mastery(self, where, number):
+    def up_mastery(self, where: str, number: int):
+        """
+        Method called to manage the mastery the character has with its weapon
+
+        :param where: "left" or "right", side of the weapon
+        :param number: number to increase mastery by
+        :return: None
+        """
         selectedchar = self.parent().get_selectedchar()
         selectedchar.get_weapon(where, "melee").upmastery(number)
 
