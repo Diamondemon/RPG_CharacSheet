@@ -94,9 +94,14 @@ class CharMelFrame(QGroupBox):
             self.leftlist["mastery_rm"].show()
 
             if type(left_equip) == Pc.MeleeEquip:
+                if left_equip.is_hast():
+                    meleelist[3] = "hast_bonus"
                 statlist = left_equip.get_stats_aslist(meleelist)
                 for i in range(7):
-                    self.leftlist[str(i)].setText(self.meleelist[i])
+                    if i == 3 and meleelist[i] == "hast_bonus":
+                        self.leftlist[str(i)].setText(self.tr("Bon. Hast"))
+                    else:
+                        self.leftlist[str(i)].setText(self.tr(self.meleelist[i]))
                     self.leftlist[str(i)].show()
                     self.leftlist["equip_" + str(i)].setText(str(statlist[i]))
                     self.leftlist["equip_" + str(i)].show()
@@ -104,7 +109,7 @@ class CharMelFrame(QGroupBox):
             elif type(left_equip) == Pc.ShieldEquip:
                 statlist = left_equip.get_stats_aslist(shieldlist)
                 for i in range(7):
-                    self.leftlist[str(i)].setText(self.shieldlist[i])
+                    self.leftlist[str(i)].setText(self.tr(self.shieldlist[i]))
                     self.leftlist[str(i)].show()
                     self.leftlist["equip_" + str(i)].setText(str(statlist[i]))
                     self.leftlist["equip_" + str(i)].show()
@@ -157,9 +162,14 @@ class CharMelFrame(QGroupBox):
             self.rightlist["mastery_rm"].show()
 
             if type(right_equip) == Pc.MeleeEquip:
+                if right_equip.is_hast():
+                    meleelist[3] = "hast_bonus"
                 statlist = right_equip.get_stats_aslist(meleelist)
                 for i in range(7):
-                    self.rightlist[str(i)].setText(self.meleelist[i])
+                    if i == 3 and meleelist[i] == "hast_bonus":
+                        self.rightlist[str(i)].setText(self.tr("Bon. Hast"))
+                    else:
+                        self.rightlist[str(i)].setText(self.tr(self.meleelist[i]))
                     self.rightlist[str(i)].show()
                     self.rightlist["equip_" + str(i)].setText(str(statlist[i]))
                     self.rightlist["equip_" + str(i)].show()
@@ -167,7 +177,7 @@ class CharMelFrame(QGroupBox):
             elif type(right_equip) == Pc.ShieldEquip:
                 statlist = right_equip.get_stats_aslist(shieldlist)
                 for i in range(7):
-                    self.rightlist[str(i)].setText(self.shieldlist[i])
+                    self.rightlist[str(i)].setText(self.tr(self.shieldlist[i]))
                     self.rightlist[str(i)].show()
                     self.rightlist["equip_" + str(i)].setText(str(statlist[i]))
                     self.rightlist["equip_" + str(i)].show()
