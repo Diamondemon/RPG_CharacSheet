@@ -6,7 +6,7 @@ import MW
 
 
 class SpellCreatorFrame(QWidget):
-    """ Widget de création des sorts """
+    """ Widget to create and delete spells """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -75,7 +75,7 @@ class SpellCreatorFrame(QWidget):
     @Slot()
     def register(self):
         """
-        Méthode qui crée le nouveau sort
+        Method called to create a new spell
 
         :return: None
         """
@@ -91,7 +91,7 @@ class SpellCreatorFrame(QWidget):
 
     def refresh(self):
         """
-        Méthode qui rafraîchit la liste des sorts
+        Method called to refresh the list of spells displayed
 
         :return: None
         """
@@ -120,7 +120,7 @@ class SpellCreatorFrame(QWidget):
     @Slot()
     def select_spell(self):
         """
-        Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin
+        Slot called when a spell is selected, to delete it if needed
 
         :return: None
         """
@@ -143,7 +143,7 @@ class SpellCreatorFrame(QWidget):
     @Slot()
     def suppr(self):
         """
-        Méthode qui supprime la compétence sélectionnée
+        Method called to delete the selected spell
 
         :return: None
         """
