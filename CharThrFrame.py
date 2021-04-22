@@ -2,64 +2,72 @@ from PySide6.QtCore import SIGNAL, Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QGroupBox, QGridLayout, QLabel, QPushButton, QFrame)
 from functools import partial
+import ThrScopeTable as TsT
 import CUF
 import Perso_class as Pc
 
 
 class CharThrFrame(QGroupBox):
+    """ Widget to display the throwable/throwing weapons equipped by the character """
 
     def __init__(self):
         QGroupBox.__init__(self, " Jet ")
         self.grid = QGridLayout(self)
+        self.leftgrid = QGridLayout(self)
+        self.rightgrid = QGridLayout(self)
         self.setLayout(self.grid)
+        self.grid.addLayout(self.leftgrid, 0, 0)
+        self.grid.addLayout(self.rightgrid, 2, 0)
 
         self.mastery_image = QIcon("./Images/symb-mastery.svg")
 
         self.throwlist = ["Dég.", "P.-Arm.", "Cordes", "Maîtr.", "Sol."]
 
         self.leftlist = {"title": QLabel(), "name": QLabel(), "equip_name": QLabel(),
-                         "mastery_add": QPushButton("+"), "mastery_rm": QPushButton("-")}
+                         "mastery_add": QPushButton("+"), "mastery_rm": QPushButton("-"), "scope": TsT.ThrScopeTable()}
         self.leftlist["mastery_add"].setIcon(self.mastery_image)
         self.leftlist["mastery_rm"].setIcon(self.mastery_image)
-        self.grid.addWidget(self.leftlist["title"], 1, 0)
-        self.grid.addWidget(self.leftlist["name"], 0, 1)
-        self.grid.addWidget(self.leftlist["equip_name"], 1, 1)
-        self.grid.addWidget(self.leftlist["mastery_add"], 0, 9)
-        self.grid.addWidget(self.leftlist["mastery_rm"], 1, 9)
+        self.leftgrid.addWidget(self.leftlist["title"], 1, 0)
+        self.leftgrid.addWidget(self.leftlist["name"], 0, 1)
+        self.leftgrid.addWidget(self.leftlist["equip_name"], 1, 1)
+        self.leftgrid.addWidget(self.leftlist["mastery_add"], 0, 9)
+        self.leftgrid.addWidget(self.leftlist["mastery_rm"], 1, 9)
         for i in range(5):
             self.leftlist[str(i)] = QLabel()
-            self.grid.addWidget(self.leftlist[str(i)], 0, i + 2)
+            self.leftgrid.addWidget(self.leftlist[str(i)], 0, i + 2)
             self.leftlist["equip_" + str(i)] = QLabel()
-            self.grid.addWidget(self.leftlist["equip_" + str(i)], 1, i + 2)
+            self.leftgrid.addWidget(self.leftlist["equip_" + str(i)], 1, i + 2)
+        self.leftgrid.addWidget(self.leftlist["scope"], 0, 8, 2, 1)
 
         self.separator = QFrame()
         self.separator.setFrameShape(QFrame.HLine)
-        self.grid.addWidget(self.separator, 2, 0, 1, 10)
+        self.grid.addWidget(self.separator, 1, 0)
 
         self.rightlist = {"title": QLabel(self.tr("Main droite")), "name": QLabel(), "equip_name": QLabel(),
-                          "mastery_add": QPushButton("+"), "mastery_rm": QPushButton("-")}
+                          "mastery_add": QPushButton("+"), "mastery_rm": QPushButton("-"), "scope": TsT.ThrScopeTable()}
         self.rightlist["mastery_add"].setIcon(self.mastery_image)
         self.rightlist["mastery_rm"].setIcon(self.mastery_image)
-        self.grid.addWidget(self.rightlist["title"], 4, 0)
-        self.grid.addWidget(self.rightlist["name"], 3, 1)
-        self.grid.addWidget(self.rightlist["equip_name"], 4, 1)
-        self.grid.addWidget(self.rightlist["mastery_add"], 3, 9)
-        self.grid.addWidget(self.rightlist["mastery_rm"], 4, 9)
+        self.rightgrid.addWidget(self.rightlist["title"], 1, 0)
+        self.rightgrid.addWidget(self.rightlist["name"], 0, 1)
+        self.rightgrid.addWidget(self.rightlist["equip_name"], 1, 1)
+        self.rightgrid.addWidget(self.rightlist["mastery_add"], 0, 9)
+        self.rightgrid.addWidget(self.rightlist["mastery_rm"], 1, 9)
         for i in range(5):
             self.rightlist[str(i)] = QLabel()
-            self.grid.addWidget(self.rightlist[str(i)], 3, i + 2)
+            self.rightgrid.addWidget(self.rightlist[str(i)], 0, i + 2)
             self.rightlist["equip_" + str(i)] = QLabel()
-            self.grid.addWidget(self.rightlist["equip_" + str(i)], 4, i + 2)
+            self.rightgrid.addWidget(self.rightlist["equip_" + str(i)], 1, i + 2)
+        self.rightgrid.addWidget(self.rightlist["scope"], 0, 8, 2, 1)
 
         for key in self.rightlist.keys():
-            if (key != "mastery_add") and (key != "mastery_rm"):
+            if (key != "mastery_add") and (key != "mastery_rm") and (key != "scope"):
                 self.leftlist[key].setAlignment(Qt.AlignCenter)
                 self.rightlist[key].setAlignment(Qt.AlignCenter)
             elif key == "mastery_add":
                 self.connect(self.leftlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "left", 1))
                 self.connect(self.rightlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "right", 1))
 
-            else:
+            elif key == "mastery_rm":
                 self.connect(self.leftlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "left", -1))
                 self.connect(self.rightlist[key], SIGNAL("clicked()"), partial(self.up_mastery, "right", -1))
 
@@ -106,6 +114,8 @@ class CharThrFrame(QGroupBox):
             self.leftlist["equip_name"].show()
             self.leftlist["mastery_add"].show()
             self.leftlist["mastery_rm"].show()
+            self.leftlist["scope"].refresh(left_equip)
+            self.leftlist["scope"].show()
 
             statlist = left_equip.get_stats_aslist(throwlist)
             for i in range(5):
@@ -138,231 +148,6 @@ class CharThrFrame(QGroupBox):
                 self.leftlist["equip_"+str(i)].show()
 
             self.refresh_right(selectedchar)
-        """
-        i = 1
-        # si l'objet est équipé, on met ses caractéristiques, sinon, on met des "..."
-        if self.master.master.master.selectedchar.playerequipment["left_throw"]:
-            Label(self, text=self.master.master.master.selectedchar.playerequipment["left_throw"].name).grid(row=1,
-                                                                                                             column=1)
-            if self.master.master.master.selectedchar.playerequipment["left_throw"].carac["hand"] == 2:
-                Label(self, text="2 mains").grid(row=0, column=0, rowspan=2)
-                i = 1
-                for key in ["Nom", "Dég.", "P.-Arm.", "Cordes", "Maîtr.", "Sol."]:
-                    if key != "Cordes" or self.master.master.master.selectedchar.playerequipment["left_throw"].carac[
-                        "cord"]:
-                        Label(self, text=key).grid(row=0, column=i)
-                        i += 1
-                i = 2
-                for key in Throwlist:
-                    if key != "cord":
-                        Label(self, text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac[
-                            key]).grid(row=1, column=i)
-                        i += 1
-
-                    elif self.master.master.master.selectedchar.playerequipment["left_throw"].carac["cord"]:
-                        Label(self, text=str(
-                            self.master.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][
-                                0]) + " - " + str(
-                            self.master.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][
-                                1]) + "%").grid(row=1, column=i)
-                        i += 1
-
-                scopeFrame = Frame(self)
-                scopeFrame.grid(row=0, column=7, rowspan=2)
-                Label(scopeFrame, text="Préc.").grid(row=1, column=0)
-                Label(scopeFrame, text="Vit.").grid(row=2, column=0)
-                Label(scopeFrame, text=0).grid(row=0, column=1)
-                ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=1, rowspan=2, sticky="ns")
-
-                for i in range(
-                        len(self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"])):
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"][i][
-                              0]).grid(row=0, column=3 + 2 * i)
-                    ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=3 + 2 * i, rowspan=2, sticky="NS")
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"][i][
-                              2]).grid(row=1, column=2 + 2 * i)
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"][i][
-                              1]).grid(row=2, column=2 + 2 * i)
-
-
-
-            else:
-                Label(self, text="Main gauche").grid(row=0, column=0, rowspan=2)
-                i = 1
-                for key in ["Nom", "Dég.", "P.-Arm.", "Cordes", "Maîtr.", "Sol."]:
-                    if key != "Cordes" or self.master.master.master.selectedchar.playerequipment["left_throw"].carac[
-                        "cord"]:
-                        Label(self, text=key).grid(row=0, column=i)
-                        i += 1
-                i = 2
-                for key in Throwlist:
-                    if key != "cord":
-                        Label(self, text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac[
-                            key]).grid(row=1, column=i)
-                        i += 1
-
-                    elif self.master.master.master.selectedchar.playerequipment["left_throw"].carac["cord"]:
-                        Label(self, text=str(
-                            self.master.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][
-                                0]) + " - " + str(
-                            self.master.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][
-                                1]) + "%").grid(row=1, column=i)
-                        i += 1
-
-                scopeFrame = Frame(self)
-                scopeFrame.grid(row=0, column=7, rowspan=2)
-                Label(scopeFrame, text="Vit.").grid(row=1, column=0)
-                Label(scopeFrame, text="Préc.").grid(row=2, column=0)
-                Label(scopeFrame, text=0).grid(row=0, column=1)
-                ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=1, rowspan=2, sticky="ns")
-
-                for i in range(
-                        len(self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"])):
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"][i][
-                              0]).grid(row=0, column=3 + 2 * i)
-                    ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=3 + 2 * i, rowspan=2, sticky="NS")
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"][i][
-                              1]).grid(row=1, column=2 + 2 * i)
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["left_throw"].carac["scope"][i][
-                              2]).grid(row=2, column=2 + 2 * i)
-
-                ttk.Separator(self, orient="horizontal").grid(row=2, column=0, columnspan=9, sticky="we", padx="4p",
-                                                              pady="4p")
-
-                Label(self, text="Main droite").grid(row=3, column=0, rowspan=2)
-
-                if self.master.master.master.selectedchar.playerequipment["right_throw"]:
-                    Label(self, text=self.master.master.master.selectedchar.playerequipment["right_throw"].name).grid(
-                        row=4, column=1)
-                    i = 1
-                    for key in ["Nom", "Dég.", "P.-Arm.", "Cordes", "Maîtr.", "Sol."]:
-                        if key != "Cordes" or \
-                                self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"]:
-                            Label(self, text=key).grid(row=3, column=i)
-                            i += 1
-                    i = 2
-                    for key in Throwlist:
-                        if key != "cord":
-                            Label(self,
-                                  text=self.master.master.master.selectedchar.playerequipment["right_throw"].carac[
-                                      key]).grid(row=4, column=i)
-                            i += 1
-                        elif self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"]:
-                            Label(self, text=str(
-                                self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][
-                                    0]) + " - " + str(
-                                self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][
-                                    1]) + "%").grid(row=4, column=i)
-                            i += 1
-
-                    scopeFrame = Frame(self)
-                    scopeFrame.grid(row=3, column=7, rowspan=2)
-                    Label(scopeFrame, text="Vit.").grid(row=1, column=0)
-                    Label(scopeFrame, text="Préc.").grid(row=2, column=0)
-                    Label(scopeFrame, text=0).grid(row=0, column=1)
-                    ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=1, rowspan=2, sticky="ns")
-
-                    for i in range(
-                            len(self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"])):
-                        Label(scopeFrame, text=
-                        self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"][i][
-                            0]).grid(row=0, column=3 + 2 * i)
-                        ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=3 + 2 * i, rowspan=2,
-                                                                          sticky="NS")
-                        Label(scopeFrame, text=
-                        self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"][i][
-                            1]).grid(row=1, column=2 + 2 * i)
-                        Label(scopeFrame, text=
-                        self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"][i][
-                            2]).grid(row=2, column=2 + 2 * i)
-
-                    Button(self, text="+", image=self.mastery_image, compound="right",
-                           command=partial(self.up_mastery, "right", 1)).grid(sticky="we", row=3, column=8, padx="4p")
-                    Button(self, text="-", image=self.mastery_image, compound="right",
-                           command=partial(self.up_mastery, "right", -1)).grid(sticky="we", row=4, column=8, padx="4p")
-
-                else:
-                    for i in range(1, 8):
-                        Label(self, text="...").grid(row=3, column=i)
-                        Label(self, text="...").grid(row=4, column=i)
-
-            Button(self, text="+", image=self.mastery_image, compound="right",
-                   command=partial(self.up_mastery, "left", 1)).grid(sticky="we", row=0, column=8, padx="4p")
-            Button(self, text="-", image=self.mastery_image, compound="right",
-                   command=partial(self.up_mastery, "left", -1)).grid(sticky="we", row=1, column=8, padx="4p")
-
-
-        else:
-            Label(self, text="Main gauche").grid(row=0, column=0, rowspan=2)
-            for i in range(1, 8):
-                Label(self, text="...").grid(row=1, column=i)
-                Label(self, text="...").grid(row=0, column=i)
-
-            ttk.Separator(self, orient="horizontal").grid(row=2, column=0, columnspan=9, sticky="we", padx="4p",
-                                                          pady="4p")
-
-            Label(self, text="Main droite").grid(row=3, column=0, rowspan=2)
-
-            if self.master.master.master.selectedchar.playerequipment["right_throw"]:
-                Label(self, text=self.master.master.master.selectedchar.playerequipment["right_throw"].name).grid(row=4,
-                                                                                                                  column=1)
-                i = 1
-                for key in ["Nom", "Dég.", "P.-Arm.", "Cordes", "Maîtr.", "Sol."]:
-                    if key != "Cordes" or self.master.master.master.selectedchar.playerequipment["right_throw"].carac[
-                        "cord"]:
-                        Label(self, text=key).grid(row=3, column=i)
-                        i += 1
-
-                i = 2
-                for key in Throwlist:
-                    if key != "cord":
-                        Label(self, text=self.master.master.master.selectedchar.playerequipment["right_throw"].carac[
-                            key]).grid(row=4, column=i)
-                        i += 1
-
-                    elif self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"]:
-                        Label(self, text=str(
-                            self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][
-                                0]) + " - " + str(
-                            self.master.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][
-                                1]) + "%").grid(row=4, column=i)
-                        i += 1
-
-                scopeFrame = Frame(self)
-                scopeFrame.grid(row=3, column=7, rowspan=2)
-                Label(scopeFrame, text="Vit.").grid(row=1, column=0)
-                Label(scopeFrame, text="Préc.").grid(row=2, column=0)
-                Label(scopeFrame, text=0).grid(row=0, column=1)
-                ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=1, rowspan=2, sticky="ns")
-
-                for i in range(
-                        len(self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"])):
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"][i][
-                              0]).grid(row=0, column=3 + 2 * i)
-                    ttk.Separator(scopeFrame, orient="vertical").grid(row=1, column=3 + 2 * i, rowspan=2, sticky="NS")
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"][i][
-                              1]).grid(row=1, column=2 + 2 * i)
-                    Label(scopeFrame,
-                          text=self.master.master.master.selectedchar.playerequipment["right_throw"].carac["scope"][i][
-                              2]).grid(row=2, column=2 + 2 * i)
-
-                Button(self, text="+", image=self.mastery_image, compound="right",
-                       command=partial(self.up_mastery, "right", 1)).grid(sticky="we", row=3, column=8, padx="4p")
-                Button(self, text="-", image=self.mastery_image, compound="right",
-                       command=partial(self.up_mastery, "right", -1)).grid(sticky="we", row=4, column=8, padx="4p")
-
-            else:
-                for i in range(1, 8):
-                    Label(self, text="...").grid(row=3, column=i)
-                    Label(self, text="...").grid(row=4, column=i)"""
 
     def refresh_right(self, selectedchar: Pc.player):
         """
@@ -385,6 +170,8 @@ class CharThrFrame(QGroupBox):
             self.rightlist["equip_name"].show()
             self.rightlist["mastery_add"].show()
             self.rightlist["mastery_rm"].show()
+            self.rightlist["scope"].refresh(right_equip)
+            self.rightlist["scope"].show()
 
             statlist = right_equip.get_stats_aslist(throwlist)
             for i in range(5):

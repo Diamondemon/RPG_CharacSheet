@@ -3173,17 +3173,16 @@ class ObjCreatorFrame(Frame):
             for i in range(1,self.Throw["scope"].grid_size()[1]):
                 sublist=[]
                 for key in self.Throw["scope"].grid_slaves(row=i):
-                    sublist.insert(0,int(key.get()))
+                    sublist.insert(0, int(key.get()))
                 scopelist.append(sublist)
             new_obj.newscope(scopelist)
 
-        elif val=="Armure":
+        elif val == "Armure":
             new_obj=pc.ArmorEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get(),self.Armor["location_entry"].get())
             new_obj.upstats(self.Armor["prot_var"].get(),self.Armor["amort_var"].get(),self.Armor["mobi_var"].get(),self.Armor["vit_var"].get())
             new_obj.upsolid(self.Armor["solidity_var"].get())
 
-
-        elif val=="Bouclier":
+        elif val == "Bouclier":
             new_obj=pc.ShieldEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get())
             new_obj.upstats(self.Shield["hand_entry"].current()+1,self.Shield["close_var"].get(),self.Shield["dist_var"].get(),self.Shield["mobi_var"].get(),self.Shield["vit_var"].get())
             new_obj.upsolid(self.Shield["solidity_var"].get())
