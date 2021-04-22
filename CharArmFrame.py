@@ -1,4 +1,4 @@
-from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QGroupBox, QGridLayout, QFrame, QTreeWidget, QTreeWidgetItem)
 from PySide6.QtGui import (QIcon)
 import numpy as np
@@ -12,15 +12,18 @@ class CharArmFrame(QGroupBox):
         self.grid = QGridLayout(self)
         self.setLayout(self.grid)
 
-        self.threshold_types = ["Arm. Légère", "Arm. Moyenne", "Arm. Lourde"]
+        threshold_types = ["Arm. Légère", "Arm. Moyenne", "Arm. Lourde"]
         self.Threshold_View = QTreeWidget()
+        self.Threshold_View.header().setDefaultAlignment(Qt.AlignCenter)
         self.Threshold_View.setHeaderLabels([self.tr("Palier d'armure %n", "", 0), self.tr("Val. d'Arm."),
                                              self.tr("Vit."), self.tr("Mobi.")])
         self.grid.addWidget(self.Threshold_View, 0, 0, 1, 8)
 
         itemlist = []
-        for key in self.threshold_types:
+        for key in threshold_types:
             itemlist.append(QTreeWidgetItem([self.tr(key), "", "", ""]))
+            for j in range(1, 4):
+                itemlist[-1].setTextAlignment(j, Qt.AlignCenter)
         self.Threshold_View.addTopLevelItems(itemlist)
 
         separator = QFrame(self)
@@ -28,9 +31,6 @@ class CharArmFrame(QGroupBox):
         self.grid.addWidget(separator, 1, 0, 1, 8)
 
         self.armor_attr = ["", "Nom", "Prot.", "Amort.", "Mobi.", "Vit.", "Sol.", ""]
-
-        self.armor_image = QSvgWidget("./Images/symb-armor.svg")
-        self.armor_image.setFixedSize(12, 20)
 
         self.Armorlist = ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
                           "Cuissots", "Grèves", "Solerets"]
@@ -78,15 +78,13 @@ class CharArmFrame(QGroupBox):
 
         header = self.Threshold_View.headerItem()
         header.setText(0, self.tr("Palier d'armure %n", "", armor_level))
-        self.Threshold_View.clear()
         i = 0
         for trio in palier[armor_level]:
-            key = self.Armorlist[i]
-            self.Threshold_View.addTopLevelItem(QTreeWidgetItem([self.tr(key), str(trio[0]), str(trio[1]),
-                                                                 str(trio[2])]))
+            item = self.Threshold_View.topLevelItem(i)
+            for j in range(1, 4):
+                item.setText(j, str(trio[j-1]))
             i += 1
 
-        self.Armor_View.clear()
         for item in self.Armorlist:
             invested_armor = str(selectedchar.get_invested_armor(item))
             linked_equip = selectedchar.get_current_armor(item)
