@@ -1,7 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout)
-from PySide6.QtGui import (QPixmap)
 
 import CUF
 
@@ -50,4 +49,4 @@ class CharFirstSymbFrame(QWidget):
 
         :return: the reference to the parent
         """
-        return self.parentWidget()
+        return QWidget.parent(self)

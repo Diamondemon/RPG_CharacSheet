@@ -85,7 +85,7 @@ class CharThrFrame(QGroupBox):
 
         :return: the reference to the parent
         """
-        return self.parentWidget()
+        return QGroupBox.parent(self)
 
     def refresh(self):
         """

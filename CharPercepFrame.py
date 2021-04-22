@@ -1,7 +1,5 @@
-from PySide6.QtCore import SIGNAL
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout, QSplitter, QFrame)
-from PySide6.QtGui import (QPixmap, Qt)
+from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout, QFrame)
 
 import CUF
 
@@ -88,4 +86,4 @@ class CharPercepFrame(QWidget):
 
         :return: the reference to the parent
         """
-        return self.parentWidget()
+        return QWidget.parent(self)
