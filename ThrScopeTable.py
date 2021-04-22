@@ -4,6 +4,7 @@ import Perso_class as Pc
 
 
 class ThrScopeTable(QTableWidget):
+    """ Table Widget to display the scope of a shooting weapon """
 
     def __init__(self):
         QTableWidget.__init__(self)
@@ -16,6 +17,12 @@ class ThrScopeTable(QTableWidget):
         self.setShowGrid(False)
 
     def refresh(self, equipment: Pc.ThrowEquip):
+        """
+        Method called to refresh the scope display of the specified shooting weapon
+
+        :param equipment: shooting weapon to display the scope
+        :return: None
+        """
         scope = equipment.get_stat("scope")
         self.setColumnCount(len(scope))
         i = 0
