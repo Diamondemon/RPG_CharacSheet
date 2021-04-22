@@ -1,7 +1,9 @@
 from PySide6.QtCore import SIGNAL
-from PySide6.QtWidgets import (QWidget, QLabel, QPushButton, QTreeWidget, QGridLayout, QFrame)
+from PySide6.QtWidgets import (QWidget, QLabel, QPushButton, QTreeWidget, QGridLayout, QFrame, QTreeWidgetItem)
 from functools import partial
+import Perso_class as Pc
 
+import CNbk
 from ObjCreatorFrame import ObjCreatorFrame
 
 
@@ -29,7 +31,10 @@ class CharIFrame(QWidget):
         # un clic gauche sur une ligne d'objet permet de l'équiper/retirer/supprimer/changer son nombre
 
         self.Obj_view = QTreeWidget()
-        self.Obj_view.setHeaderLabels([self.tr("Nom"), self.tr("Nombre")])
+        self.Obj_view.setHeaderLabels([self.tr("Nom"), self.tr("Nombre"), self.tr("Id")])
+        self.Obj_view.hideColumn(2)
+        self.Obj_view.setColumnWidth(0, 170)
+        self.Obj_view.setMinimumHeight(120)
         """self.Obj_pop = ObjPopup(self.Obj_view)
         self.Obj_firstindex=1
         self.Obj_view.bind("<Motion>",func=self.obj_schedule)
@@ -37,7 +42,12 @@ class CharIFrame(QWidget):
         self.Obj_view.bind("<Button-1>",func=self.obj_options)"""
 
         self.Melee_view = QTreeWidget()
-        self.Melee_view.setHeaderLabels([self.tr("Nom"), self.tr("Type"), self.tr("Taille"), self.tr("Nombre")])
+        self.Melee_view.setHeaderLabels([self.tr("Nom"), self.tr("Type"), self.tr("Taille"), self.tr("Nombre"),
+                                         self.tr("Id")])
+        self.Melee_view.hideColumn(4)
+        self.Melee_view.setColumnWidth(0, 170)
+        self.Melee_view.setMinimumHeight(120)
+
         """self.Melee_pop=MeleePopup(self.Melee_view)
         self.Melee_firstindex=1
         self.Melee_view.bind("<Motion>",func=self.melee_schedule)
@@ -45,7 +55,10 @@ class CharIFrame(QWidget):
         self.Melee_view.bind("<Button-1>",func=self.melee_options)"""
 
         self.Throw_view = QTreeWidget()
-        self.Throw_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre")])
+        self.Throw_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre"), self.tr("Id")])
+        self.Throw_view.hideColumn(3)
+        self.Throw_view.setColumnWidth(0, 170)
+        self.Throw_view.setMinimumHeight(120)
         """self.Throw_pop=ThrowPopup(self.Throw_view)
         self.Throw_firstindex=1
         self.Throw_view.bind("<Motion>",func=self.throw_schedule)
@@ -53,7 +66,10 @@ class CharIFrame(QWidget):
         self.Throw_view.bind("<Button-1>",func=self.throw_options)"""
 
         self.Shield_view = QTreeWidget()
-        self.Shield_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre")])
+        self.Shield_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre"), self.tr("Id")])
+        self.Shield_view.hideColumn(3)
+        self.Shield_view.setColumnWidth(0, 170)
+        self.Shield_view.setMinimumHeight(120)
         """self.Shield_pop=ShieldPopup(self.Shield_view)
         self.Shield_firstindex=1
         self.Shield_view.bind("<Motion>",func=self.shield_schedule)
@@ -61,7 +77,10 @@ class CharIFrame(QWidget):
         self.Shield_view.bind("<Button-1>",func=self.shield_options)"""
 
         self.Armor_view = QTreeWidget()
-        self.Armor_view.setHeaderLabels([self.tr("Nom"), self.tr("Position"), self.tr("Nombre")])
+        self.Armor_view.setHeaderLabels([self.tr("Nom"), self.tr("Position"), self.tr("Nombre"), self.tr("Id")])
+        self.Armor_view.hideColumn(3)
+        self.Armor_view.setColumnWidth(0, 170)
+        self.Armor_view.setMinimumHeight(120)
         """self.Armor_pop=ArmorPopup(self.Armor_view)
         self.Armor_firstindex=1
         self.Armor_view.bind("<Motion>",func=self.armor_schedule)
@@ -123,7 +142,7 @@ class CharIFrame(QWidget):
         self.grid.addWidget(self.Melee_view, 2, 0, 2, 3)
         self.grid.addWidget(self.Throw_view, 4, 0, 2, 3)
         self.grid.addWidget(self.Shield_view, 6, 0, 2, 3)
-        self.grid.addWidget(self.Armor_view, 8, 0, 2, 3)
+        self.grid.addWidget(self.Armor_view, 8, 0, 1, 3)
 
         self.grid.addWidget(self.Left_Cord, 0, 3, 1, 2)
         self.grid.addWidget(self.Right_Cord, 1, 3, 1, 2)
@@ -151,79 +170,78 @@ class CharIFrame(QWidget):
         self.grid.addWidget(self.Import, 0, 7)
         self.grid.addWidget(self.ObjCF, 1, 6, 4, 2)
 
-    def refresh(self, event=None):
+        self.grid.setRowStretch(8, 20)
+
+    def refresh(self):
         """
-        "" fonction qui rafraîchit l'inventaire ""
-        # self.master.master.selectedchar.inventory={}
-        self.Objlist=[]
-        self.Meleelist=[]
-        self.Throwlist=[]
-        self.Shieldlist=[]
-        self.Armorlist=[]
+         Method called to refresh the content of the character's inventory
 
-        # on supprime tout l'affichage dans chaque tableau
-        for item in self.Obj_view.get_children():
-            self.Obj_view.delete(item)
+        :return: None
+        """
 
-        for item in self.Melee_view.get_children():
-            self.Melee_view.delete(item)
+        self.Obj_view.clear()
+        self.Melee_view.clear()
+        self.Armor_view.clear()
+        self.Throw_view.clear()
+        self.Shield_view.clear()
+        self.Objlist = []
+        self.Meleelist = []
+        self.Throwlist = []
+        self.Shieldlist = []
+        self.Armorlist = []
 
-        for item in self.Throw_view.get_children():
-            self.Throw_view.delete(item)
+        selectedchar = self.get_selectedchar()
+        inventory = selectedchar.get_inventory()
+        for duo in enumerate(inventory.keys()):
+            if type(duo[1]) == Pc.Obj or type(duo[1]) == Pc.Cord:
+                index = str(len(self.Objlist))
+                item: Pc.Obj = duo[1]
+                self.Objlist.append(item)
+                name = item.get_stat("name")
+                number = str(inventory[item])
+                self.Obj_view.addTopLevelItem(QTreeWidgetItem([name, number, index]))
 
-        for item in self.Shield_view.get_children():
-            self.Shield_view.delete(item)
+            elif type(duo[1]) == Pc.MeleeEquip:
+                index = str(len(self.Meleelist))
+                item: Pc.MeleeEquip = duo[1]
+                self.Meleelist.append(item)
+                statlist = item.get_stats_aslist(["name", "weight", "hand"])
+                number = str(inventory[item])
+                self.Melee_view.addTopLevelItem(QTreeWidgetItem(statlist[:2]+[self.tr("%n Main(s)", "", statlist[-1]),
+                                                                              number, index]))
+            elif type(duo[1]) == Pc.ThrowEquip:
+                index = str(len(self.Throwlist))
+                item: Pc.ThrowEquip = duo[1]
+                self.Throwlist.append(item)
+                statlist = item.get_stats_aslist(["name", "hand"])
+                number = str(inventory[item])
+                self.Throw_view.addTopLevelItem(QTreeWidgetItem([statlist[0], self.tr("%n Main(s)", "", statlist[-1]),
+                                                                 number, index]))
+            elif type(duo[1]) == Pc.ShieldEquip:
+                index = str(len(self.Shieldlist))
+                item: Pc.ShieldEquip = duo[1]
+                self.Shieldlist.append(item)
+                statlist = item.get_stats_aslist(["name", "hand"])
+                number = str(inventory[item])
+                self.Shield_view.addTopLevelItem(QTreeWidgetItem([statlist[0], self.tr("%n Main(s)", "", statlist[-1]),
+                                                                  number, index]))
 
-        for item in self.Armor_view.get_children():
-            self.Armor_view.delete(item)
-
-        # on reprend la liste complète des objets dans l'inventaire et on les trie par type, puis on les affiche
-        for i in self.master.master.selectedchar.inventory.keys():
-            if type(i)==pc.Obj or type(i)==pc.Cord:
-                self.Obj_view.insert("","end",text=i.name,values=[self.master.master.selectedchar.inventory[i]])
-                self.Objlist.append(i)
-
-            elif type(i)==pc.MeleeEquip:
-                self.Melee_view.insert("","end",text=i.name,values=[i.carac["weight"],str(i.carac["hand"])+" Main(s)",self.master.master.selectedchar.inventory[i]])
-                self.Meleelist.append(i)
-
-            elif type(i)==pc.ThrowEquip:
-                self.Throw_view.insert("","end",text=i.name,values=[str(i.carac["hand"])+" Main(s)",self.master.master.selectedchar.inventory[i]])
-                self.Throwlist.append(i)
-
-            elif type(i)==pc.ShieldEquip:
-                self.Shield_view.insert("","end",text=i.name,values=[str(i.carac["hand"])+" Main(s)",self.master.master.selectedchar.inventory[i]])
-                self.Shieldlist.append(i)
-
-            elif type(i)==pc.ArmorEquip:
-                self.Armor_view.insert("","end",text=i.name,values=[i.location,self.master.master.selectedchar.inventory[i]])
-                self.Armorlist.append(i)
-
-
-        # si des objets sont affichés dans les tableaux, on regarde quel est l'indice le plus bas donné aux objets
-        if self.Obj_view.get_children():
-            self.Obj_firstindex=int(self.Obj_view.get_children()[0][1:],base=16)
-
-        if self.Melee_view.get_children():
-            self.Melee_firstindex=int(self.Melee_view.get_children()[0][1:],base=16)
-
-        if self.Throw_view.get_children():
-            self.Throw_firstindex=int(self.Throw_view.get_children()[0][1:],base=16)
-
-        if self.Shield_view.get_children():
-            self.Shield_firstindex=int(self.Shield_view.get_children()[0][1:],base=16)
-
-        if self.Armor_view.get_children():
-            self.Armor_firstindex=int(self.Armor_view.get_children()[0][1:],base=16)
-
+            elif type(duo[1]) == Pc.ArmorEquip:
+                index = str(len(self.Armorlist))
+                item: Pc.ArmorEquip = duo[1]
+                self.Armorlist.append(item)
+                statlist = item.get_stats_aslist(["name", "location"])
+                number = str(inventory[item])
+                self.Armor_view.addTopLevelItem(QTreeWidgetItem(statlist + [number, index]))
 
     # les popups n'apparaissent que si la souris ne bouge pas
     def obj_schedule(self,event=None):
+        """
         "" Prépare à l'affichage du popup pour l'objet ""
         self.unschedule()
         if self.Obj_view.identify_row(event.y):
-            self.id=self.after("500",self.Obj_pop.showinfo,self.Objlist[int(self.Obj_view.identify_row(event.y)[1:],base=16)-self.Obj_firstindex],event)"""
-
+            self.id=self.after("500",self.Obj_pop.showinfo,self.Objlist[int(self.Obj_view.identify_row(event.y)[1:],base=16)-self.Obj_firstindex],event)
+        """
 
     def melee_schedule(self,event=None):
         """
@@ -232,7 +250,6 @@ class CharIFrame(QWidget):
         if self.Melee_view.identify_row(event.y):
             self.id=self.after("500",self.Melee_pop.showinfo,self.Meleelist[int(self.Melee_view.identify_row(event.y)[1:],base=16)-self.Melee_firstindex],event)"""
 
-
     def throw_schedule(self,event=None):
         """
         ""Prépare à l'affichage du popup pour l'arme de jet ""
@@ -240,14 +257,12 @@ class CharIFrame(QWidget):
         if self.Throw_view.identify_row(event.y):
             self.id=self.after("500",self.Throw_pop.showinfo,self.Throwlist[int(self.Throw_view.identify_row(event.y)[1:],base=16)-self.Throw_firstindex],event)"""
 
-
     def shield_schedule(self,event=None):
         """
         "" Prépare à l'affichage du popup pour le bouclier ""
         self.unschedule()
         if self.Shield_view.identify_row(event.y):
             self.id=self.after("500",self.Shield_pop.showinfo,self.Shieldlist[int(self.Shield_view.identify_row(event.y)[1:],base=16)-self.Shield_firstindex],event)"""
-
 
     def armor_schedule(self,event=None):
         """
@@ -271,42 +286,39 @@ class CharIFrame(QWidget):
         """
 
     def unselect_previous(self):
-        """
-        "" Désélectionne l'item précédent ""
+        """ Désélectionne l'item précédent """
 
         # on désactive tous les boutons
         if self.selected_item:
-            self.Obj_suppr["state"]="disabled"
-            self.Obj_add["state"]="disabled"
-            self.Obj_remove["state"]="disabled"
-            self.Obj_transfer["state"]="disabled"
-            self.Equip_remove["state"]="disabled"
+            self.Obj_suppr.setDisabled(True)
+            self.Obj_add.setDisabled(True)
+            self.Obj_remove.setDisabled(True)
+            self.Obj_transfer.setDisabled(True)
+            self.Equip_remove.setDisabled(True)
 
-            self.Solid_add["state"]="disabled"
-            self.Solid_remove["state"]="disabled"
+            self.Solid_add.setDisabled(True)
+            self.Solid_remove.setDisabled(True)
 
+            if type(self.selected_item) == Pc.MeleeEquip:
+                self.Left_Melee.setDisabled(True)
+                self.Right_Melee.setDisabled(True)
 
-            if type(self.selected_item)==pc.MeleeEquip:
-                self.Left_Melee["state"]="disabled"
-                self.Right_Melee["state"]="disabled"
+            elif type(self.selected_item) == Pc.ThrowEquip:
+                self.Left_Throw.setDisabled(True)
+                self.Right_Throw.setDisabled(True)
 
-            elif type(self.selected_item)==pc.ThrowEquip:
-                self.Left_Throw["state"]="disabled"
-                self.Right_Throw["state"]="disabled"
+            elif type(self.selected_item) == Pc.ShieldEquip:
+                self.Left_Shield.setDisabled(True)
+                self.Right_Shield.setDisabled(True)
 
-            elif type(self.selected_item)==pc.ShieldEquip:
-                self.Left_Shield["state"]="disabled"
-                self.Right_Shield["state"]="disabled"
+            elif type(self.selected_item) == Pc.ArmorEquip:
+                self.Armor_Equip.setDisabled(True)
 
-            elif type(self.selected_item)==pc.ArmorEquip:
-                self.Armor_Equip["state"]="disabled"
+            elif type(self.selected_item) == Pc.Cord:
+                self.Left_Cord.setDisabled(True)
+                self.Right_Cord.setDisabled(True)
 
-            elif type(self.selected_item)==pc.Cord:
-                self.Left_Cord["state"]="disabled"
-                self.Right_Cord["state"]="disabled"
-
-            self.selected_item=None
-            """
+            self.selected_item = None
 
     def obj_options(self,event=None):
         """
@@ -375,7 +387,6 @@ class CharIFrame(QWidget):
                         self.Right_Cord["state"]="normal"
         """
 
-
     def melee_options(self,event=None):
         """
         "" fonction qui affiche les boutons adéquats à l'objet sélectionné ""
@@ -443,8 +454,6 @@ class CharIFrame(QWidget):
                 self.Equip_remove["state"]="normal"
         """
 
-
-
     def shield_options(self,event=None):
         """
         "" fonction qui affiche les boutons adéquats à l'objet sélectionné ""
@@ -477,7 +486,6 @@ class CharIFrame(QWidget):
             if self.selected_item in self.master.master.selectedchar.playerequipment.values():
                 self.Equip_remove["state"]="normal"
         """
-
 
     def armor_options(self,event=None):
         """
@@ -610,7 +618,6 @@ class CharIFrame(QWidget):
         if type(self.selected_item)==pc.ThrowEquip:
             self.selected_item.del_cord()"""
 
-
     def equip_cord(self,where):
         """
         "" fonction pour équiper une corde sur un arc/ une arbalète ""
@@ -651,8 +658,6 @@ class CharIFrame(QWidget):
                 if where == "right":
                     self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)"""
 
-
-
     def change_solid(self,number):
         """if self.selected_item:
             self.selected_item.upsolid(number)
@@ -666,4 +671,16 @@ class CharIFrame(QWidget):
 
     def get_selectedchar(self):
         """
-        return self.master.get_selectedchar()"""
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CNbk.CharNotebook:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget().parent()

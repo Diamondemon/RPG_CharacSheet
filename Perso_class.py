@@ -775,6 +775,9 @@ class player(object):
     def get_gmstats(self):
         return self.GMstats
 
+    def get_inventory(self):
+        return self.inventory
+
     def get_invested_armor(self, location):
         """
         :param location: armor piece location
