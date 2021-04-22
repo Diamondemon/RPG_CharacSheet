@@ -116,7 +116,8 @@ class player(object):
         self.percentages["spell"] = 0
         self.percentages["magical-perception"] = 0
 
-        self.playerequipment: dict[str, ArmorEquip] = {"Heaume": None, "Spallières": None, "Brassards": None, "Avant-bras": None,
+        self.playerequipment: dict[str, Union[ArmorEquip, MeleeEquip, ThrowEquip]] = {"Heaume": None,
+                                "Spallières": None, "Brassards": None, "Avant-bras": None,
                                 "Plastron": None, "Jointures": None, "Tassette": None, "Cuissots": None, "Grèves": None,
                                 "Solerets": None, "left_melee": None, "right_melee": None, "left_throw": None,
                                 "right_throw": None}
@@ -606,6 +607,9 @@ class player(object):
         if self.inventory[obj] + number >= 0:
             self.inventory[obj] += number
 
+    def invent_add(self, obj):
+        self.inventory[obj] = 1
+
     def invent_suppr(self, obj):
         """ Methode qui supprime l'objet spécifié de l'inventaire """
         self.inventory.pop(obj)
@@ -771,6 +775,9 @@ class player(object):
     def get_current_armor(self, location):
         """ Méthode pour récupérer un des objets équipés"""
         return self.playerequipment[location]
+
+    def get_equipment(self):
+        return self.playerequipment
 
     def get_gmstats(self):
         return self.GMstats
