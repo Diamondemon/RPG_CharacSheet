@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import (QGroupBox, QGridLayout, QTableWidget, QTableWidgetItem)
-from PySide6.QtGui import (QPixmap, QIcon)
-import numpy as np
+from PySide6.QtCore import Qt
 
 import CUF
 
@@ -37,6 +36,7 @@ class CharPercFrame(QGroupBox):
         for key in percentages.keys():
             if percentages[key] != 0:
                 newitem = QTableWidgetItem(self.tr(self.perclist[j] + " : %n%", "", percentages[key]))
+                newitem.setFlags(Qt.ItemIsEnabled)
                 self.table.setItem(i, k, newitem)
                 i += 1
 
