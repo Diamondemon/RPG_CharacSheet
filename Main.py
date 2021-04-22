@@ -23,6 +23,7 @@ if not path.exists("spells"):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyleSheet("QTableWidget {border: 0px;} QTreeWidget {border: 2px solid black;}")
     window = UI_W()
     window.show()
     sys.exit(app.exec_())

@@ -1,6 +1,6 @@
 from PySide6.QtCore import SIGNAL, Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QGroupBox, QGridLayout, QLabel, QPushButton, QFrame)
+from PySide6.QtWidgets import (QGroupBox, QGridLayout, QLabel, QPushButton, QFrame, QWidget)
 from functools import partial
 import ThrScopeTable as TsT
 import CUF
@@ -13,11 +13,17 @@ class CharThrFrame(QGroupBox):
     def __init__(self):
         QGroupBox.__init__(self, " Jet ")
         self.grid = QGridLayout(self)
+        self.leftFrame = QWidget()
+        self.leftFrame.setMinimumHeight(120)
+        self.rightFrame = QWidget()
+        self.rightFrame.setMinimumHeight(120)
         self.leftgrid = QGridLayout(self)
         self.rightgrid = QGridLayout(self)
         self.setLayout(self.grid)
-        self.grid.addLayout(self.leftgrid, 0, 0)
-        self.grid.addLayout(self.rightgrid, 2, 0)
+        self.grid.addWidget(self.leftFrame, 0, 0, 3, 1)
+        self.leftFrame.setLayout(self.leftgrid)
+        self.grid.addWidget(self.rightFrame, 4, 0, 3, 1)
+        self.rightFrame.setLayout(self.rightgrid)
 
         self.mastery_image = QIcon("./Images/symb-mastery.svg")
 
@@ -41,7 +47,7 @@ class CharThrFrame(QGroupBox):
 
         self.separator = QFrame()
         self.separator.setFrameShape(QFrame.HLine)
-        self.grid.addWidget(self.separator, 1, 0)
+        self.grid.addWidget(self.separator, 3, 0, 1, 1)
 
         self.rightlist = {"title": QLabel(self.tr("Main droite")), "name": QLabel(), "equip_name": QLabel(),
                           "mastery_add": QPushButton("+"), "mastery_rm": QPushButton("-"), "scope": TsT.ThrScopeTable()}
