@@ -338,7 +338,7 @@ class CharIFrame(QWidget):
         if len(selected_items) == 1:
             item = selected_items[0]
             try:
-                self.selected_item: Pc.Obj = self.Objlist[int(item.text(4))]
+                self.selected_item: Pc.Obj = self.Objlist[int(item.text(2))]
                 self.Obj_suppr.setDisabled(False)
                 self.Obj_transfer.setDisabled(False)
 
@@ -576,6 +576,7 @@ class CharIFrame(QWidget):
         "" fonction qui affiche les boutons adéquats à l'objet sélectionné ""
         """
 
+    @Slot()
     def import_obj(self):
         """
         Slot called to import objects created by other users
@@ -678,44 +679,64 @@ class CharIFrame(QWidget):
         """
 
     def equip_cord(self, where):
-        """
-        "" fonction pour équiper une corde sur un arc/ une arbalète ""
-        if self.master.master.selectedchar.playerequipment["left_throw"] and self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"]:
+
+        selectedchar = self.get_selectedchar()
+        inventory = selectedchar.get_inventory()
+
+        left_throw = selectedchar.get_weapon("left", "throw")
+        right_throw = selectedchar.get_weapon("right", "throw")
+
+        if left_throw and left_throw.get_stat("cord"):
+
             # si l'arme est à 2 mains, on vérifier juste qu'on a assez de cordes pour en "corder" une de plus
-            if self.master.master.selectedchar.playerequipment["left_throw"].carac["hand"]==2:
-                if self.master.master.selectedchar.inventory[self.selected_item]>self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][0] or self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]!=self.selected_item.perc:
-                    self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)
+            if left_throw.get_stat("hand") == 2:
+
+                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
+                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
             # sinon, on vérifie si la deuxième arme existe, puis si elle a besoin d'une corde
-            elif self.master.master.selectedchar.playerequipment["right_throw"] and self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"]:
+            elif right_throw and right_throw.get_stat("cord"):
 
-                if (self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]==self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]==self.selected_item.perc) or (self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]==self.selected_item.perc and self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]==0) or (self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]==self.selected_item.perc and self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]==0) or (self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]==self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]==0):
-                    if self.master.master.selectedchar.inventory[self.selected_item]>self.master.master.selectedchar.playerquipment["left_throw"].carac["cord"][0]+self.master.master.selectedchar.playerquipment["right_throw"].carac["cord"][0]:
-                        self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)
+                if (left_throw.get_stat("cord")[1] ==
+                    right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc")) or (
+                        left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                        right_throw.get_stat("cord")[1] == 0) or (
+                        right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                        left_throw.get_stat("cord")[1] == 0) or (
+                        left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] == 0):
 
-                elif (self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]==self.selected_item.perc and self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]!=self.selected_item.perc):
-                    if self.master.master.selectedchar.inventory[self.selected_item]>self.master.master.selectedchar.playerquipment["left_throw"].carac["cord"][0]:
-                        self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)
+                    if inventory[self.selected_item] > left_throw.get_stat("cord")[0] + right_throw.get_stat("cord")[0]:
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
-                elif self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]==self.selected_item.perc and self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]!=self.selected_item.perc:
-                    if self.master.master.selectedchar.inventory[self.selected_item]>self.master.master.selectedchar.playerquipment["right_throw"].carac["cord"][0]:
-                        self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)
+                elif (left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                      right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc")):
+
+                    if inventory[self.selected_item] > left_throw.get_stat("cord")[0]:
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+                elif right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and \
+                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+
+                    if inventory[self.selected_item] > right_throw.get_stat("cord")[0]:
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
                 else:
-                    self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)
+                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
             else:
-                if self.master.master.selectedchar.inventory[self.selected_item]>self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][0] or self.master.master.selectedchar.playerequipment["left_throw"].carac["cord"][1]!=self.selected_item.perc:
+                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
+                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
                     if where == "left":
-                        self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
-
-        # sinon, on regarde pour la droite, qui est alors forcément à une main si elle existe
-        elif self.master.master.selectedchar.playerequipment["right_throw"] and self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"]:
+            # sinon, on regarde pour la droite, qui est alors forcément à une main si elle existe
+        elif right_throw and right_throw.get_stat("cord"):
             # si on a assez de corde pour corder à droite, on dévérouille le bouton
-            if self.master.master.selectedchar.inventory[self.selected_item]>self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][0] or self.master.master.selectedchar.playerequipment["right_throw"].carac["cord"][1]!=self.selected_item.perc:
+            if inventory[self.selected_item] > right_throw.get_stat("cord")[0] or \
+                    right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
                 if where == "right":
-                    self.master.master.selectedchar.playerequipment[where+"_throw"].load_cord(self.selected_item)"""
+                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
     def change_solid(self, number):
         if self.selected_item:
