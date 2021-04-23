@@ -21,7 +21,8 @@ class CompetCreatorFrame(QWidget):
 
         self.Categ_entry = QComboBox()
         self.Categ_entry.setEditable(False)
-        self.Categ_entry.addItems(self.categlist)
+        for key in self.categlist:
+            self.Categ_entry.addItems(self.tr(key))
         self.Categ_entry.setCurrentIndex(0)
         self.Subcateg_entry = QComboBox()
         self.Subcateg_entry.setEditable(False)
@@ -157,21 +158,21 @@ class CompetCreatorFrame(QWidget):
 
         :return: None
         """
-        val = self.Categ_entry.currentText()
+        val = self.Categ_entry.currentIndex()
 
-        if val == "Mélée":
+        if val == 1:
             self.Subcateg_entry.clear()
             self.Subcateg_entry.addItems(["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"])
             self.Subcateg_entry.setCurrentIndex(0)
             self.Subcateg_entry.setDisabled(False)
 
-        elif val == "Jet":
+        elif val == 2:
             self.Subcateg_entry.clear()
             self.Subcateg_entry.addItems(["Lancer", "Arc", "Arbalète"])
             self.Subcateg_entry.setCurrentIndex(0)
             self.Subcateg_entry.setDisabled(False)
 
-        elif val == "Armure":
+        elif val == 4:
             self.Subcateg_entry.clear()
             self.Subcateg_entry.setDisabled(True)
 
