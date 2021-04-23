@@ -85,6 +85,7 @@ class CharArmFrame(QGroupBox):
                 item.setText(j, str(trio[j-1]))
             i += 1
 
+        self.Armor_View.clear()
         for item in self.Armorlist:
             invested_armor = str(selectedchar.get_invested_armor(item))
             linked_equip = selectedchar.get_current_armor(item)
