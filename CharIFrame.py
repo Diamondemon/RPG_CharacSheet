@@ -193,7 +193,9 @@ class CharIFrame(QWidget):
         self.Throw_view.clear()
         self.Shield_view.clear()
         self.Objlist = []
+        self.Objitems = []
         self.Meleelist = []
+        self.Meleeitems = []
         self.Throwlist = []
         self.Shieldlist = []
         self.Armorlist = []
@@ -207,7 +209,10 @@ class CharIFrame(QWidget):
                 self.Objlist.append(item)
                 name = item.get_stat("name")
                 number = str(inventory[item])
-                self.Obj_view.addTopLevelItem(QTreeWidgetItem([name, number, index]))
+                infos_popup = item.get_stat("description")
+                self.Objitems.append(QTreeWidgetItem([name, number, index]))
+                self.Objitems[-1].setToolTip(0, infos_popup)
+                self.Obj_view.addTopLevelItem(self.Objitems[-1])
 
             elif type(duo[1]) == Pc.MeleeEquip:
                 index = str(len(self.Meleelist))
@@ -215,8 +220,39 @@ class CharIFrame(QWidget):
                 self.Meleelist.append(item)
                 statlist = item.get_stats_aslist(["name", "weight", "hand"])
                 number = str(inventory[item])
-                self.Melee_view.addTopLevelItem(QTreeWidgetItem(statlist[:2]+[self.tr("%n Main(s)", "", statlist[-1]),
-                                                                              number, index]))
+
+                labellist = {"Dgt tr": "dgt_tr", "Dgt ctd": "dgt_ctd", "Estoc": "estoc",
+                             "hast": ["vit", "hast_bonus"], "Maîtr.": "mastery", "Qual.": "quality", "Sol.": "solid"}
+                infos_popup = "<body><div><p>" + item.get_stat("description") + "</p>"
+                infos_popup += "<p><table cellpadding='4'><tbody><tr>"
+
+                for k in labellist:
+                    if k != "hast":
+                        infos_popup += '<th "align=center">' + k + "</th>"
+                    else:
+                        if not item.get_stat("hast"):
+                            infos_popup += '<th "align=center">' + "Vit." + "</th>"
+                        else:
+                            infos_popup += '<th "align=center">' + "Bon.Hast" + "</th>"
+
+                infos_popup += "</tr><tr>"
+
+                for k, v in labellist.items():
+                    if k != "hast":
+                        infos_popup += '<th "align=center">' + str(item.get_stat(v)) + "</th>"
+                    else:
+                        if not item.get_stat("hast"):
+                            infos_popup += '<th "align=center">' + str(item.get_stat(v[0])) + "</th>"
+                        else:
+                            infos_popup += '<th "align=center">' + str(item.get_stat(v[1])) + "</th>"
+
+                infos_popup += "</tr></tbody></table></p></div></body>"
+
+                self.Meleeitems.append(QTreeWidgetItem(statlist[:2]+[self.tr("%n Main(s)", "", statlist[-1]), number,
+                                                                     index]))
+                self.Meleeitems[-1].setToolTip(0, infos_popup)
+                self.Melee_view.addTopLevelItem(self.Meleeitems[-1])
+
             elif type(duo[1]) == Pc.ThrowEquip:
                 index = str(len(self.Throwlist))
                 item: Pc.ThrowEquip = duo[1]

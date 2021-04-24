@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (QWidget, QTabWidget)
 from CharCaracFrame import CharCaracFrame
 from CharUsefulFrame import CharUsefulFrame
 from CharIFrame import CharIFrame
+from CharCompetFrame import CharCompetFrame
 import CDF
 
 
@@ -17,10 +18,11 @@ class CharNotebook(QTabWidget):
         self.addTab(self.CharUF, "Statistiques utiles")
         self.CharIF = CharIFrame()
         self.addTab(self.CharIF, "Inventaire")
+        self.CharCompF = CharCompetFrame()
+        self.addTab(self.CharCompF, "Compétences")
 
-        """self.CharCompF = CharCompetFrame(self)
-        self.CharSpellF = CharSpellFrame(self)
-        self.addTab(self.CharCompF, "Compétences")"""
+        """self.CharSpellF = CharSpellFrame(self)
+        self.addTab(self.CharSpellF, "Sorts")"""
         self.connect(self, SIGNAL("currentChanged(int)"), self.refresh)
 
     def refresh(self):
