@@ -594,6 +594,7 @@ class CharIFrame(QWidget):
                     if type(obj) in (Pc.Obj, Pc.MeleeEquip, Pc.ThrowEquip, Pc.ArmorEquip, Pc.ShieldEquip):
                         self.get_selectedchar().invent_add(obj)
             self.refresh()
+            self.save_character()
 
     @Slot()
     def export_obj(self):
@@ -636,6 +637,8 @@ class CharIFrame(QWidget):
             # si l'objet est équipé, on le déséquipe
             if self.selected_item in selectedchar.get_equipment().values():
                 self.unequip_item()
+
+        self.save_character()
         """
         "" fonction pour changer le nombre d'instances d'un objet dans l'inventaire ""
         """
@@ -652,6 +655,7 @@ class CharIFrame(QWidget):
 
         # on désélectionne l'objet, car il n'est plus censé exister
         self.unselect_previous()
+        self.save_character()
 
     def equip_item(self, where=""):
         # on équipe l'objet et on rafraichit le cadre qui affiche l'objet équipé.
@@ -666,6 +670,7 @@ class CharIFrame(QWidget):
 
         # on peut alors déséquiper l'objet du personnage
         self.Equip_remove.setDisabled(False)
+        self.save_character()
 
     def unequip_item(self):
         self.get_selectedchar().unequip_obj(self.selected_item)
@@ -674,6 +679,7 @@ class CharIFrame(QWidget):
         # on rafraîchit le cadre qui affichait l'objet déséquipé
         if type(self.selected_item) == Pc.ThrowEquip:
             self.selected_item.del_cord()
+        self.save_character()
         """
         "" fonction pour déséquiper l'objet sélectionné ""
         """
@@ -738,10 +744,13 @@ class CharIFrame(QWidget):
                 if where == "right":
                     selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
 
+        self.save_character()
+
     def change_solid(self, number):
         if self.selected_item:
             self.selected_item.upsolid(number)
             self.refresh()
+            self.save_character()
 
     def get_selectedchar(self):
         """
@@ -758,3 +767,11 @@ class CharIFrame(QWidget):
         :return: the reference to the parent
         """
         return self.parentWidget().parent()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()
