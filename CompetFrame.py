@@ -47,7 +47,7 @@ class CompetCreatorFrame(QWidget):
 
         # les compétences qui existent déjà
         self.Compet_view = QTreeWidget()
-        self.Compet_view.setHeaderLabels(["Catégorie", "Nom", "Effet", "Id"])
+        self.Compet_view.setHeaderLabels([self.tr("Catégorie"), self.tr("Nom"), self.tr("Effet"), "Id"])
         self.Compet_view.hideColumn(3)
         self.grid.addWidget(self.Compet_view, 3, 0, 1, 5)
 
