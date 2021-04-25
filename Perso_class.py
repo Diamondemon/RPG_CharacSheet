@@ -607,6 +607,12 @@ class player(object):
         if self.inventory[obj] + number >= 0:
             self.inventory[obj] += number
 
+    def compet_add(self, competence: Competence):
+        self.competences.append(competence)
+
+    def compet_suppr(self, index):
+        self.competences.pop(index)
+
     def invent_add(self, obj):
         self.inventory[obj] = 1
 
