@@ -75,19 +75,22 @@ class SpellCreatorFrame(QWidget):
     @Slot()
     def register(self):
         """
-        Method called to create a new spell
+        Slot called to create a new spell
 
         :return: None
         """
-        self.parent().generate_spell(self.Elem_entry.currentText(), self.Subcateg_entry.currentText(),
+        elem = self.elemlist[self.Elem_entry.currentIndex()]
+        subcateg = self.subcateglist[self.Subcateg_entry.currentIndex()]
+        self.parent().generate_spell(elem, subcateg,
                                      self.Name_entry.text(), self.Effect_entry.toPlainText(),
                                      self.Description_entry.toPlainText(), self.Cost_entry.text())
 
         key = self.parent().get_spelllist()[-1]
         i = len(self.parent().get_spelllist()) - 1
-        super_tree_item = self.Spell_view.findItems(key.elem, Qt.MatchExactly, 0)[0]
-        tree_item = super_tree_item.child(self.subcateglist.index(key.subcateg))
-        tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, key.description, key.cost, str(i)]))
+        super_tree_item = self.Spell_view.findItems(self.tr(key.get_stat("elem")), Qt.MatchExactly, 0)[0]
+        tree_item = super_tree_item.child(self.subcateglist.index(key.get_stat("subcateg")))
+        tree_item.addChild(QTreeWidgetItem([""] + key.get_stats_aslist(["name", "effect", "description", "cost"]) +
+                                           [str(i)]))
 
     def refresh(self):
         """
@@ -110,9 +113,10 @@ class SpellCreatorFrame(QWidget):
         if spelllist:
             i = 0
             for key in spelllist:
-                super_tree_item = self.Spell_view.findItems(key.elem, Qt.MatchExactly, 0)[0]
-                tree_item = super_tree_item.child(self.subcateglist.index(key.subcateg))
-                tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, key.description, key.cost, str(i)]))
+                super_tree_item = self.Spell_view.findItems(self.tr(key.get_stat("elem")), Qt.MatchExactly, 0)[0]
+                tree_item = super_tree_item.child(self.subcateglist.index(key.get_stat("subcateg")))
+                tree_item.addChild(QTreeWidgetItem([""] + key.get_stats_aslist(["name", "effect",
+                                                                                "description", "cost"]) + [str(i)]))
                 i += 1
 
         self.Spell_view.expandAll()

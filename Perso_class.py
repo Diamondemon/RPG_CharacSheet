@@ -1210,7 +1210,7 @@ class Spell(object):
         new_spell.__dict__ = self.__dict__.copy()
         return new_spell
 
-    def get_stats(self,key):
+    def get_stat(self,key):
 
         if key in self.__dict__.keys():
             return self.__dict__[key]
