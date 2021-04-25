@@ -1167,6 +1167,11 @@ class Competence(object):
         new_comp.__dict__ = self.__dict__.copy()
         return new_comp
 
+    def get_attr(self, key=""):
+
+        if key in self.__dict__.keys():
+            return self.__dict__[key]
+
     def __str__(self):
         return "Compétence (catégorie {}) {} : {}".format(self.categ, self.name, self.effect)
 

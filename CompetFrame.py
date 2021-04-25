@@ -63,20 +63,21 @@ class CompetCreatorFrame(QWidget):
 
     def refresh(self):
         """
-        Méthode qui rafraîchit la liste des compétences
+        Method called to refresh the TreeView
 
         :return: None
         """
-
+        meleelist = ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]
+        throwlist = ["Lancer", "Arc", "Arbalète"]
         self.Compet_view.clear()
         itemlist = []
         for key in self.categlist:
             itemlist.append(QTreeWidgetItem([self.tr(key), "", ""]))
 
-        for key in ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]:
+        for key in meleelist:
             itemlist[1].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
 
-        for key in ["Lancer", "Arc", "Arbalète"]:
+        for key in throwlist:
             itemlist[2].addChild(QTreeWidgetItem([self.tr(key), "", ""]))
 
         self.Compet_view.addTopLevelItems(itemlist)
@@ -85,53 +86,55 @@ class CompetCreatorFrame(QWidget):
         if competlist:
             i = 0
             for key in competlist:
-                super_tree_item = self.Compet_view.findItems(key.categ, Qt.MatchExactly, 0)[0]
-                if key.subcateg:
-                    if key.categ == "Mélée":
-                        tree_item = super_tree_item.child(["Mains nues", "Une main", "Doubles", "Deux mains",
-                                                           "Bouclier"].index(key.subcateg))
+                super_tree_item = self.Compet_view.findItems(self.tr(key.get_attr("categ")), Qt.MatchExactly, 0)[0]
+                if key.get_attr("subcateg"):
+                    if key.get_attr("categ") == "Mélée":
+                        tree_item = super_tree_item.child(meleelist.index(key.get_attr("subcateg")))
                     else:
-                        tree_item = super_tree_item.child(["Lancer", "Arc", "Arbalète"].index(key.subcateg))
+                        tree_item = super_tree_item.child(throwlist.index(key.get_attr("subcateg")))
 
-                    tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+                    tree_item.addChild(QTreeWidgetItem(["", key.get_attr("name"), key.get_attr("effect"), str(i)]))
                 else:
-                    super_tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+                    super_tree_item.addChild(QTreeWidgetItem(["", key.get_attr("name"), key.get_attr("effect"),
+                                                              str(i)]))
                 i += 1
         self.Compet_view.expandAll()
 
     @Slot()
     def register(self):
         """
-        Méthode qui crée la nouvelle compétence
+        Slot called to create a new competence based on what the user entered
 
         :return: None
         """
+        meleelist = ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]
+        throwlist = ["Lancer", "Arc", "Arbalète"]
         if self.Name_entry.text() and self.Effect_entry.toPlainText():
             if self.Effect_entry.toPlainText().endswith("\n"):
                 text = self.Effect_entry.toPlainText()[:-1]
             else:
                 text = self.Effect_entry.toPlainText()
-            self.parent().generate_competence(self.Categ_entry.currentText(), self.Subcateg_entry.currentText(),
-                                              self.Name_entry.text(), text)
+            categ = self.categlist[self.Categ_entry.currentIndex()]
+            subcateg = self.categlist[self.Subcateg_entry.currentIndex()]
+            self.parent().generate_competence(categ, subcateg, self.Name_entry.text(), text)
 
             key = self.parent().get_competlist()[-1]
             i = len(self.parent().get_competlist()) - 1
-            super_tree_item = self.Compet_view.findItems(key.categ, Qt.MatchExactly, 0)[0]
-            if key.subcateg:
-                if key.categ == "Mélée":
-                    tree_item = super_tree_item.child(["Mains nues", "Une main", "Doubles", "Deux mains",
-                                                       "Bouclier"].index(key.subcateg))
+            super_tree_item = self.Compet_view.findItems(self.tr(key.get_attr("categ")), Qt.MatchExactly, 0)[0]
+            if key.get_attr("subcateg"):
+                if key.get_attr("categ") == "Mélée":
+                    tree_item = super_tree_item.child(meleelist.index(key.get_attr("subcateg")))
                 else:
-                    tree_item = super_tree_item.child(["Lancer", "Arc", "Arbalète"].index(key.subcateg))
+                    tree_item = super_tree_item.child(throwlist.index(key.get_attr("subcateg")))
 
-                tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+                tree_item.addChild(QTreeWidgetItem(["", key.get_attr("name"), key.get_attr("effect"), str(i)]))
             else:
-                super_tree_item.addChild(QTreeWidgetItem(["", key.name, key.effect, str(i)]))
+                super_tree_item.addChild(QTreeWidgetItem(["", key.get_attr("name"), key.get_attr("effect"), str(i)]))
 
     @Slot()
     def select_compet(self):
         """
-        Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin
+        Slot called when selecting a competence in the TreeWidget
 
         :return: None
         """
