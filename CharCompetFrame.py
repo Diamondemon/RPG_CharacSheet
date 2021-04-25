@@ -112,9 +112,14 @@ class CharCompetFrame(QWidget):
 
         :return: None
         """
-        self.selected_compet.modify(self.modif_name.text(), self.modif_effect.toPlainText())
-        self.save_character()
-        self.refresh_char()
+        if self.modif_name.text() and self.modif_effect.toPlainText():
+            if self.modif_effect.toPlainText().endswith("\n"):
+                text = self.modif_effect.toPlainText()[:-1]
+            else:
+                text = self.modif_effect.toPlainText()
+            self.selected_compet.modify(self.modif_name.text(), text)
+            self.save_character()
+            self.refresh_char()
 
     def refresh(self):
         """

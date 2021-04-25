@@ -79,18 +79,29 @@ class SpellCreatorFrame(QWidget):
 
         :return: None
         """
-        elem = self.elemlist[self.Elem_entry.currentIndex()]
-        subcateg = self.subcateglist[self.Subcateg_entry.currentIndex()]
-        self.parent().generate_spell(elem, subcateg,
-                                     self.Name_entry.text(), self.Effect_entry.toPlainText(),
-                                     self.Description_entry.toPlainText(), self.Cost_entry.text())
+        if self.Name_entry.text() and self.Effect_entry.toPlainText() and self.Cost_entry.text():
+            if self.Effect_entry.toPlainText().endswith("\n"):
+                effect_text = self.Effect_entry.toPlainText()[:-1]
+            else:
+                effect_text = self.Effect_entry.toPlainText()
 
-        key = self.parent().get_spelllist()[-1]
-        i = len(self.parent().get_spelllist()) - 1
-        super_tree_item = self.Spell_view.findItems(self.tr(key.get_stat("elem")), Qt.MatchExactly, 0)[0]
-        tree_item = super_tree_item.child(self.subcateglist.index(key.get_stat("subcateg")))
-        tree_item.addChild(QTreeWidgetItem([""] + key.get_stats_aslist(["name", "effect", "description", "cost"]) +
-                                           [str(i)]))
+            if self.Description_entry.toPlainText().endswith("\n"):
+                descr_text = self.Description_entry.toPlainText()[:-1]
+            else:
+                descr_text = self.Description_entry.toPlainText()
+
+            elem = self.elemlist[self.Elem_entry.currentIndex()]
+            subcateg = self.subcateglist[self.Subcateg_entry.currentIndex()]
+            self.parent().generate_spell(elem, subcateg,
+                                         self.Name_entry.text(), effect_text,
+                                         descr_text, int(self.Cost_entry.text()))
+
+            key = self.parent().get_spelllist()[-1]
+            i = len(self.parent().get_spelllist()) - 1
+            super_tree_item = self.Spell_view.findItems(self.tr(key.get_stat("elem")), Qt.MatchExactly, 0)[0]
+            tree_item = super_tree_item.child(self.subcateglist.index(key.get_stat("subcateg")))
+            tree_item.addChild(QTreeWidgetItem([""] + key.get_stats_aslist(["name", "effect", "description", "cost"]) +
+                                               [str(i)]))
 
     def refresh(self):
         """
