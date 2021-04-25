@@ -25,6 +25,25 @@ class CharNotebook(QTabWidget):
         self.addTab(self.CharSpellF, "Sorts")"""
         self.connect(self, SIGNAL("currentChanged(int)"), self.refresh)
 
+    def get_selectedchar(self):
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CDF.CharDisplayFrame:
+        """
+        Method called to get the parent widget (the main window)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)
+
+    def get_competlist(self):
+        """
+        Method called to get the available competences
+
+        :return: Reference to the list of competences
+        """
+        return self.parent().get_competlist()
+
     def refresh(self):
         self.CharCF.refresh()
         self.CharUF.refresh()
@@ -39,17 +58,6 @@ class CharNotebook(QTabWidget):
         :return: None
         """
         self.parent().refresh_base()
-
-    def get_selectedchar(self):
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CDF.CharDisplayFrame:
-        """
-        Method called to get the parent widget (the main window)
-
-        :return: the reference to the parent
-        """
-        return QWidget.parent(self)
 
     def save_character(self):
         """

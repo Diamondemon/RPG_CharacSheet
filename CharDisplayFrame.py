@@ -57,6 +57,14 @@ class CharDisplayFrame(QWidget):
         self.baseFrame.refresh(self.selectedchar)
         self.save_character()
 
+    def get_competlist(self):
+        """
+        Method called to get the available competences
+
+        :return: Reference to the list of competences
+        """
+        return self.parent().get_competlist()
+
     def get_selectedchar(self):
         """
         Method called to get the character to be displayed
