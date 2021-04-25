@@ -914,6 +914,12 @@ class Obj(object):
         self.description = description
         self.is_stackable = stackable
 
+    def copy(self):
+
+        new_obj = Obj(self.name, self.description, self.is_stackable)
+
+        return new_obj
+
     def get_stat(self, key):
 
         if key in self.__dict__.keys():
@@ -934,6 +940,11 @@ class Cord(Obj):
     def __init__(self, name="", description="", stackable="False", pourcentage=0):
         Obj.__init__(self, name, description, stackable)
         self.perc = pourcentage  # chance de ne pas casser en cas d'échec
+
+    def copy(self):
+        new_cord = Cord(self.name, self.description, self.is_stackable, self.perc)
+
+        return new_cord
 
     def set_perc(self,newval):
 
