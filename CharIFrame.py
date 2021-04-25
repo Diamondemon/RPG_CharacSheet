@@ -17,10 +17,15 @@ class CharIFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
         self.Objlist = []
+        self.Objitems = []
         self.Meleelist = []
+        self.Meleeitems = []
         self.Throwlist = []
+        self.Throwitems = []
         self.Shieldlist = []
+        self.Shielditems = []
         self.Armorlist = []
+        self.Armoritems = []
         self.id = None
         self.selected_item = None
 
@@ -39,11 +44,6 @@ class CharIFrame(QWidget):
         self.Obj_view.setColumnWidth(0, 170)
         self.Obj_view.setMinimumHeight(120)
         self.connect(self.Obj_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.obj_options)
-        """self.Obj_pop = ObjPopup(self.Obj_view)
-        self.Obj_firstindex=1
-        self.Obj_view.bind("<Motion>",func=self.obj_schedule)
-        self.Obj_view.bind("<Leave>",func=self.unschedule)
-        self.Obj_view.bind("<Button-1>",func=self.obj_options)"""
 
         self.Melee_view = QTreeWidget()
         self.Melee_view.setHeaderLabels([self.tr("Nom"), self.tr("Type"), self.tr("Taille"), self.tr("Nombre"),
@@ -53,23 +53,12 @@ class CharIFrame(QWidget):
         self.Melee_view.setMinimumHeight(120)
         self.connect(self.Melee_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.melee_options)
 
-        """self.Melee_pop=MeleePopup(self.Melee_view)
-        self.Melee_firstindex=1
-        self.Melee_view.bind("<Motion>",func=self.melee_schedule)
-        self.Melee_view.bind("<Leave>",func=self.unschedule)
-        self.Melee_view.bind("<Button-1>",func=self.melee_options)"""
-
         self.Throw_view = QTreeWidget()
         self.Throw_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre"), self.tr("Id")])
         self.Throw_view.hideColumn(3)
         self.Throw_view.setColumnWidth(0, 170)
         self.Throw_view.setMinimumHeight(120)
         self.connect(self.Throw_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.throw_options)
-        """self.Throw_pop=ThrowPopup(self.Throw_view)
-        self.Throw_firstindex=1
-        self.Throw_view.bind("<Motion>",func=self.throw_schedule)
-        self.Throw_view.bind("<Leave>",func=self.unschedule)
-        self.Throw_view.bind("<Button-1>",func=self.throw_options)"""
 
         self.Shield_view = QTreeWidget()
         self.Shield_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre"), self.tr("Id")])
@@ -77,11 +66,6 @@ class CharIFrame(QWidget):
         self.Shield_view.setColumnWidth(0, 170)
         self.Shield_view.setMinimumHeight(120)
         self.connect(self.Shield_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.shield_options)
-        """self.Shield_pop=ShieldPopup(self.Shield_view)
-        self.Shield_firstindex=1
-        self.Shield_view.bind("<Motion>",func=self.shield_schedule)
-        self.Shield_view.bind("<Leave>",func=self.unschedule)
-        self.Shield_view.bind("<Button-1>",func=self.shield_options)"""
 
         self.Armor_view = QTreeWidget()
         self.Armor_view.setHeaderLabels([self.tr("Nom"), self.tr("Position"), self.tr("Nombre"), self.tr("Id")])
@@ -89,11 +73,6 @@ class CharIFrame(QWidget):
         self.Armor_view.setColumnWidth(0, 170)
         self.Armor_view.setMinimumHeight(120)
         self.connect(self.Armor_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.armor_options)
-        """self.Armor_pop=ArmorPopup(self.Armor_view)
-        self.Armor_firstindex=1
-        self.Armor_view.bind("<Motion>",func=self.armor_schedule)
-        self.Armor_view.bind("<Leave>",func=self.unschedule)
-        self.Armor_view.bind("<Button-1>",func=self.armor_options)"""
 
         # boutons pour équiper les objets, gauche/droite pour les armes; boutons pour changer les nombres/supprimer, etc
 
@@ -339,57 +318,6 @@ class CharIFrame(QWidget):
                 self.Armoritems.append(QTreeWidgetItem(statlist + [number, index]))
                 self.Armoritems[-1].setToolTip(0, infos_popup)
                 self.Armor_view.addTopLevelItem(self.Armoritems[-1])
-
-    # les popups n'apparaissent que si la souris ne bouge pas
-    def obj_schedule(self):
-        """
-        "" Prépare à l'affichage du popup pour l'objet ""
-        self.unschedule()
-        if self.Obj_view.identify_row(event.y):
-            self.id=self.after("500",self.Obj_pop.showinfo,self.Objlist[int(self.Obj_view.identify_row(event.y)[1:],base=16)-self.Obj_firstindex],event)
-        """
-
-    def melee_schedule(self):
-        """
-        ""Prépare à l'affichage du popup pour l'arme de mélée ""
-        self.unschedule()
-        if self.Melee_view.identify_row(event.y):
-            self.id=self.after("500",self.Melee_pop.showinfo,self.Meleelist[int(self.Melee_view.identify_row(event.y)[1:],base=16)-self.Melee_firstindex],event)"""
-
-    def throw_schedule(self):
-        """
-        ""Prépare à l'affichage du popup pour l'arme de jet ""
-        self.unschedule()
-        if self.Throw_view.identify_row(event.y):
-            self.id=self.after("500",self.Throw_pop.showinfo,self.Throwlist[int(self.Throw_view.identify_row(event.y)[1:],base=16)-self.Throw_firstindex],event)"""
-
-    def shield_schedule(self):
-        """
-        "" Prépare à l'affichage du popup pour le bouclier ""
-        self.unschedule()
-        if self.Shield_view.identify_row(event.y):
-            self.id=self.after("500",self.Shield_pop.showinfo,self.Shieldlist[int(self.Shield_view.identify_row(event.y)[1:],base=16)-self.Shield_firstindex],event)"""
-
-    def armor_schedule(self):
-        """
-        "" Prépare à l'affichage du popup pour l'armure ""
-        self.unschedule()
-        if self.Armor_view.identify_row(event.y):
-            self.id=self.after("500",self.Armor_pop.showinfo,self.Armorlist[int(self.Armor_view.identify_row(event.y)[1:],base=16)-self.Armor_firstindex],event)
-        """
-
-    def unschedule(self):
-        """
-        "" Arrête l'attente pour afficher le popup, et efface le popup s'il est présent ""
-        if self.id:
-            self.after_cancel(self.id)
-            self.id = None
-        self.Obj_pop.hideinfo()
-        self.Melee_pop.hideinfo()
-        self.Throw_pop.hideinfo()
-        self.Shield_pop.hideinfo()
-        self.Armor_pop.hideinfo()
-        """
 
     def unselect_previous(self):
         """ Désélectionne l'item précédent """
@@ -714,6 +642,12 @@ class CharIFrame(QWidget):
                 pk.Pickler(fichier).dump(selected_item)
 
     def change_number(self, number):
+        """
+        Method called to change the number of exemplaries of the selected item the character carries
+
+        :param number: number to modify
+        :return: None
+        """
         selectedchar = self.get_selectedchar()
         selectedchar.change_invent_number(self.selected_item, number)
         self.refresh()
@@ -742,6 +676,11 @@ class CharIFrame(QWidget):
         """
 
     def suppr_obj(self):
+        """
+        Method to remove the selected item from the character's inventory
+
+        :return: None
+        """
         # on retire l'objet de l'inventaire
         selectedchar = self.get_selectedchar()
         selectedchar.invent_suppr(self.selected_item)
@@ -756,6 +695,12 @@ class CharIFrame(QWidget):
         self.save_character()
 
     def equip_item(self, where=""):
+        """
+        Method called to equip the selected item
+
+        :param where: if it is a weapon
+        :return: None
+        """
         # on équipe l'objet et on rafraichit le cadre qui affiche l'objet équipé.
         # Si c'est une arme, on dit de quel côté l'équiper
 
@@ -771,6 +716,11 @@ class CharIFrame(QWidget):
         self.save_character()
 
     def unequip_item(self):
+        """
+        Method called to unequip the selected item.
+
+        :return: None
+        """
         self.get_selectedchar().unequip_obj(self.selected_item)
         self.Equip_remove.setDisabled(True)
 
@@ -778,12 +728,14 @@ class CharIFrame(QWidget):
         if type(self.selected_item) == Pc.ThrowEquip:
             self.selected_item.del_cord()
         self.save_character()
-        """
-        "" fonction pour déséquiper l'objet sélectionné ""
-        """
 
     def equip_cord(self, where):
+        """
+        Method called to put a cord on a shooting weapon.
 
+        :param where: side of the weapon to cord
+        :return: None
+        """
         selectedchar = self.get_selectedchar()
         inventory = selectedchar.get_inventory()
 
@@ -845,6 +797,12 @@ class CharIFrame(QWidget):
         self.save_character()
 
     def change_solid(self, number):
+        """
+        Method called to manage the solidity of the selected item
+
+        :param number: change to apply in the number
+        :return: None
+        """
         if self.selected_item:
             self.selected_item.upsolid(number)
             self.refresh()
