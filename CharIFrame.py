@@ -197,8 +197,11 @@ class CharIFrame(QWidget):
         self.Meleelist = []
         self.Meleeitems = []
         self.Throwlist = []
+        self.Throwitems = []
         self.Shieldlist = []
+        self.Shielditems = []
         self.Armorlist = []
+        self.Armoritems = []
 
         selectedchar = self.get_selectedchar()
         inventory = selectedchar.get_inventory()
@@ -259,16 +262,59 @@ class CharIFrame(QWidget):
                 self.Throwlist.append(item)
                 statlist = item.get_stats_aslist(["name", "hand"])
                 number = str(inventory[item])
-                self.Throw_view.addTopLevelItem(QTreeWidgetItem([statlist[0], self.tr("%n Main(s)", "", statlist[-1]),
-                                                                 number, index]))
+                keylist = ["dgt", "pa", "mastery", "solid"]
+                labellist = ["Dég.", "P.-Arm.", "Maîtr.", "Sol."]
+                scope = item.get_stat("scope")
+                infos_popup = "<body><div><p>" + item.get_stat("description") + "</p>"
+                infos_popup += "<p><table cellpadding='4'><tbody><tr><th><table cellpadding='4'><tbody><tr>"
+
+                for k in labellist:
+                    infos_popup += '<th "align=center">' + k + "</th>"
+
+                infos_popup += "</tr><tr>"
+
+                for k in keylist:
+                    infos_popup += '<th "align=center">' + str(item.get_stat(k)) + "</th>"
+
+                infos_popup += "</tr></tbody></table></th><th><table cellpadding='4'><tbody><tr>"
+                infos_popup += "<th></th><th>0</th>"
+                for sublist in scope:
+                    infos_popup += "<th></th><th>" + str(sublist[0]) + "</th>"
+                infos_popup += "</tr><tr><th>Préc.</th><th>|</th>"
+                for sublist in scope:
+                    infos_popup += "<th>" + str(sublist[2]) + "</th><th>|</th>"
+                infos_popup += "</tr><tr><th>Vit.</th><th>|</th>"
+                for sublist in scope:
+                    infos_popup += "<th>" + str(sublist[1]) + "</th><th>|</th>"
+                infos_popup += "</tr></tbody></table></th></tr></tbody></table></p></div></body>"
+                self.Throwitems.append(QTreeWidgetItem([statlist[0], self.tr("%n Main(s)", "", statlist[-1]),
+                                                        number, index]))
+                self.Throwitems[-1].setToolTip(0, infos_popup)
+                self.Throw_view.addTopLevelItem(self.Throwitems[-1])
             elif type(duo[1]) == Pc.ShieldEquip:
                 index = str(len(self.Shieldlist))
                 item: Pc.ShieldEquip = duo[1]
                 self.Shieldlist.append(item)
                 statlist = item.get_stats_aslist(["name", "hand"])
                 number = str(inventory[item])
-                self.Shield_view.addTopLevelItem(QTreeWidgetItem([statlist[0], self.tr("%n Main(s)", "", statlist[-1]),
-                                                                  number, index]))
+                keylist = ["close", "dist", "mastery", "mobi", "vit", "quality", "solid"]
+                labellist = ["Par. CàC", "Par. Dist.", "Maîtr.", "Mobi.", "Vit.", "Quali.", "Sol."]
+                infos_popup = "<body><div><p>" + item.get_stat("description") + "</p>"
+                infos_popup += "<p><table cellpadding='4'><tbody><tr>"
+
+                for k in labellist:
+                    infos_popup += '<th "align=center">' + k + "</th>"
+
+                infos_popup += "</tr><tr>"
+
+                for k in keylist:
+                    infos_popup += '<th "align=center">' + str(item.get_stat(k)) + "</th>"
+
+                infos_popup += "</tr></tbody></table></p></div></body>"
+                self.Shielditems.append(QTreeWidgetItem([statlist[0], self.tr("%n Main(s)", "", statlist[-1]),
+                                                        number, index]))
+                self.Shielditems[-1].setToolTip(0, infos_popup)
+                self.Shield_view.addTopLevelItem(self.Shielditems[-1])
 
             elif type(duo[1]) == Pc.ArmorEquip:
                 index = str(len(self.Armorlist))
@@ -276,7 +322,23 @@ class CharIFrame(QWidget):
                 self.Armorlist.append(item)
                 statlist = item.get_stats_aslist(["name", "location"])
                 number = str(inventory[item])
-                self.Armor_view.addTopLevelItem(QTreeWidgetItem(statlist + [number, index]))
+                keylist = ["prot", "amort", "mobi", "vit", "solid"]
+                labellist = ["Prot.", "Amort.", "Mobi.", "Vit.", "Sol."]
+                infos_popup = "<body><div><p>" + item.get_stat("description") + "</p>"
+                infos_popup += "<p><table cellpadding='4'><tbody><tr>"
+
+                for k in labellist:
+                    infos_popup += '<th "align=center">' + k + "</th>"
+
+                infos_popup += "</tr><tr>"
+
+                for k in keylist:
+                    infos_popup += '<th "align=center">' + str(item.get_stat(k)) + "</th>"
+
+                infos_popup += "</tr></tbody></table></p></div></body>"
+                self.Armoritems.append(QTreeWidgetItem(statlist + [number, index]))
+                self.Armoritems[-1].setToolTip(0, infos_popup)
+                self.Armor_view.addTopLevelItem(self.Armoritems[-1])
 
     # les popups n'apparaissent que si la souris ne bouge pas
     def obj_schedule(self):
