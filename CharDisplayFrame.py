@@ -75,9 +75,9 @@ class CharDisplayFrame(QWidget):
 
     def get_spelllist(self):
         """
-        Method called to get the available competences
+        Method called to get the available spells
 
-        :return: Reference to the list of competences
+        :return: Reference to the list of spells
         """
         return self.parent().get_spelllist()
 
