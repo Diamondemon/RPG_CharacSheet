@@ -131,7 +131,7 @@ class SpellCreatorFrame(QWidget):
         selected_items = self.Spell_view.selectedItems()
         if len(selected_items) == 1:
             item = selected_items[0]
-            if item.text(3):
+            if item.text(5):
                 try:
                     self.selected_item = int(item.text(5))
                     self.Suppr_choice.setDisabled(False)
