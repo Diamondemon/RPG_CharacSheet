@@ -48,6 +48,7 @@ class CharNotebook(QTabWidget):
         self.CharCF.refresh()
         self.CharUF.refresh()
         self.CharIF.refresh()
+        self.CharCompF.refresh()
         """if self.parent().get_selectedchar().ismage():
             self.CharSpellF.refresh()"""
 

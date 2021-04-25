@@ -1,3 +1,33 @@
+class Competence(object):
+    """ classe objet de compétence de personnage """
+
+    def __init__(self, categ="", subcateg="", name="", effect=""):
+        object.__init__(self)
+        self.categ = categ
+        self.subcateg = subcateg
+        self.name = name
+        self.effect = effect
+
+    def copy(self):
+        """ Méthode pour dupliquer la compétence """
+        new_comp = Competence()
+        new_comp.__dict__ = self.__dict__.copy()
+        return new_comp
+
+    def get_attr(self, key=""):
+
+        if key in self.__dict__.keys():
+            return self.__dict__[key]
+
+    def modify(self, name="", effect=""):
+
+        self.name = name
+        self.effect = effect
+
+    def __str__(self):
+        return "Compétence (catégorie {}) {} : {}".format(self.categ, self.name, self.effect)
+
+
 class player(object):
 
     def __init__(self, name="Joueur", basexp=0, mage=False):
@@ -607,7 +637,7 @@ class player(object):
         if self.inventory[obj] + number >= 0:
             self.inventory[obj] += number
 
-    def compet_add(self, competence: Competence):
+    def compet_add(self, competence):
         self.competences.append(competence)
 
     def compet_suppr(self, index):
@@ -774,7 +804,7 @@ class player(object):
 
         return self.basestats
 
-    def get_competences(self):
+    def get_competences(self) -> list[Competence]:
 
         return self.competences
 
@@ -1149,31 +1179,6 @@ class ShieldEquip(Obj):
             valuelist.append(self.get_stat(key))
 
         return valuelist
-
-
-class Competence(object):
-    """ classe objet de compétence de personnage """
-
-    def __init__(self, categ="", subcateg="", name="", effect=""):
-        object.__init__(self)
-        self.categ = categ
-        self.subcateg = subcateg
-        self.name = name
-        self.effect = effect
-
-    def copy(self):
-        """ Méthode pour dupliquer la compétence """
-        new_comp = Competence()
-        new_comp.__dict__ = self.__dict__.copy()
-        return new_comp
-
-    def get_attr(self, key=""):
-
-        if key in self.__dict__.keys():
-            return self.__dict__[key]
-
-    def __str__(self):
-        return "Compétence (catégorie {}) {} : {}".format(self.categ, self.name, self.effect)
 
 
 class Spell(object):
