@@ -73,6 +73,14 @@ class CharDisplayFrame(QWidget):
         """
         return self.selectedchar
 
+    def get_spelllist(self):
+        """
+        Method called to get the available competences
+
+        :return: Reference to the list of competences
+        """
+        return self.parent().get_spelllist()
+
     def GM_reinit_char(self):
         """
         Method called to reset all the stats given to the character by the Game Master in specific stats.

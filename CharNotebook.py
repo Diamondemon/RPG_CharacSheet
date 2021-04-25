@@ -1,4 +1,4 @@
-from PySide6.QtCore import SIGNAL
+from PySide6.QtCore import SIGNAL, Slot
 from PySide6.QtWidgets import (QWidget, QTabWidget)
 from CharCaracFrame import CharCaracFrame
 from CharUsefulFrame import CharUsefulFrame
@@ -24,16 +24,7 @@ class CharNotebook(QTabWidget):
         self.CharSpellF = CharSpellFrame()
         self.addTab(self.CharSpellF, "Sorts")
 
-    def get_selectedchar(self):
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CDF.CharDisplayFrame:
-        """
-        Method called to get the parent widget (the main window)
-
-        :return: the reference to the parent
-        """
-        return QWidget.parent(self)
+        self.connect(self, SIGNAL("currentChanged(int)"), self.refresh)
 
     def get_competlist(self):
         """
@@ -43,13 +34,43 @@ class CharNotebook(QTabWidget):
         """
         return self.parent().get_competlist()
 
+    def get_selectedchar(self):
+        """
+        Method called to get the character to be displayed
+
+        :return: the reference to the character
+        """
+        return self.parent().get_selectedchar()
+
+    def get_spelllist(self):
+        """
+        Method called to get the available competences
+
+        :return: Reference to the list of competences
+        """
+        return self.parent().get_spelllist()
+
+    def parent(self) -> CDF.CharDisplayFrame:
+        """
+        Method called to get the parent widget (the char display)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)
+
+    @Slot()
     def refresh(self):
+        """
+        Method called to refresh all the widgets contained
+
+        :return: None
+        """
         self.CharCF.refresh()
         self.CharUF.refresh()
         self.CharIF.refresh()
         self.CharCompF.refresh()
-        """if self.parent().get_selectedchar().ismage():
-            self.CharSpellF.refresh()"""
+        if self.get_selectedchar().ismage():
+            self.CharSpellF.refresh()
 
     def refresh_base(self):
         """
