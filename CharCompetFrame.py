@@ -1,5 +1,7 @@
-from PySide6.QtCore import SIGNAL
+from PySide6.QtCore import SIGNAL, Slot
 from PySide6.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QTreeWidget, QFrame, QLineEdit, QPlainTextEdit
+
+import CNbk
 
 
 class CharCompetFrame(QWidget):
@@ -24,7 +26,7 @@ class CharCompetFrame(QWidget):
         self.connect(self.suppr_choice, SIGNAL("clicked()"), self.suppr_compet)
 
         self.CharCompet_view = QTreeWidget()
-        self.CharCompet_view.setHeaderLabels(["Catégorie", "Nom", "Effet"])
+        self.CharCompet_view.setHeaderLabels(["Catégorie", "Nom", "Effet", "Id"])
         self.CharCompet_view.hideColumn(3)
         self.grid.addWidget(self.CharCompet_view, 3, 0, 1, 5)
 
@@ -42,7 +44,7 @@ class CharCompetFrame(QWidget):
         self.connect(self.transfer_choice, SIGNAL("clicked()"), self.transfer_compet)
 
         self.Compet_view = QTreeWidget()
-        self.Compet_view.setHeaderLabels(["Catégorie", "Nom", "Effet"])
+        self.Compet_view.setHeaderLabels(["Catégorie", "Nom", "Effet", "Id"])
         self.Compet_view.hideColumn(3)
         self.grid.addWidget(self.Compet_view, 4, 0, 1, 5)
 
@@ -60,21 +62,32 @@ class CharCompetFrame(QWidget):
         self.modif_validate.setDisabled(True)
         self.connect(self.modif_validate, SIGNAL("clicked()"), self.modif_register)
 
-
     def transfer_compet(self):
-        """ Méthode qui associe la compétence sélectionnée dans le général au personnage """
-        """if self.selected_item:
-            self.master.master.selectedchar.competences.append(self.master.master.master.competlist[self.selected_item-1].copy())
-            self.refresh_char()"""
+        """
+        Method called to give the selected competence to the selected character
 
-    def refresh(self,event=None):
-        """ Méthode qui rafraîchit tout """
-        """self.refresh_char()
-        self.refresh_general()"""
+        :return: None
+        """
+        if self.selected_item:
+            self.get_selectedchar().compet_add(self.get_competlist()[self.selected_item].copy())
+            self.refresh_char()
+            self.save_character()
 
+    def refresh(self):
+        """
+        Method called to refresh everything on display
+
+        :return: None
+        """
+        self.refresh_char()
+        self.refresh_general()
 
     def refresh_char(self):
-        """ Méthode qui rafraîchit la liste des compétences du personnage """
+        """
+        Method called to refresh the competences possessed by the character
+
+        :return: None
+        """
 
         """for key in ["Lore","Mains nues","Une main","Doubles","Deux mains","Bouclier","Lancer","Arc","Arbalète","Combat vétéran","Armure"]:
             for i in self.CharCompet_view.get_children(key):
@@ -110,8 +123,13 @@ class CharCompetFrame(QWidget):
 
                 i+=1"""
 
-    def select_compet(self,event):
-        """ Méthode qui sélectionne une compétence de la liste générale """
+    @Slot()
+    def select_compet(self):
+        """
+        Slot called when selecting a competence from the list of available competences
+
+        :return: None
+        """
 
         """if self.Compet_view.identify_row(event.y):
 
@@ -128,8 +146,12 @@ class CharCompetFrame(QWidget):
             self.transfer_choice["state"]="disabled"
         """
 
-    def select_charcompet(self,event):
-        """ Méthode qui sélectionne une compétence du personnage """
+    def select_charcompet(self):
+        """
+        Slot called when selecting a competence among the competences of the character
+
+        :return: None
+        """
         """if self.CharCompet_view.identify_row(event.y):
 
             try:
@@ -164,12 +186,16 @@ class CharCompetFrame(QWidget):
             self.modif_effect.insert("end",self.selected_compet.effect)"""
 
     def suppr_compet(self):
-        """ Méthode qui retire la compétence de personnage sélectionnée """
-        """if self.selected_charitem:
-            self.master.master.selectedchar.competences.pop(self.selected_charitem-1)
-            self.suppr_choice["state"]="disabled"
-            self.modify_choice["state"]="disabled"
-            self.refresh_char()"""
+        """
+        Method called to remove the selected competence from the character's competences
+
+        :return:
+        """
+        if self.selected_charitem:
+            self.get_selectedchar().compet_suppr(self.selected_charitem)
+            self.suppr_choice.setDisabled(True)
+            self.modify_choice.setDisabled(True)
+            self.refresh_char()
 
     def modif_register(self):
         """ Méthode qui permet d'enregistrer les modifications apportées """
@@ -177,5 +203,34 @@ class CharCompetFrame(QWidget):
         self.selected_compet.effect=self.modif_effect.get(0.0,"end")
         self.refresh_char()"""
 
+    def get_competlist(self):
+        """
+        Method called to get the available competences
+
+        :return: Reference to the list of competences
+        """
+        return self.parent().get_competlist()
+
     def get_selectedchar(self):
-        """return self.master.get_selectedchar()"""
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CNbk.CharNotebook:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget().parent()
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()
