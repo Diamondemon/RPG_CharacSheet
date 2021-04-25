@@ -30,7 +30,7 @@ class CharCompetFrame(QWidget):
 
         self.CharCompet_view = QTreeWidget()
         self.CharCompet_view.setMinimumHeight(300)
-        self.CharCompet_view.setHeaderLabels([self.tr("Catégorie"), self.tr("Nom"), self.tr("Effet"), "Id"])
+        self.CharCompet_view.setHeaderLabels([self.tr("Catégorie"), self.tr("Nom"), self.tr("Effet"), self.tr("Id")])
         self.CharCompet_view.hideColumn(3)
 
         self.grid.addWidget(self.CharCompet_view, 1, 0, 2, 5)

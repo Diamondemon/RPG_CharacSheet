@@ -4,6 +4,7 @@ from CharCaracFrame import CharCaracFrame
 from CharUsefulFrame import CharUsefulFrame
 from CharIFrame import CharIFrame
 from CharCompetFrame import CharCompetFrame
+from CharSpellFrame import CharSpellFrame
 import CDF
 
 
@@ -20,10 +21,8 @@ class CharNotebook(QTabWidget):
         self.addTab(self.CharIF, "Inventaire")
         self.CharCompF = CharCompetFrame()
         self.addTab(self.CharCompF, "Compétences")
-
-        """self.CharSpellF = CharSpellFrame(self)
-        self.addTab(self.CharSpellF, "Sorts")"""
-        self.connect(self, SIGNAL("currentChanged(int)"), self.refresh)
+        self.CharSpellF = CharSpellFrame()
+        self.addTab(self.CharSpellF, "Sorts")
 
     def get_selectedchar(self):
         return self.parent().get_selectedchar()
