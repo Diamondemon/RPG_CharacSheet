@@ -1,6 +1,9 @@
-from PySide6.QtCore import SIGNAL
+from PySide6.QtCore import SIGNAL, Slot, Qt
 from PySide6.QtWidgets import (QWidget, QLineEdit, QComboBox, QPushButton, QLabel, QGridLayout, QPlainTextEdit,
-                               QCheckBox)
+                               QCheckBox, QTableWidget)
+from PySide6.QtGui import QIntValidator
+import Perso_class as Pc
+import CIF
 
 
 class ObjCreatorFrame(QWidget):
@@ -10,6 +13,8 @@ class ObjCreatorFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
         # Widgets et variables nécessaires à la création de tout type d'objet
+        self.genericValid = QIntValidator(0, 100, self)
+        self.statValid = QIntValidator(-100, 100, self)
 
         self.Name_entry = QLineEdit()
         self.Description_entry = QPlainTextEdit()
@@ -19,8 +24,9 @@ class ObjCreatorFrame(QWidget):
             self.ObjType.addItem(self.tr(key))
         self.ObjType.setEditable(False)
         self.ObjType.setCurrentIndex(0)
+        self.connect(self.ObjType, SIGNAL("currentIndexChanged(int)"), self.change_obj_type)
         self.Register = QPushButton(self.tr("Ajouter"))
-        self.connect(self.Register, SIGNAL("clicked()"),self.inventory_add)
+        self.connect(self.Register, SIGNAL("clicked()"), self.inventory_add)
 
         self.Name_QLabel = QLabel(self.tr("Nom de l'objet"))
         self.Description_QLabel = QLabel(self.tr("Description"))
@@ -36,20 +42,13 @@ class ObjCreatorFrame(QWidget):
         self.grid.addWidget(self.Register, 2, 8, 1, 2)
 
         # dictionnaire de tous les widgets et variables pour la création d'arme de mélée
-        self.Melee = {}
+        self.Melee = {"weight_QLabel": QLabel(self.tr("Type d'arme")), "hand_QLabel": QLabel(self.tr("Taille")),
+                      "tr_QLabel": QLabel(self.tr("Tranchant")), "ctd_QLabel": QLabel(self.tr("Contondant")),
+                      "estoc_QLabel": QLabel(self.tr("Estoc")), "hast_QLabel": QLabel(self.tr("Hast")),
+                      "hast_bonus_QLabel": QLabel(self.tr("Bonus de hast")), "vit_QLabel": QLabel(self.tr("Vitesse")),
+                      "quality_QLabel": QLabel(self.tr("Qualité")), "solidity_QLabel": QLabel(self.tr("Solidité")),
+                      "weight_entry": QComboBox()}
 
-        self.Melee["weight_QLabel"] = QLabel(self.tr("Type d'arme"))
-        self.Melee["hand_QLabel"] = QLabel(self.tr("Taille"))
-        self.Melee["tr_QLabel"] = QLabel(self.tr("Tranchant"))
-        self.Melee["ctd_QLabel"] = QLabel(self.tr("Contondant"))
-        self.Melee["estoc_QLabel"] = QLabel(self.tr("Estoc"))
-        self.Melee["hast_QLabel"] = QLabel(self.tr("Hast"))
-        self.Melee["hast_bonus_QLabel"] = QLabel(self.tr("Bonus de hast"))
-        self.Melee["vit_QLabel"] = QLabel(self.tr("Vitesse"))
-        self.Melee["quality_QLabel"] = QLabel(self.tr("Qualité"))
-        self.Melee["solidity_QLabel"] = QLabel(self.tr("Solidité"))
-
-        self.Melee["weight_entry"] = QComboBox()
         for key in ["Poings", "Légère", "Moyenne", "Lourde"]:
             self.Melee["weight_entry"].addItem(self.tr(key))
         self.Melee["weight_entry"].setEditable(False)
@@ -60,38 +59,43 @@ class ObjCreatorFrame(QWidget):
         self.Melee["hand_entry"].setEditable(False)
         self.Melee["hand_entry"].setCurrentIndex(0)
         self.Melee["tr_entry"] = QLineEdit()
+        self.Melee["tr_entry"].setText("0")
+        self.Melee["tr_entry"].setValidator(self.genericValid)
+        self.Melee["tr_entry"].setAlignment(Qt.AlignCenter)
         self.Melee["ctd_entry"] = QLineEdit()
+        self.Melee["ctd_entry"].setText("0")
+        self.Melee["ctd_entry"].setValidator(self.genericValid)
+        self.Melee["ctd_entry"].setAlignment(Qt.AlignCenter)
         self.Melee["estoc_entry"] = QLineEdit()
+        self.Melee["estoc_entry"].setText("0")
+        self.Melee["estoc_entry"].setValidator(self.genericValid)
+        self.Melee["estoc_entry"].setAlignment(Qt.AlignCenter)
         self.Melee["hast_entry"] = QCheckBox()
+        self.Melee["hast_bonus_entry"] = QLineEdit()
+        self.Melee["hast_bonus_entry"].setText("0")
+        self.Melee["hast_bonus_entry"].setValidator(self.statValid)
+        self.Melee["hast_bonus_entry"].setAlignment(Qt.AlignCenter)
         self.Melee["vit_entry"] = QLineEdit()
+        self.Melee["vit_entry"].setText("0")
+        self.Melee["vit_entry"].setValidator(self.statValid)
+        self.Melee["vit_entry"].setAlignment(Qt.AlignCenter)
         self.Melee["quality_entry"] = QLineEdit()
+        self.Melee["quality_entry"].setText("0")
+        self.Melee["quality_entry"].setValidator(self.genericValid)
+        self.Melee["quality_entry"].setAlignment(Qt.AlignCenter)
         self.Melee["solidity_entry"] = QLineEdit()
+        self.Melee["solidity_entry"].setText("0")
+        self.Melee["solidity_entry"].setValidator(self.genericValid)
+        self.Melee["solidity_entry"].setAlignment(Qt.AlignCenter)
+
+        self.connect(self.Melee["hast_entry"], SIGNAL("stateChanged(int)"), self.hast_change)
 
         # dictionnaire de tous les widgets et variables pour la création d'arme de jet
-        self.Throw = {}
+        self.Throw = {"hand_QLabel": QLabel(self.tr("Taille")), "type_QLabel": QLabel(self.tr("Type")),
+                      "dgt_QLabel": QLabel(self.tr("Dégats")), "pa_QLabel": QLabel(self.tr("Perce-armure")),
+                      "solidity_QLabel": QLabel(self.tr("Solidité")), "scope": QTableWidget(),
+                      "hand_entry": QComboBox()}
 
-        self.Throw["hand_QLabel"] = QLabel(self.tr("Taille"))
-        self.Throw["type_QLabel"] = QLabel(self.tr("Type"))
-        self.Throw["dgt_QLabel"] = QLabel(self.tr("Dégats"))
-        self.Throw["pa_QLabel"] = QLabel(self.tr("Perce-armure"))
-        self.Throw["solidity_QLabel"] = QLabel(self.tr("Solidité"))
-
-        """self.Throw["scope"] = Frame(self)
-        QLabel(self.Throw["scope"],text="Max palier portée").grid(row=0,column=0)
-        QLabel(self.Throw["scope"],text="Vitesse").grid(row=0,column=1)
-        QLabel(self.Throw["scope"],text="Précision").grid(row=0,column=2)
-        QLineEdit().grid(row=1, column=0, padx="4p")  # scope
-        QLineEdit().grid(row=1, column=1, padx="4p")
-        QLineEdit().grid(row=1, column=2, padx="4p")"""
-
-        """self.Throw["scope"].bind("<Button-3>",func=self.choose_scope)
-        for i in self.Throw["scope"].grid_slaves():
-            i.bind("<Button-3>",func=self.choose_scope)
-        self.Throw["popup"] = Menu(self, tearoff=0)
-        self.Throw["popup"].add_command(QLabel="Ajouter une ligne",command=self.scope_add)
-        self.Throw["popup"].add_command(QLabel="Retirer une ligne",command=self.del_scope)"""
-
-        self.Throw["hand_entry"] = QComboBox()
         for key in ["1 main", "2 mains"]:
             self.Throw["hand_entry"].addItem(self.tr(key))
         self.Throw["hand_entry"].setEditable(False)
@@ -102,214 +106,347 @@ class ObjCreatorFrame(QWidget):
         self.Throw["type_entry"].setEditable(False)
         self.Throw["type_entry"].setCurrentIndex(1)
         self.Throw["dgt_entry"] = QLineEdit()
+        self.Throw["dgt_entry"].setText("0")
+        self.Throw["dgt_entry"].setValidator(self.genericValid)
+        self.Throw["dgt_entry"].setMaximumWidth(40)
+        self.Throw["dgt_entry"].setAlignment(Qt.AlignCenter)
         self.Throw["pa_entry"] = QLineEdit()
+        self.Throw["pa_entry"].setText("0")
+        self.Throw["pa_entry"].setValidator(self.genericValid)
+        self.Throw["pa_entry"].setMaximumWidth(40)
+        self.Throw["pa_entry"].setAlignment(Qt.AlignCenter)
         self.Throw["solidity_entry"] = QLineEdit()
+        self.Throw["solidity_entry"].setText("0")
+        self.Throw["solidity_entry"].setValidator(self.genericValid)
+        self.Throw["solidity_entry"].setMaximumWidth(40)
+        self.Throw["solidity_entry"].setAlignment(Qt.AlignCenter)
+        self.Throw["scope"].setColumnCount(3)
+        self.Throw["scope"].setHorizontalHeaderLabels([self.tr("Po. max"), self.tr("Vit."), self.tr("Préc.")])
+        for column in range(3):
+            self.Throw["scope"].setColumnWidth(column, 50)
+        self.Throw["scope"].setRowCount(6)
+        self.Throw["scope"].verticalHeader().hide()
 
-        #widget pour le pourcentage de la corde
+        # widget pour le pourcentage de la corde
         self.Cord_QLabel = QLabel(self.tr("Casse (en %)"))
         self.Cord_entry = QLineEdit()
+        self.Cord_entry.setText("0")
+        self.Cord_entry.setValidator(self.genericValid)
 
         # dictionnaire de tous les widgets et variables pour la création de bouclier
-        self.Shield = {}
+        self.Shield = {"hand_QLabel": QLabel(self.tr("Taille")), "close_QLabel": QLabel(self.tr("Parade CàC")),
+                       "dist_QLabel": QLabel(self.tr("Parade distance")), "mobi_QLabel": QLabel(self.tr("Mobilité")),
+                       "vit_QLabel": QLabel(self.tr("Vitesse")), "quality_QLabel": QLabel(self.tr("Qualité")),
+                       "solidity_QLabel": QLabel(self.tr("Solidité")), "hand_entry": QComboBox()}
 
-        self.Shield["hand_QLabel"] = QLabel(self.tr("Taille"))
-        self.Shield["close_QLabel"] = QLabel(self.tr("Parade CàC"))
-        self.Shield["dist_QLabel"] = QLabel(self.tr("Parade distance"))
-        self.Shield["mobi_QLabel"] = QLabel(self.tr("Mobilité"))
-        self.Shield["vit_QLabel"] = QLabel(self.tr("Vitesse"))
-        self.Shield["quality_QLabel"] = QLabel(self.tr("Qualité"))
-        self.Shield["solidity_QLabel"] = QLabel(self.tr("Solidité"))
-
-        self.Shield["hand_entry"] = QComboBox()
         for key in ["1 main", "2 mains"]:
             self.Shield["hand_entry"].addItem(self.tr(key))
         self.Shield["hand_entry"].setEditable(False)
         self.Shield["hand_entry"].setCurrentIndex(0)
         self.Shield["close_entry"] = QLineEdit()
+        self.Shield["close_entry"].setText("0")
+        self.Shield["close_entry"].setValidator(self.genericValid)
+        self.Shield["close_entry"].setAlignment(Qt.AlignCenter)
         self.Shield["dist_entry"] = QLineEdit()
+        self.Shield["dist_entry"].setText("0")
+        self.Shield["dist_entry"].setValidator(self.genericValid)
+        self.Shield["dist_entry"].setAlignment(Qt.AlignCenter)
         self.Shield["mobi_entry"] = QLineEdit()
+        self.Shield["mobi_entry"].setText("0")
+        self.Shield["mobi_entry"].setValidator(self.statValid)
+        self.Shield["mobi_entry"].setAlignment(Qt.AlignCenter)
         self.Shield["vit_entry"] = QLineEdit()
+        self.Shield["vit_entry"].setText("0")
+        self.Shield["vit_entry"].setValidator(self.statValid)
+        self.Shield["vit_entry"].setAlignment(Qt.AlignCenter)
         self.Shield["quality_entry"] = QLineEdit()
+        self.Shield["quality_entry"].setText("0")
+        self.Shield["quality_entry"].setValidator(self.genericValid)
+        self.Shield["quality_entry"].setAlignment(Qt.AlignCenter)
         self.Shield["solidity_entry"] = QLineEdit()
+        self.Shield["solidity_entry"].setText("0")
+        self.Shield["solidity_entry"].setValidator(self.genericValid)
+        self.Shield["solidity_entry"].setAlignment(Qt.AlignCenter)
 
         # dictionnaire de tous les widgets et variables pour la création d'armure
-        self.Armor = {}
+        self.Armor = {"location_QLabel": QLabel(self.tr("Localisation")), "prot_QLabel": QLabel(self.tr("Protection")),
+                      "amort_QLabel": QLabel(self.tr("Amortissement")), "mobi_QLabel": QLabel(self.tr("Mobilité")),
+                      "vit_QLabel": QLabel(self.tr("Vitesse")), "solidity_QLabel": QLabel(self.tr("Solidité")),
+                      "location_entry": QComboBox()}
 
-        self.Armor["location_QLabel"] = QLabel(self.tr("Localisation"))
-        self.Armor["prot_QLabel"] = QLabel(self.tr("Protection"))
-        self.Armor["amort_QLabel"] = QLabel(self.tr("Amortissement"))
-        self.Armor["mobi_QLabel"] = QLabel(self.tr("Mobilité"))
-        self.Armor["vit_QLabel"] = QLabel(self.tr("Vitesse"))
-        self.Armor["solidity_QLabel"] = QLabel(self.tr("Solidité"))
-
-        self.Armor["location_entry"] = QComboBox()
         for key in ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette", "Cuissots",
                     "Grèves", "Solerets"]:
             self.Armor["location_entry"].addItem(self.tr(key))
         self.Armor["location_entry"].setEditable(False)
         self.Armor["location_entry"].setCurrentIndex(0)
         self.Armor["prot_entry"] = QLineEdit()
+        self.Armor["prot_entry"].setText("0")
+        self.Armor["prot_entry"].setValidator(self.genericValid)
+        self.Armor["prot_entry"].setAlignment(Qt.AlignCenter)
         self.Armor["amort_entry"] = QLineEdit()
+        self.Armor["amort_entry"].setText("0")
+        self.Armor["amort_entry"].setValidator(self.genericValid)
+        self.Armor["amort_entry"].setAlignment(Qt.AlignCenter)
         self.Armor["mobi_entry"] = QLineEdit()
+        self.Armor["mobi_entry"].setText("0")
+        self.Armor["mobi_entry"].setValidator(self.statValid)
+        self.Armor["mobi_entry"].setAlignment(Qt.AlignCenter)
         self.Armor["vit_entry"] = QLineEdit()
+        self.Armor["vit_entry"].setText("0")
+        self.Armor["vit_entry"].setValidator(self.statValid)
+        self.Armor["vit_entry"].setAlignment(Qt.AlignCenter)
         self.Armor["solidity_entry"] = QLineEdit()
+        self.Armor["solidity_entry"].setText("0")
+        self.Armor["solidity_entry"].setValidator(self.genericValid)
+        self.Armor["solidity_entry"].setAlignment(Qt.AlignCenter)
 
+        self.grid_all()
+        self.clear()
 
-    def change_obj_type(self,event=None):
+    @Slot()
+    def change_obj_type(self):
         """
-        ""Fonction pour alterner entre les différents types d'objets et faire changer les widgets""
-        for i in self.grid_slaves(row=3):
-            i.grid_forget()
+        Method called to show the right widgets according to the selected type of object
 
-        for i in self.grid_slaves(row=4):
-            i.grid_forget()
-
-        val=self.ObjType.get()
+        :return: None
+        """
+        self.clear()
 
         # listes des caractéristiques demandées pour chaque objet
-        meleelist=["weight","hand","tr","ctd","estoc","hast","quality","solidity"]
-        throwlist=["hand","type","dgt","pa","solidity"]
-        shieldlist=["hand","close","dist","mobi","vit","quality","solidity"]
-        armorlist=["location","prot","amort","mobi","vit","solidity"]
+        meleelist = ["weight", "hand", "tr", "ctd", "estoc", "hast", "quality", "solidity"]
 
-        if val=="Arme de mélée":
-            i=0
+        val = self.ObjType.currentIndex()
+
+        if val == 1:
             for key in meleelist:
-                self.Melee[key+"_QLabel"].grid(row=3,column=i,padx="4p")
-                self.Melee[key+"_entry"].grid(row=4,column=i,padx="4p")
-                i+=1
-                if key=="hast":
-                    if self.Melee["hast_var"].get():
-                        key="hast_bonus"
-                        self.Melee[key+"_QLabel"].grid(row=3,column=i,padx="4p")
-                        self.Melee[key+"_entry"].grid(row=4,column=i,padx="4p")
+                self.Melee[key + "_QLabel"].show()
+                self.Melee[key + "_entry"].show()
+                if key == "hast":
+                    if self.Melee["hast_entry"].isChecked():
+                        key = "hast_bonus"
+                        self.Melee[key + "_QLabel"].show()
+                        self.Melee[key + "_entry"].show()
                     else:
-                        key="vit"
-                        self.Melee[key+"_QLabel"].grid(row=3,column=i,padx="4p")
-                        self.Melee[key+"_entry"].grid(row=4,column=i,padx="4p")
-                    i+=1
+                        key = "vit"
+                        self.Melee[key + "_QLabel"].show()
+                        self.Melee[key + "_entry"].show()
 
-        elif val=="Arme de jet":
-            i=0
-            for key in throwlist:
-                self.Throw[key+"_QLabel"].grid(row=3,column=i,padx="4p")
-                self.Throw[key+"_entry"].grid(row=4,column=i,padx="4p")
-                i+=1
-            self.Throw["scope"].grid(row=3,column=i,rowspan=3)
+        elif val == 2:
+            for widget in self.Throw.values():
+                widget.show()
 
+        elif val == 3:
+            self.Cord_QLabel.show()
+            self.Cord_entry.show()
 
-        elif val=="Bouclier":
-            i=0
-            for key in shieldlist:
-                self.Shield[key+"_QLabel"].grid(row=3,column=i,padx="4p")
-                self.Shield[key+"_entry"].grid(row=4,column=i,padx="4p")
-                i+=1
-        elif val=="Armure":
-            i=0
-            for key in armorlist:
-                self.Armor[key+"_QLabel"].grid(row=3,column=i,padx="4p")
-                self.Armor[key+"_entry"].grid(row=4,column=i,padx="4p")
-                i+=1
-        elif val=="Corde":
-            self.Cord_QLabel.grid(row=3,column=0)
-            self.Cord_entry.grid(row=3,column=1)
-    """
+        elif val == 4:
+            for widget in self.Shield.values():
+                widget.show()
 
+        elif val == 5:
+            for widget in self.Armor.values():
+                widget.show()
+
+    def clear(self):
+        """
+        Method called to hide all the non-generic widgets used for the creation of an object
+
+        :return: None
+        """
+        for widget in self.Melee.values():
+            widget.hide()
+
+        for widget in self.Throw.values():
+            widget.hide()
+
+        for widget in self.Shield.values():
+            widget.hide()
+
+        for widget in self.Armor.values():
+            widget.hide()
+
+            self.Cord_entry.hide()
+            self.Cord_QLabel.hide()
+
+    def get_scope(self):
+        """
+        Method called to get the scope from the Throw[scope] tablewidget
+
+        :return: None
+        """
+        scopelist = []
+        for i in range(self.Throw["scope"].rowCount()):
+            sublist = []
+            for j in range(3):
+                try:
+                    value = int(self.Throw["scope"].item(i, j).text())
+                    sublist.append(value)
+                except ValueError:
+                    return scopelist
+            scopelist.append(sublist)
+        return scopelist
+
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def grid_all(self):
+        """
+        Method called to grid all the QLabels and QLineEdits for the creation of the object (once, at the __init__)
+
+        :return: None
+        """
+        meleelist = ["weight", "hand", "tr", "ctd", "estoc", "hast", "quality", "solidity"]
+        i = 0
+        for key in meleelist:
+
+            self.grid.addWidget(self.Melee[key + "_QLabel"], 3, i)
+            self.grid.addWidget(self.Melee[key + "_entry"], 4, i)
+            i += 1
+            if key == "hast":
+                key = "hast_bonus"
+                self.grid.addWidget(self.Melee[key + "_QLabel"], 3, i)
+                self.grid.addWidget(self.Melee[key + "_entry"], 4, i)
+                key = "vit"
+                self.grid.addWidget(self.Melee[key + "_QLabel"], 3, i)
+                self.grid.addWidget(self.Melee[key + "_entry"], 4, i)
+                i += 1
+
+        throwlist = ["hand", "type", "dgt", "pa", "solidity"]
+        i = 0
+        for key in throwlist:
+            self.grid.addWidget(self.Throw[key + "_QLabel"], 3, i)
+            self.grid.addWidget(self.Throw[key + "_entry"], 4, i)
+            i += 1
+        self.grid.addWidget(self.Throw["scope"], 3, i, 3, 2)
+
+        self.grid.addWidget(self.Cord_QLabel, 3, 0)
+        self.grid.addWidget(self.Cord_entry, 3, 1)
+
+        shieldlist = ["hand", "close", "dist", "mobi", "vit", "quality", "solidity"]
+        i = 0
+        for key in shieldlist:
+            self.grid.addWidget(self.Shield[key + "_QLabel"], 3, i)
+            self.grid.addWidget(self.Shield[key + "_entry"], 4, i)
+            i += 1
+
+        armorlist = ["location", "prot", "amort", "mobi", "vit", "solidity"]
+        i = 0
+        for key in armorlist:
+            self.grid.addWidget(self.Armor[key + "_QLabel"], 3, i)
+            self.grid.addWidget(self.Armor[key + "_entry"], 4, i)
+            i += 1
 
     def hast_change(self):
         """
-        ""Fonction pour passer du titre vitesse au titre bonus de hast ""
+        Method called when switching between the creation of a hast weapon and a non-hast weapon
 
-        if self.Melee["hast_var"].get():
-            self.Melee["vit_QLabel"].grid_forget()
+        :return: None
+        """
+        if self.Melee["hast_entry"].isChecked():
+            self.Melee["vit_QLabel"].hide()
+            self.Melee["vit_entry"].hide()
 
-            self.Melee["hast_bonus_QLabel"].grid(row=3,column=5,padx="4p")
+            self.Melee["hast_bonus_QLabel"].show()
+            self.Melee["hast_bonus_entry"].show()
 
         else:
-            self.Melee["hast_bonus_QLabel"].grid_forget()
+            self.Melee["hast_bonus_QLabel"].hide()
+            self.Melee["hast_bonus_entry"].hide()
 
-            self.Melee["vit_QLabel"].grid(row=3,column=5,padx="4p")
-        """
+            self.Melee["vit_QLabel"].show()
+            self.Melee["vit_entry"].show()
 
-    def choose_scope(self,event=None):
-        """
-        ""Fonction d'apparition du popup pour ajouter/supprimer des lignes du tableau de portée ""
-
-        self.Throw["popup"].tk_popup(event.x_root,event.y_root+20,0)
-        """
-
-    def del_scope(self,event=None):
-        """
-        "" Fonction de suppression d'une ligne du tableau de portée ""
-        i=self.Throw["scope"].grid_size()[1]
-        if i>2:
-            for i in self.Throw["scope"].grid_slaves(row=i-1):
-                i.destroy()
-        """
-
-
-    def scope_add(self,event=None):
-        """
-        "" Fonction d'ajout d'une ligne au tableau de portée""
-        i=self.Throw["scope"].grid_size()[1]
-        QLineEdit(self.Throw["scope"],textvariable=IntVar(),width=16).grid(row=i,column=0,padx="4p")
-        QLineEdit(self.Throw["scope"],textvariable=IntVar(),width=6).grid(row=i,column=1,padx="4p")
-        QLineEdit(self.Throw["scope"],textvariable=IntVar(),width=9).grid(row=i,column=2,padx="4p")
-
-        for key in self.Throw["scope"].grid_slaves(row=i):
-            key.bind("<Button-3>",self.choose_scope)
-        """
-
-
-
+    @Slot()
     def inventory_add(self):
         """
-        "" Fonction qui ajoute l'objet au personnage selectionné dans CharDFrame ""
-        val=self.ObjType.get()
+        Method called to create the object and add it to the character's inventory
 
-        if val=="Objet":
-            new_obj=pc.Obj(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get())
-
-        elif val=="Arme de mélée":
-            new_obj=pc.MeleeEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get(),self.Melee["weight_entry"].get(),self.Melee["hast_var"].get())
-            new_obj.upstats(self.Melee["hand_entry"].current()+1,self.Melee["tr_var"].get(),self.Melee["ctd_var"].get(),self.Melee["estoc_var"].get(),self.Melee["vit_var"].get())
-            new_obj.newquali(self.Melee["quality_var"].get())
-            new_obj.upsolid(self.Melee["solidity_var"].get())
-
-
-        elif val=="Arme de jet":
-            new_obj=pc.ThrowEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get(),self.Throw["type_entry"].get())
-            new_obj.upstats(self.Throw["hand_entry"].current()+1,self.Throw["dgt_var"].get(),self.Throw["pa_var"].get())
-            new_obj.upsolid(self.Throw["solidity_var"].get())
-
-            scopelist=[]
-            for i in range(1,self.Throw["scope"].grid_size()[1]):
-                sublist=[]
-                for key in self.Throw["scope"].grid_slaves(row=i):
-                    sublist.insert(0,int(key.get()))
-                scopelist.append(sublist)
-            new_obj.newscope(scopelist)
-
-        elif val=="Armure":
-            new_obj=pc.ArmorEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get(),self.Armor["location_entry"].get())
-            new_obj.upstats(self.Armor["prot_var"].get(),self.Armor["amort_var"].get(),self.Armor["mobi_var"].get(),self.Armor["vit_var"].get())
-            new_obj.upsolid(self.Armor["solidity_var"].get())
-
-
-        elif val=="Bouclier":
-            new_obj=pc.ShieldEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get())
-            new_obj.upstats(self.Shield["hand_entry"].current()+1,self.Shield["close_var"].get(),self.Shield["dist_var"].get(),self.Shield["mobi_var"].get(),self.Shield["vit_var"].get())
-            new_obj.upsolid(self.Shield["solidity_var"].get())
-            new_obj.newquali(self.Shield["quality_var"].get())
-
-        elif val=="Corde":
-            new_obj=pc.Cord(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get(),self.Cord_var.get())
-
-
-        self.master.master.master.selectedchar.inventory[new_obj]=1 #par défaut, on gagne 1 objet et il n'est pas équipé
-        # print(self.master.master.master.selectedchar.inventory)
-        self.master.refresh()
+        :return: None
         """
+        throwlist = ["Lancer", "Tir"]
+        meleelist = ["Poings", "Légère", "Moyenne", "Lourde"]
+        armorlist = ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
+                     "Cuissots", "Grèves", "Solerets"]
 
-    def get_selectedchar(self):
-        return self.master.get_selectedchar()
+        new_obj = None
+
+        val = self.ObjType.currentIndex()
+        if self.Name_entry.text():
+            if val == 0:
+                new_obj = Pc.Obj(self.Name_entry.text(), self.Description_entry.toPlainText(),
+                                 self.Stackable_entry.isChecked())
+
+            elif val == 1:
+                new_obj = Pc.MeleeEquip(self.Name_entry.text(), self.Description_entry.toPlainText(),
+                                        self.Stackable_entry.isChecked(),
+                                        meleelist[self.Melee["weight_entry"].currentIndex()],
+                                        self.Melee["hast_entry"].isChecked())
+                if self.Melee["hast_entry"].isChecked():
+                    new_obj.upstats(self.Melee["hand_entry"].currentIndex() + 1, int(self.Melee["tr_entry"].text()),
+                                    int(self.Melee["ctd_entry"].text()), int(self.Melee["estoc_entry"].text()),
+                                    int(self.Melee["hast_bonus_entry"].text()))
+                else:
+                    new_obj.upstats(self.Melee["hand_entry"].currentIndex() + 1, int(self.Melee["tr_entry"].text()),
+                                    int(self.Melee["ctd_entry"].text()), int(self.Melee["estoc_entry"].text()),
+                                    int(self.Melee["vit_entry"].text()))
+
+                new_obj.newquali(int(self.Melee["quality_entry"].text()))
+                new_obj.upsolid(int(self.Melee["solidity_entry"].text()))
+
+            elif val == 2:
+                new_obj = Pc.ThrowEquip(self.Name_entry.text(), self.Description_entry.toPlainText(),
+                                        self.Stackable_entry.isChecked(),
+                                        throwlist[self.Throw["type_entry"].currentIndex()])
+                new_obj.upstats(self.Throw["hand_entry"].currentIndex() + 1, int(self.Throw["dgt_entry"].text()),
+                                int(self.Throw["pa_entry"].text()))
+                new_obj.upsolid(int(self.Throw["solidity_entry"].text()))
+
+                new_obj.newscope(self.get_scope())
+
+            elif val == 3:
+                new_obj = Pc.Cord(self.Name_entry.text(), self.Description_entry.toPlainText(),
+                                  self.Stackable_entry.isChecked(),
+                                  int(self.Cord_entry.text()))
+
+            elif val == 4:
+                new_obj = Pc.ShieldEquip(self.Name_entry.text(), self.Description_entry.toPlainText(),
+                                         self.Stackable_entry.isChecked())
+                new_obj.upstats(self.Shield["hand_entry"].currentIndex() + 1, int(self.Shield["close_entry"].text()),
+                                int(self.Shield["dist_entry"].text()), int(self.Shield["mobi_entry"].text()),
+                                int(self.Shield["vit_entry"].text()))
+                new_obj.upsolid(int(self.Shield["solidity_entry"].text()))
+                new_obj.newquali(int(self.Shield["quality_entry"].text()))
+
+            elif val == 5:
+                new_obj = Pc.ArmorEquip(self.Name_entry.text(), self.Description_entry.toPlainText(),
+                                        self.Stackable_entry.isChecked(),
+                                        armorlist[self.Armor["location_entry"].currentIndex()])
+                new_obj.upstats(int(self.Armor["prot_entry"].text()), int(self.Armor["amort_entry"].text()),
+                                int(self.Armor["mobi_entry"].text()), int(self.Armor["vit_entry"].text()))
+                new_obj.upsolid(int(self.Armor["solidity_entry"].text()))
+
+        if new_obj:
+            self.get_selectedchar().invent_add(new_obj)  # par défaut, on gagne 1 objet et il n'est pas équipé
+            self.parent().refresh()
+            self.save_character()
+
+    def parent(self) -> CIF.CharIFrame:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return QWidget.parent(self)
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()
