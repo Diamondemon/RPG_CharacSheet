@@ -867,17 +867,20 @@ class player(object):
 
         return self.mage
 
-    def pop_spell(self,spell):
+    def spell_add(self, spell):
+
+        self.spells[spell] = 0
+
+    def spell_pop(self, spell):
         """
         :param spell: name of the spell to remove from the player's set
-        :return:
+        :return: None
         """
 
         if self.spells[spell]>0:
             self.use_lightning(spell,-self.spells[spell])
 
         self.spells.pop(spell)
-
 
     def __setstate__(self, dict_attr):
         """Méthode appelée lors de la désérialisation de l'objet"""
