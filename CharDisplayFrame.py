@@ -160,3 +160,4 @@ class CharDisplayFrame(QWidget):
         :return: None
         """
         self.selectedchar = character
+        self.NBK.handle_spells()

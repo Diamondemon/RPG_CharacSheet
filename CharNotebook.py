@@ -14,17 +14,16 @@ class CharNotebook(QTabWidget):
         QTabWidget.__init__(self, parent)
 
         self.CharCF = CharCaracFrame()
-        self.addTab(self.CharCF, "Caractéristiques")
+        self.addTab(self.CharCF, self.tr("Caractéristiques"))
         self.CharUF = CharUsefulFrame()
-        self.addTab(self.CharUF, "Statistiques utiles")
+        self.addTab(self.CharUF, self.tr("Statistiques utiles"))
         self.CharIF = CharIFrame()
-        self.addTab(self.CharIF, "Inventaire")
+        self.addTab(self.CharIF, self.tr("Inventaire"))
         self.CharCompF = CharCompetFrame()
-        self.addTab(self.CharCompF, "Compétences")
+        self.addTab(self.CharCompF, self.tr("Compétences"))
         self.CharSpellF = CharSpellFrame()
-        self.addTab(self.CharSpellF, "Sorts")
 
-        self.connect(self, SIGNAL("currentChanged(int)"), self.refresh)
+        self.connect(self, SIGNAL("tabBarClicked(int)"), self.refresh)
 
     def get_competlist(self):
         """
@@ -49,6 +48,18 @@ class CharNotebook(QTabWidget):
         :return: Reference to the list of spells
         """
         return self.parent().get_spelllist()
+
+    def handle_spells(self):
+        """
+        Method called to handle the display of the spell tab
+
+        :return: None
+        """
+        if self.get_selectedchar().ismage():
+            self.removeTab(4)
+            self.addTab(self.CharSpellF, self.tr("Sorts"))
+        else:
+            self.removeTab(4)
 
     def parent(self) -> CDF.CharDisplayFrame:
         """

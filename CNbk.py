@@ -27,6 +27,14 @@ class CharNotebook:
         """
         return self.parent().get_spelllist()
 
+    def handle_spells(self):
+        """
+        Method called to handle the display of the spell tab
+
+        :return: None
+        """
+        pass
+
     def parent(self) -> CDF.CharDisplayFrame:
         """
         Method called to get the parent widget (the char display)
