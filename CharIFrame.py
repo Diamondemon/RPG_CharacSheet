@@ -31,7 +31,7 @@ class CharIFrame(QWidget):
 
         self.ObjCLabel = QLabel(self.tr("Créer un objet"))
         self.Import = QPushButton(self.tr("Importer"))
-        self.connect(self.Import, SIGNAL("clicked()"), self.import_obj)
+        self.connect(self.Import, SIGNAL("clicked()"), self.obj_import)
         self.ObjCF = ObjCreatorFrame()
 
         # tableaux d'affichage des objets --> _view
@@ -43,7 +43,7 @@ class CharIFrame(QWidget):
         self.Obj_view.hideColumn(2)
         self.Obj_view.setColumnWidth(0, 170)
         self.Obj_view.setMinimumHeight(150)
-        self.connect(self.Obj_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.obj_options)
+        self.connect(self.Obj_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.options_obj)
 
         self.Melee_view = QTreeWidget()
         self.Melee_view.setHeaderLabels([self.tr("Nom"), self.tr("Type"), self.tr("Taille"), self.tr("Nombre"),
@@ -52,28 +52,28 @@ class CharIFrame(QWidget):
         self.Melee_view.setColumnWidth(0, 170)
         self.Melee_view.setMinimumHeight(120)
         self.Melee_view.setMinimumWidth(500)
-        self.connect(self.Melee_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.melee_options)
+        self.connect(self.Melee_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.options_melee)
 
         self.Throw_view = QTreeWidget()
         self.Throw_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre"), self.tr("Id")])
         self.Throw_view.hideColumn(3)
         self.Throw_view.setColumnWidth(0, 170)
         self.Throw_view.setMinimumHeight(120)
-        self.connect(self.Throw_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.throw_options)
+        self.connect(self.Throw_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.options_throw)
 
         self.Shield_view = QTreeWidget()
         self.Shield_view.setHeaderLabels([self.tr("Nom"), self.tr("Taille"), self.tr("Nombre"), self.tr("Id")])
         self.Shield_view.hideColumn(3)
         self.Shield_view.setColumnWidth(0, 170)
         self.Shield_view.setMinimumHeight(120)
-        self.connect(self.Shield_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.shield_options)
+        self.connect(self.Shield_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.options_shield)
 
         self.Armor_view = QTreeWidget()
         self.Armor_view.setHeaderLabels([self.tr("Nom"), self.tr("Position"), self.tr("Nombre"), self.tr("Id")])
         self.Armor_view.hideColumn(3)
         self.Armor_view.setColumnWidth(0, 170)
         self.Armor_view.setMinimumHeight(120)
-        self.connect(self.Armor_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.armor_options)
+        self.connect(self.Armor_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.options_armor)
 
         # boutons pour équiper les objets, gauche/droite pour les armes; boutons pour changer les nombres/supprimer, etc
 
@@ -115,7 +115,7 @@ class CharIFrame(QWidget):
         self.connect(self.Obj_remove, SIGNAL("clicked()"), partial(self.change_number, -1))
         self.Obj_transfer = QPushButton(self.tr("Exporter"))
         self.Obj_transfer.setDisabled(True)
-        self.connect(self.Obj_transfer, SIGNAL("clicked()"), self.export_obj)
+        self.connect(self.Obj_transfer, SIGNAL("clicked()"), self.obj_export)
         self.Equip_remove = QPushButton(self.tr("Retirer"))
         self.Equip_remove.setDisabled(True)
         self.connect(self.Equip_remove, SIGNAL("clicked()"), self.unequip_item)
@@ -160,13 +160,463 @@ class CharIFrame(QWidget):
 
         self.grid.setRowStretch(8, 20)
 
+    def change_number(self, number):
+        """
+        Method called to change the number of exemplaries of the selected item the character carries
+
+        :param number: number to modify
+        :return: None
+        """
+        selectedchar = self.get_selectedchar()
+        selectedchar.change_invent_number(self.selected_item, number)
+        self.refresh()
+        inventory = selectedchar.get_inventory()
+
+        # si l'objet n'est pas stackable, on change les boutons disponibles
+        if inventory[self.selected_item] and not self.selected_item.get_stat("is_stackable"):
+            self.Obj_add.setDisabled(True)
+            self.Obj_remove.setDisabled(False)
+
+        elif inventory[self.selected_item] and self.selected_item.is_stackable:
+            self.Obj_remove.setDisabled(False)
+
+        # si le nombre atteint 0, on enlève la posiibilité de retirer un objet
+        if not inventory[self.selected_item]:
+            self.Obj_remove.setDisabled(True)
+            self.Obj_add.setDisabled(False)
+
+            # si l'objet est équipé, on le déséquipe
+            if self.selected_item in selectedchar.get_equipment().values():
+                self.unequip_item()
+
+        self.save_character()
+
+    def change_solid(self, number):
+        """
+        Method called to manage the solidity of the selected item
+
+        :param number: change to apply in the number
+        :return: None
+        """
+        if self.selected_item:
+            self.selected_item.upsolid(number)
+            self.refresh()
+            self.save_character()
+
+    def equip_cord(self, where):
+        """
+        Method called to put a cord on a shooting weapon.
+
+        :param where: side of the weapon to cord
+        :return: None
+        """
+        selectedchar = self.get_selectedchar()
+        inventory = selectedchar.get_inventory()
+
+        left_throw = selectedchar.get_weapon("left", "throw")
+        right_throw = selectedchar.get_weapon("right", "throw")
+
+        if left_throw and left_throw.get_stat("cord"):
+
+            # si l'arme est à 2 mains, on vérifier juste qu'on a assez de cordes pour en "corder" une de plus
+            if left_throw.get_stat("hand") == 2:
+
+                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
+                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+            # sinon, on vérifie si la deuxième arme existe, puis si elle a besoin d'une corde
+            elif right_throw and right_throw.get_stat("cord"):
+
+                if (left_throw.get_stat("cord")[1] ==
+                    right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc")) or (
+                        left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                        right_throw.get_stat("cord")[1] == 0) or (
+                        right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                        left_throw.get_stat("cord")[1] == 0) or (
+                        left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] == 0):
+
+                    if inventory[self.selected_item] > left_throw.get_stat("cord")[0] + right_throw.get_stat("cord")[0]:
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+                elif (left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                      right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc")):
+
+                    if inventory[self.selected_item] > left_throw.get_stat("cord")[0]:
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+                elif right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and \
+                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+
+                    if inventory[self.selected_item] > right_throw.get_stat("cord")[0]:
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+                else:
+                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+            else:
+                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
+                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                    if where == "left":
+                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+            # sinon, on regarde pour la droite, qui est alors forcément à une main si elle existe
+        elif right_throw and right_throw.get_stat("cord"):
+            # si on a assez de corde pour corder à droite, on dévérouille le bouton
+            if inventory[self.selected_item] > right_throw.get_stat("cord")[0] or \
+                    right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                if where == "right":
+                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
+
+        self.save_character()
+
+    def equip_item(self, where=""):
+        """
+        Method called to equip the selected item
+
+        :param where: if it is a weapon
+        :return: None
+        """
+        # on équipe l'objet et on rafraichit le cadre qui affiche l'objet équipé.
+        # Si c'est une arme, on dit de quel côté l'équiper
+
+        if type(self.selected_item) == Pc.ArmorEquip:
+            self.get_selectedchar().equip_obj(self.selected_item)
+        elif type(self.selected_item) == Pc.ThrowEquip:
+            self.get_selectedchar().equip_obj(self.selected_item, where)
+        else:
+            self.get_selectedchar().equip_obj(self.selected_item, where)
+
+        # on peut alors déséquiper l'objet du personnage
+        self.Equip_remove.setDisabled(False)
+        self.save_character()
+
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.Player)
+        """
+        return self.parent().get_selectedchar()
+
+    @Slot()
+    def obj_export(self):
+        """
+        Slot called to export characters created to share them with other users
+
+        :return: None
+        """
+        selected_item = self.selected_item.copy()
+
+        filename = QFileDialog.getSaveFileName(self, self.tr("Sauvegarder un objet"),
+                                               path.dirname(__file__) + "/Objets/" + selected_item.get_stat("name"),
+                                               self.tr("Tous fichiers (*)"))
+
+        if filename[0]:
+            with open(filename[0], "wb") as fichier:
+                pk.Pickler(fichier).dump(selected_item)
+
+    @Slot()
+    def obj_import(self):
+        """
+        Slot called to import objects created by other users
+
+        :return: None
+        """
+        # on demande le fichier de personnage à importer
+        filenames = QFileDialog.getOpenFileNames(self, self.tr("Choisissez des fichiers d'objets"),
+                                                 path.dirname(__file__), self.tr("Tous fichiers (*)"))
+        if filenames[0]:
+            for filename in filenames[0]:
+                with open(filename, "rb") as fichier:
+                    # si le fichier importé est bien celui d'un objet, on le stocke dans l'inventaire
+                    obj = pk.Unpickler(fichier).load()
+                    if type(obj) in (Pc.Obj, Pc.MeleeEquip, Pc.ThrowEquip, Pc.ArmorEquip, Pc.ShieldEquip, Pc.Cord):
+                        self.get_selectedchar().invent_add(obj)
+            self.refresh()
+            self.save_character()
+
+    @Slot()
+    def options_armor(self):
+        """
+        Method called to enable the adequate buttons for the selected piece of armor
+
+        :return: None
+        """
+        self.unselect_previous()
+
+        selected_items = self.Armor_view.selectedItems()
+        selectedchar = self.get_selectedchar()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            try:
+                self.selected_item: Pc.ArmorEquip = self.Armorlist[int(item.text(3))]
+                self.Armor_Equip.setDisabled(False)
+                self.Obj_suppr.setDisabled(False)
+                self.Obj_transfer.setDisabled(False)
+
+                self.Solid_add.setDisabled(False)
+                self.Solid_remove.setDisabled(False)
+
+                if self.selected_item.get_stat("is_stackable"):
+                    self.Obj_add.setDisabled(False)
+                    self.Obj_remove.setDisabled(False)
+
+                    if not selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(True)
+
+                else:
+                    if selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(False)
+                    else:
+                        self.Obj_add.setDisabled(False)
+
+                if self.selected_item in selectedchar.get_equipment().values():
+                    self.Equip_remove.setDisabled(False)
+
+            except ValueError:
+                self.selected_item = True
+                self.unselect_previous()
+
+    @Slot()
+    def options_melee(self):
+        """
+        Method called to enable the adequate buttons for the selected melee weapon
+
+        :return: None
+        """
+        self.unselect_previous()
+
+        selected_items = self.Melee_view.selectedItems()
+        selectedchar = self.get_selectedchar()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            try:
+                self.selected_item: Pc.MeleeEquip = self.Meleelist[int(item.text(4))]
+                self.Obj_suppr.setDisabled(False)
+                self.Left_Melee.setDisabled(False)
+                self.Right_Melee.setDisabled(False)
+
+                self.Obj_suppr.setDisabled(False)
+                self.Obj_transfer.setDisabled(False)
+
+                self.Solid_add.setDisabled(False)
+                self.Solid_remove.setDisabled(False)
+
+                if self.selected_item.get_stat("is_stackable"):
+                    self.Obj_add.setDisabled(False)
+                    self.Obj_remove.setDisabled(False)
+
+                    if not selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(True)
+
+                else:
+                    if selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(False)
+                    else:
+                        self.Obj_add.setDisabled(False)
+
+                if self.selected_item in selectedchar.get_equipment().values():
+                    self.Equip_remove.setDisabled(False)
+
+            except ValueError:
+                self.selected_item = True
+                self.unselect_previous()
+
+    @Slot()
+    def options_obj(self):
+        """
+        Method called to enable the adequate buttons for the selected item
+
+        :return: None
+        """
+        self.unselect_previous()
+
+        selected_items = self.Obj_view.selectedItems()
+        selectedchar = self.get_selectedchar()
+        inventory = selectedchar.get_inventory()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            try:
+                self.selected_item: Pc.Obj = self.Objlist[int(item.text(2))]
+                self.Obj_suppr.setDisabled(False)
+                self.Obj_transfer.setDisabled(False)
+
+                if self.selected_item.get_stat("is_stackable"):
+                    self.Obj_add.setDisabled(False)
+                    self.Obj_remove.setDisabled(False)
+
+                    if not inventory[self.selected_item]:
+                        self.Obj_remove.setDisabled(True)
+
+                else:
+                    if inventory[self.selected_item]:
+                        self.Obj_remove.setDisabled(False)
+                    else:
+                        self.Obj_add.setDisabled(False)
+
+                # si l'objet est une corde, on dévérouille les boutons de cordage si les conditions les permettent
+                if type(self.selected_item) == Pc.Cord:
+                    # on commence par vérifier si l'arme de jet gauche existe, puis si elle nécessite une corde
+                    left_throw: Pc.ThrowEquip = selectedchar.get_weapon("left", "throw")
+                    right_throw: Pc.ThrowEquip = selectedchar.get_weapon("right", "throw")
+                    if left_throw and left_throw.get_stat("cord"):
+                        # si l'arme est à 2 mains, on vérifie juste qu'on a assez de cordes pour en "corder" une de plus
+                        if left_throw.get_stat("hand") == 2:
+                            if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
+                                    left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                                self.Left_Cord.setDisabled(False)
+                                self.Right_Cord.setDisabled(False)
+
+                        # sinon, on vérifie si la deuxième arme existe, puis si elle a besoin d'une corde
+                        elif right_throw and right_throw.get_stat("cord"):
+
+                            if (left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] ==
+                                self.selected_item.get_stat("perc")) or (
+                                    left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                                    right_throw.get_stat("cord")[1] == 0) or (
+                                    right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                                    left_throw.get_stat("cord")[1] == 0) or (
+                                    left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] == 0):
+
+                                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] + \
+                                        right_throw.get_stat("cord")[0]:
+                                    self.Left_Cord.setDisabled(False)
+                                    self.Right_Cord.setDisabled(False)
+
+                            elif (left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
+                                  right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc")):
+                                if inventory[self.selected_item] > left_throw.get_stat("cord")[0]:
+                                    self.Left_Cord.setDisabled(False)
+                                    self.Right_Cord.setDisabled(False)
+
+                            elif right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and \
+                                    left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                                if inventory[self.selected_item] > right_throw.get_stat("cord")[0]:
+                                    self.Left_Cord.setDisabled(False)
+                                    self.Right_Cord.setDisabled(False)
+
+                            else:
+                                self.Left_Cord.setDisabled(False)
+                                self.Right_Cord.setDisabled(False)
+
+                        else:
+                            if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
+                                    left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                                self.Left_Cord.setDisabled(False)
+
+                    # sinon, on regarde pour la droite, qui est alors forcément à une main si elle existe
+                    elif right_throw and right_throw.get_stat("cord"):
+                        # si on a assez de corde pour corder à droite, on dévérouille le bouton
+                        if inventory[self.selected_item] > right_throw.get_stat("cord")[0] or \
+                                right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
+                            self.Right_Cord.setDisabled(False)
+
+            except ValueError:
+                self.selected_item = True
+                self.unselect_previous()
+
+    @Slot()
+    def options_shield(self):
+        """
+        Method called to enable the adequate buttons for the selected shield
+
+        :return: None
+        """
+        self.unselect_previous()
+
+        selected_items = self.Shield_view.selectedItems()
+        selectedchar = self.get_selectedchar()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            try:
+                self.selected_item: Pc.ShieldEquip = self.Shieldlist[int(item.text(3))]
+                self.Left_Shield.setDisabled(False)
+                self.Right_Shield.setDisabled(False)
+                self.Obj_suppr.setDisabled(False)
+                self.Obj_transfer.setDisabled(False)
+
+                self.Solid_add.setDisabled(False)
+                self.Solid_remove.setDisabled(False)
+
+                if self.selected_item.get_stat("is_stackable"):
+                    self.Obj_add.setDisabled(False)
+                    self.Obj_remove.setDisabled(False)
+
+                    if not selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(True)
+
+                else:
+                    if selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(False)
+                    else:
+                        self.Obj_add.setDisabled(False)
+
+                if self.selected_item in selectedchar.get_equipment().values():
+                    self.Equip_remove.setDisabled(False)
+
+            except ValueError:
+                self.selected_item = True
+                self.unselect_previous()
+
+    @Slot()
+    def options_throw(self):
+        """
+        Method called to enable the adequate buttons for the selected throwing weapon
+
+        :return: None
+        """
+        self.unselect_previous()
+
+        selected_items = self.Throw_view.selectedItems()
+        selectedchar = self.get_selectedchar()
+        if len(selected_items) == 1:
+            item = selected_items[0]
+            try:
+                self.selected_item: Pc.ThrowEquip = self.Throwlist[int(item.text(3))]
+
+                self.Left_Throw.setDisabled(False)
+                self.Right_Throw.setDisabled(False)
+                self.Obj_suppr.setDisabled(False)
+                self.Obj_transfer.setDisabled(False)
+
+                self.Solid_add.setDisabled(False)
+                self.Solid_remove.setDisabled(False)
+
+                if self.selected_item.get_stat("is_stackable"):
+                    self.Obj_add.setDisabled(False)
+                    self.Obj_remove.setDisabled(False)
+
+                    if not selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(True)
+
+                else:
+                    if selectedchar.get_inventory()[self.selected_item]:
+                        self.Obj_remove.setDisabled(False)
+                    else:
+                        self.Obj_add.setDisabled(False)
+
+                if self.selected_item in selectedchar.get_equipment().values():
+                    self.Equip_remove.setDisabled(False)
+
+            except ValueError:
+                self.selected_item = True
+                self.unselect_previous()
+
+    def parent(self) -> CNbk.CharNotebook:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget().parent()
+
     def refresh(self):
         """
          Method called to refresh the content of the character's inventory
 
         :return: None
         """
-
         self.Obj_view.clear()
         self.Melee_view.clear()
         self.Armor_view.clear()
@@ -320,9 +770,53 @@ class CharIFrame(QWidget):
                 self.Armoritems[-1].setToolTip(0, infos_popup)
                 self.Armor_view.addTopLevelItem(self.Armoritems[-1])
 
-    def unselect_previous(self):
-        """ Désélectionne l'item précédent """
+    def save_character(self):
+        """
+        Method called to save the character
 
+        :return: None
+        """
+        self.parent().save_character()
+
+    def suppr_obj(self):
+        """
+        Method to remove the selected item from the character's inventory
+
+        :return: None
+        """
+        # on retire l'objet de l'inventaire
+        selectedchar = self.get_selectedchar()
+        selectedchar.invent_suppr(self.selected_item)
+        self.refresh()
+
+        # si l'objet est équipé, on le déséquipe
+        if self.selected_item in selectedchar.get_equipment().values():
+            self.unequip_item()
+
+        # on désélectionne l'objet, car il n'est plus censé exister
+        self.unselect_previous()
+        self.save_character()
+
+    def unequip_item(self):
+        """
+        Method called to unequip the selected item.
+
+        :return: None
+        """
+        self.get_selectedchar().unequip_obj(self.selected_item)
+        self.Equip_remove.setDisabled(True)
+
+        # on rafraîchit le cadre qui affichait l'objet déséquipé
+        if type(self.selected_item) == Pc.ThrowEquip:
+            self.selected_item.del_cord()
+        self.save_character()
+
+    def unselect_previous(self):
+        """
+        Method called to unselect any previously sleected item and disable all the buttons
+
+        :return: None
+        """
         # on désactive tous les boutons
         if self.selected_item:
             self.Obj_suppr.setDisabled(True)
@@ -354,481 +848,3 @@ class CharIFrame(QWidget):
                 self.Right_Cord.setDisabled(True)
 
             self.selected_item = None
-
-    @Slot()
-    def obj_options(self):
-        self.unselect_previous()
-
-        selected_items = self.Obj_view.selectedItems()
-        selectedchar = self.get_selectedchar()
-        inventory = selectedchar.get_inventory()
-        if len(selected_items) == 1:
-            item = selected_items[0]
-            try:
-                self.selected_item: Pc.Obj = self.Objlist[int(item.text(2))]
-                self.Obj_suppr.setDisabled(False)
-                self.Obj_transfer.setDisabled(False)
-
-                if self.selected_item.get_stat("is_stackable"):
-                    self.Obj_add.setDisabled(False)
-                    self.Obj_remove.setDisabled(False)
-
-                    if not inventory[self.selected_item]:
-                        self.Obj_remove.setDisabled(True)
-
-                else:
-                    if inventory[self.selected_item]:
-                        self.Obj_remove.setDisabled(False)
-                    else:
-                        self.Obj_add.setDisabled(False)
-
-                # si l'objet est une corde, on dévérouille les boutons de cordage si les conditions les permettent
-                if type(self.selected_item) == Pc.Cord:
-                    # on commence par vérifier si l'arme de jet gauche existe, puis si elle nécessite une corde
-                    left_throw: Pc.ThrowEquip = selectedchar.get_weapon("left", "throw")
-                    right_throw: Pc.ThrowEquip = selectedchar.get_weapon("right", "throw")
-                    if left_throw and left_throw.get_stat("cord"):
-                        # si l'arme est à 2 mains, on vérifie juste qu'on a assez de cordes pour en "corder" une de plus
-                        if left_throw.get_stat("hand") == 2:
-                            if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
-                                    left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                                self.Left_Cord.setDisabled(False)
-                                self.Right_Cord.setDisabled(False)
-
-                        # sinon, on vérifie si la deuxième arme existe, puis si elle a besoin d'une corde
-                        elif right_throw and right_throw.get_stat("cord"):
-
-                            if (left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] ==
-                                self.selected_item.get_stat("perc")) or (
-                                    left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
-                                    right_throw.get_stat("cord")[1] == 0) or (
-                                    right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
-                                    left_throw.get_stat("cord")[1] == 0) or (
-                                    left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] == 0):
-
-                                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] + \
-                                        right_throw.get_stat("cord")[0]:
-                                    self.Left_Cord.setDisabled(False)
-                                    self.Right_Cord.setDisabled(False)
-
-                            elif (left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
-                                  right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc")):
-                                if inventory[self.selected_item] > left_throw.get_stat("cord")[0]:
-                                    self.Left_Cord.setDisabled(False)
-                                    self.Right_Cord.setDisabled(False)
-
-                            elif right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and \
-                                    left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                                if inventory[self.selected_item] > right_throw.get_stat("cord")[0]:
-                                    self.Left_Cord.setDisabled(False)
-                                    self.Right_Cord.setDisabled(False)
-
-                            else:
-                                self.Left_Cord.setDisabled(False)
-                                self.Right_Cord.setDisabled(False)
-
-                        else:
-                            if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
-                                    left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                                self.Left_Cord.setDisabled(False)
-
-                    # sinon, on regarde pour la droite, qui est alors forcément à une main si elle existe
-                    elif right_throw and right_throw.get_stat("cord"):
-                        # si on a assez de corde pour corder à droite, on dévérouille le bouton
-                        if inventory[self.selected_item] > right_throw.get_stat("cord")[0] or \
-                                right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                            self.Right_Cord.setDisabled(False)
-
-            except ValueError:
-                self.selected_item = True
-                self.unselect_previous()
-
-    @Slot()
-    def melee_options(self):
-        self.unselect_previous()
-
-        selected_items = self.Melee_view.selectedItems()
-        selectedchar = self.get_selectedchar()
-        if len(selected_items) == 1:
-            item = selected_items[0]
-            try:
-                self.selected_item: Pc.MeleeEquip = self.Meleelist[int(item.text(4))]
-                self.Obj_suppr.setDisabled(False)
-                self.Left_Melee.setDisabled(False)
-                self.Right_Melee.setDisabled(False)
-
-                self.Obj_suppr.setDisabled(False)
-                self.Obj_transfer.setDisabled(False)
-
-                self.Solid_add.setDisabled(False)
-                self.Solid_remove.setDisabled(False)
-
-                if self.selected_item.get_stat("is_stackable"):
-                    self.Obj_add.setDisabled(False)
-                    self.Obj_remove.setDisabled(False)
-
-                    if not selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(True)
-
-                else:
-                    if selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(False)
-                    else:
-                        self.Obj_add.setDisabled(False)
-
-                if self.selected_item in selectedchar.get_equipment().values():
-                    self.Equip_remove.setDisabled(False)
-
-            except ValueError:
-                self.selected_item = True
-                self.unselect_previous()
-        """
-        "" fonction qui affiche les boutons adéquats à l'objet sélectionné ""
-        """
-
-    @Slot()
-    def throw_options(self):
-        self.unselect_previous()
-
-        selected_items = self.Throw_view.selectedItems()
-        selectedchar = self.get_selectedchar()
-        if len(selected_items) == 1:
-            item = selected_items[0]
-            try:
-                self.selected_item: Pc.ThrowEquip = self.Throwlist[int(item.text(3))]
-
-                self.Left_Throw.setDisabled(False)
-                self.Right_Throw.setDisabled(False)
-                self.Obj_suppr.setDisabled(False)
-                self.Obj_transfer.setDisabled(False)
-
-                self.Solid_add.setDisabled(False)
-                self.Solid_remove.setDisabled(False)
-
-                if self.selected_item.get_stat("is_stackable"):
-                    self.Obj_add.setDisabled(False)
-                    self.Obj_remove.setDisabled(False)
-
-                    if not selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(True)
-
-                else:
-                    if selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(False)
-                    else:
-                        self.Obj_add.setDisabled(False)
-
-                if self.selected_item in selectedchar.get_equipment().values():
-                    self.Equip_remove.setDisabled(False)
-
-            except ValueError:
-                self.selected_item = True
-                self.unselect_previous()
-
-    @Slot()
-    def shield_options(self):
-        self.unselect_previous()
-
-        selected_items = self.Shield_view.selectedItems()
-        selectedchar = self.get_selectedchar()
-        if len(selected_items) == 1:
-            item = selected_items[0]
-            try:
-                self.selected_item: Pc.ShieldEquip = self.Shieldlist[int(item.text(3))]
-                self.Left_Shield.setDisabled(False)
-                self.Right_Shield.setDisabled(False)
-                self.Obj_suppr.setDisabled(False)
-                self.Obj_transfer.setDisabled(False)
-
-                self.Solid_add.setDisabled(False)
-                self.Solid_remove.setDisabled(False)
-
-                if self.selected_item.get_stat("is_stackable"):
-                    self.Obj_add.setDisabled(False)
-                    self.Obj_remove.setDisabled(False)
-
-                    if not selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(True)
-
-                else:
-                    if selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(False)
-                    else:
-                        self.Obj_add.setDisabled(False)
-
-                if self.selected_item in selectedchar.get_equipment().values():
-                    self.Equip_remove.setDisabled(False)
-
-            except ValueError:
-                self.selected_item = True
-                self.unselect_previous()
-
-    @Slot()
-    def armor_options(self):
-        self.unselect_previous()
-
-        selected_items = self.Armor_view.selectedItems()
-        selectedchar = self.get_selectedchar()
-        if len(selected_items) == 1:
-            item = selected_items[0]
-            try:
-                self.selected_item: Pc.ArmorEquip = self.Armorlist[int(item.text(3))]
-                self.Armor_Equip.setDisabled(False)
-                self.Obj_suppr.setDisabled(False)
-                self.Obj_transfer.setDisabled(False)
-
-                self.Solid_add.setDisabled(False)
-                self.Solid_remove.setDisabled(False)
-
-                if self.selected_item.get_stat("is_stackable"):
-                    self.Obj_add.setDisabled(False)
-                    self.Obj_remove.setDisabled(False)
-
-                    if not selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(True)
-
-                else:
-                    if selectedchar.get_inventory()[self.selected_item]:
-                        self.Obj_remove.setDisabled(False)
-                    else:
-                        self.Obj_add.setDisabled(False)
-
-                if self.selected_item in selectedchar.get_equipment().values():
-                    self.Equip_remove.setDisabled(False)
-
-            except ValueError:
-                self.selected_item = True
-                self.unselect_previous()
-        """
-        "" fonction qui affiche les boutons adéquats à l'objet sélectionné ""
-        """
-
-    @Slot()
-    def import_obj(self):
-        """
-        Slot called to import objects created by other users
-
-        :return: None
-        """
-        # on demande le fichier de personnage à importer
-        filenames = QFileDialog.getOpenFileNames(self, self.tr("Choisissez des fichiers d'objets"),
-                                                 path.dirname(__file__), self.tr("Tous fichiers (*)"))
-        if filenames[0]:
-            for filename in filenames[0]:
-                with open(filename, "rb") as fichier:
-                    # si le fichier importé est bien celui d'un objet, on le stocke dans l'inventaire
-                    obj = pk.Unpickler(fichier).load()
-                    if type(obj) in (Pc.Obj, Pc.MeleeEquip, Pc.ThrowEquip, Pc.ArmorEquip, Pc.ShieldEquip):
-                        self.get_selectedchar().invent_add(obj)
-            self.refresh()
-            self.save_character()
-
-    @Slot()
-    def export_obj(self):
-        """
-        Slot called to export characters created to share them with other users
-
-        :return: None
-        """
-        selected_item = self.selected_item.copy()
-        if type(self.selected_item) == Pc.ThrowEquip:
-            selected_item.del_cord()
-
-        filename = QFileDialog.getSaveFileName(self, self.tr("Sauvegarder un objet"),
-                                               path.dirname(__file__) + "/Objets/" + selected_item.get_stat("name"),
-                                               self.tr("Tous fichiers (*)"))
-
-        if filename[0]:
-            with open(filename[0], "wb") as fichier:
-                pk.Pickler(fichier).dump(selected_item)
-
-    def change_number(self, number):
-        """
-        Method called to change the number of exemplaries of the selected item the character carries
-
-        :param number: number to modify
-        :return: None
-        """
-        selectedchar = self.get_selectedchar()
-        selectedchar.change_invent_number(self.selected_item, number)
-        self.refresh()
-        inventory = selectedchar.get_inventory()
-
-        # si l'objet n'est pas stackable, on change les boutons disponibles
-        if inventory[self.selected_item] and not self.selected_item.get_stat("is_stackable"):
-            self.Obj_add.setDisabled(True)
-            self.Obj_remove.setDisabled(False)
-
-        elif inventory[self.selected_item] and self.selected_item.is_stackable:
-            self.Obj_remove.setDisabled(False)
-
-        # si le nombre atteint 0, on enlève la posiibilité de retirer un objet
-        if not inventory[self.selected_item]:
-            self.Obj_remove.setDisabled(True)
-            self.Obj_add.setDisabled(False)
-
-            # si l'objet est équipé, on le déséquipe
-            if self.selected_item in selectedchar.get_equipment().values():
-                self.unequip_item()
-
-        self.save_character()
-        """
-        "" fonction pour changer le nombre d'instances d'un objet dans l'inventaire ""
-        """
-
-    def suppr_obj(self):
-        """
-        Method to remove the selected item from the character's inventory
-
-        :return: None
-        """
-        # on retire l'objet de l'inventaire
-        selectedchar = self.get_selectedchar()
-        selectedchar.invent_suppr(self.selected_item)
-        self.refresh()
-
-        # si l'objet est équipé, on le déséquipe
-        if self.selected_item in selectedchar.get_equipment().values():
-            self.unequip_item()
-
-        # on désélectionne l'objet, car il n'est plus censé exister
-        self.unselect_previous()
-        self.save_character()
-
-    def equip_item(self, where=""):
-        """
-        Method called to equip the selected item
-
-        :param where: if it is a weapon
-        :return: None
-        """
-        # on équipe l'objet et on rafraichit le cadre qui affiche l'objet équipé.
-        # Si c'est une arme, on dit de quel côté l'équiper
-
-        if type(self.selected_item) == Pc.ArmorEquip:
-            self.get_selectedchar().equip_obj(self.selected_item)
-        elif type(self.selected_item) == Pc.ThrowEquip:
-            self.get_selectedchar().equip_obj(self.selected_item, where)
-        else:
-            self.get_selectedchar().equip_obj(self.selected_item, where)
-
-        # on peut alors déséquiper l'objet du personnage
-        self.Equip_remove.setDisabled(False)
-        self.save_character()
-
-    def unequip_item(self):
-        """
-        Method called to unequip the selected item.
-
-        :return: None
-        """
-        self.get_selectedchar().unequip_obj(self.selected_item)
-        self.Equip_remove.setDisabled(True)
-
-        # on rafraîchit le cadre qui affichait l'objet déséquipé
-        if type(self.selected_item) == Pc.ThrowEquip:
-            self.selected_item.del_cord()
-        self.save_character()
-
-    def equip_cord(self, where):
-        """
-        Method called to put a cord on a shooting weapon.
-
-        :param where: side of the weapon to cord
-        :return: None
-        """
-        selectedchar = self.get_selectedchar()
-        inventory = selectedchar.get_inventory()
-
-        left_throw = selectedchar.get_weapon("left", "throw")
-        right_throw = selectedchar.get_weapon("right", "throw")
-
-        if left_throw and left_throw.get_stat("cord"):
-
-            # si l'arme est à 2 mains, on vérifier juste qu'on a assez de cordes pour en "corder" une de plus
-            if left_throw.get_stat("hand") == 2:
-
-                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
-                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-            # sinon, on vérifie si la deuxième arme existe, puis si elle a besoin d'une corde
-            elif right_throw and right_throw.get_stat("cord"):
-
-                if (left_throw.get_stat("cord")[1] ==
-                    right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc")) or (
-                        left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
-                        right_throw.get_stat("cord")[1] == 0) or (
-                        right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
-                        left_throw.get_stat("cord")[1] == 0) or (
-                        left_throw.get_stat("cord")[1] == right_throw.get_stat("cord")[1] == 0):
-
-                    if inventory[self.selected_item] > left_throw.get_stat("cord")[0] + right_throw.get_stat("cord")[0]:
-                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-                elif (left_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and
-                      right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc")):
-
-                    if inventory[self.selected_item] > left_throw.get_stat("cord")[0]:
-                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-                elif right_throw.get_stat("cord")[1] == self.selected_item.get_stat("perc") and \
-                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-
-                    if inventory[self.selected_item] > right_throw.get_stat("cord")[0]:
-                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-                else:
-                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-            else:
-                if inventory[self.selected_item] > left_throw.get_stat("cord")[0] or \
-                        left_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                    if where == "left":
-                        selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-            # sinon, on regarde pour la droite, qui est alors forcément à une main si elle existe
-        elif right_throw and right_throw.get_stat("cord"):
-            # si on a assez de corde pour corder à droite, on dévérouille le bouton
-            if inventory[self.selected_item] > right_throw.get_stat("cord")[0] or \
-                    right_throw.get_stat("cord")[1] != self.selected_item.get_stat("perc"):
-                if where == "right":
-                    selectedchar.get_weapon(where, "throw").load_cord(self.selected_item)
-
-        self.save_character()
-
-    def change_solid(self, number):
-        """
-        Method called to manage the solidity of the selected item
-
-        :param number: change to apply in the number
-        :return: None
-        """
-        if self.selected_item:
-            self.selected_item.upsolid(number)
-            self.refresh()
-            self.save_character()
-
-    def get_selectedchar(self):
-        """
-        Method called to get the character selected to display
-
-        :return: character (Perso_class.player)
-        """
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CNbk.CharNotebook:
-        """
-        Method called to get the parent widget (the CharUsefulFrame)
-
-        :return: the reference to the parent
-        """
-        return self.parentWidget().parent()
-
-    def save_character(self):
-        """
-        Method called to save the character
-
-        :return: None
-        """
-        self.parent().save_character()

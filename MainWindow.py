@@ -56,7 +56,7 @@ class UIWindow(QMainWindow):
         :param mage: boolean indicating whether the character to create is a mage of not
         :return: None
         """
-        character = Pc.player(name, xp, mage)  # create a character with the specified name and experience
+        character = Pc.Player(name, xp, mage)  # create a character with the specified name and experience
         self.characlist.append(character)
         self.save_characlist()
         self.menubar.refresh()
@@ -174,7 +174,7 @@ class UIWindow(QMainWindow):
         self.setCentralWidget(self.CSFrame)
         self.CSFrame.refresh()
 
-    def import_char(self, characters_list: list[Pc.player]):
+    def import_char(self, characters_list: list[Pc.Player]):
         """
         Method called to add characters to the list
 

@@ -109,7 +109,7 @@ class CharBaseFrame(QWidget):
         """
         return self.legal_scale
     
-    def refresh(self, selectedchar: Pc.player):
+    def refresh(self, selectedchar: Pc.Player):
         """
         Method called to refresh the name and basic characteristics of the character
         

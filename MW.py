@@ -41,7 +41,7 @@ class UIWindow:
         """
         pass
 
-    def get_characlist(self) -> list[Pc.player]:
+    def get_characlist(self) -> list[Pc.Player]:
         """
         Getter for the characlist attribute
 
@@ -113,7 +113,7 @@ class UIWindow:
         """
         pass
 
-    def import_char(self, characters_list: list[Pc.player]):
+    def import_char(self, characters_list: list[Pc.Player]):
         """
         Method called to add characters to the list
 

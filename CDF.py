@@ -29,7 +29,7 @@ class CharDisplayFrame:
         """
         return self.parent().get_competlist()
 
-    def get_selectedchar(self) -> Pc.player:
+    def get_selectedchar(self) -> Pc.Player:
         """
         Method called to get the character to be displayed
 
@@ -102,7 +102,7 @@ class CharDisplayFrame:
         """
         pass
 
-    def set_selectedchar(self, character: Pc.player):
+    def set_selectedchar(self, character: Pc.Player):
         """
         Method called to select the character to load and edit
 

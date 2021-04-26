@@ -42,7 +42,7 @@ class CharEthMFrame(QWidget):
         """
         Method called to get the character selected to display
 
-        :return: character (Perso_class.player)
+        :return: character (Perso_class.Player)
         """
         return self.parent().get_selectedchar()
 

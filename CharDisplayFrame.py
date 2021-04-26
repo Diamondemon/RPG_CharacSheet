@@ -13,7 +13,7 @@ class CharDisplayFrame(QWidget):
         QWidget.__init__(self)
         self.grid = QGridLayout(self)
 
-        self.selectedchar: Pc.player = None
+        self.selectedchar: Pc.Player = None
         self.selected = ""  # Partie des caractéristiques sélectionnée
 
         self.baseFrame = CharBaseFrame()
@@ -152,7 +152,7 @@ class CharDisplayFrame(QWidget):
         """
         self.parent().save_characlist()
 
-    def set_selectedchar(self, character: Pc.player):
+    def set_selectedchar(self, character: Pc.Player):
         """
         Method called to select the character to load and edit
 

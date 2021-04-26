@@ -155,7 +155,7 @@ class CharThrFrame(QGroupBox):
 
             self.refresh_right(selectedchar)
 
-    def refresh_right(self, selectedchar: Pc.player):
+    def refresh_right(self, selectedchar: Pc.Player):
         """
         Method called to refresh only the throwable/throwing equipment in the right hand of the character
 
