@@ -104,46 +104,45 @@ class CharSpellFrame(QWidget):
         self.grid.addWidget(self.Description_entry, 11, 2, 1, 2)
         self.grid.addWidget(self.Special_register, 9, 4)
 
-    def special_create(self):
+    def get_selectedchar(self):
         """
-        Method called to create a spell specific to the character
+        Method called to get the character selected to display
 
-        :return: None
+        :return: character (Perso_class.player)
         """
-        if self.Name_entry.text() and self.Cost_entry.text():
-            elem = self.elemlist[self.Elem_entry.currentIndex()]
-            subcateg = self.subcateglist[self.Subcateg_entry.currentIndex()]
-            new_spell = Pc.Spell(elem, subcateg, self.Name_entry.text(),
-                                 self.Effect_entry.toPlainText(), self.Description_entry.toPlainText(),
-                                 int(self.Cost_entry.text()))
-            self.get_selectedchar().spell_add(new_spell)
+        return self.parent().get_selectedchar()
 
-            self.spells_list.append(new_spell)
-            i = len(self.spells_list) - 1
-            super_tree_item = self.CharSpell_view.findItems(self.tr(new_spell.get_stat("elem")), Qt.MatchExactly, 0)[0]
-            tree_item = super_tree_item.child(self.subcateglist.index(new_spell.get_stat("subcateg")))
-            tree_item.addChild(QTreeWidgetItem(new_spell.get_stats_aslist(["name", "effect", "description"]) +
-                                               [str(new_spell.get_stat("cost")),
-                                                str(self.get_selectedchar().get_lightnings(new_spell)), str(i)]))
+    def get_spelllist(self):
+        """
+        Method called to get the available spells
+
+        :return: Reference to the list of spells
+        """
+        return self.parent().get_spelllist()
 
     @Slot()
-    def transfer_spell(self):
+    def modif_lightning(self, number):
         """
-        Method called to give the selected spell to the character
+        Method called to consume lightnings
 
+        :param number: change to apply
         :return: None
         """
-        if self.selected_item is not None:
-            new_spell = self.get_spelllist()[self.selected_item].copy()
-            self.get_selectedchar().spell_add(new_spell)
+        if self.selected_charitem is not None:
+            print(self.spells_list)
+            print(self.selected_charitem)
+            selected_spell = self.spells_list[self.selected_charitem]
+            self.get_selectedchar().use_lightning(selected_spell, number)
             self.save_character()
-            self.spells_list.append(new_spell)
-            i = len(self.spells_list) - 1
-            super_tree_item = self.CharSpell_view.findItems(self.tr(new_spell.get_stat("elem")), Qt.MatchExactly, 0)[0]
-            tree_item = super_tree_item.child(self.subcateglist.index(new_spell.get_stat("subcateg")))
-            tree_item.addChild(QTreeWidgetItem(new_spell.get_stats_aslist(["name", "effect", "description"]) +
-                                               [str(new_spell.get_stat("cost")),
-                                                str(self.get_selectedchar().get_lightnings(new_spell)), str(i)]))
+            self.refresh_char()
+
+    def parent(self) -> CNbk.CharNotebook:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return self.parentWidget().parent()
 
     def refresh(self):
         """
@@ -219,6 +218,28 @@ class CharSpellFrame(QWidget):
         self.Spell_view.expandAll()
 
     @Slot()
+    def remove_charspell(self):
+        """
+        Method called to remove the selected spell from the character's spells
+
+        :return: None
+        """
+        if self.selected_charitem is not None:
+            self.get_selectedchar().spell_pop(self.spells_list[self.selected_charitem])
+            self.save_character()
+            self.refresh_char()
+            self.selected_charitem = None
+            self.remove_choice.setDisabled(True)
+
+    def save_character(self):
+        """
+        Method called to save the character
+
+        :return: None
+        """
+        self.parent().save_character()
+
+    @Slot()
     def select_charspell(self):
         """
         Slot called when a spell of the character is selected, to delete it if needed
@@ -271,63 +292,43 @@ class CharSpellFrame(QWidget):
                 self.transfer_choice.setDisabled(True)
 
     @Slot()
-    def remove_charspell(self):
+    def special_create(self):
         """
-        Method called to remove the selected spell from the character's spells
+        Method called to create a spell specific to the character
 
         :return: None
         """
-        if self.selected_charitem is not None:
-            self.get_selectedchar().spell_pop(self.spells_list[self.selected_charitem])
-            self.save_character()
-            self.refresh_char()
-            self.selected_charitem = None
-            self.remove_choice.setDisabled(True)
+        if self.Name_entry.text() and self.Cost_entry.text():
+            elem = self.elemlist[self.Elem_entry.currentIndex()]
+            subcateg = self.subcateglist[self.Subcateg_entry.currentIndex()]
+            new_spell = Pc.Spell(elem, subcateg, self.Name_entry.text(),
+                                 self.Effect_entry.toPlainText(), self.Description_entry.toPlainText(),
+                                 int(self.Cost_entry.text()))
+            self.get_selectedchar().spell_add(new_spell)
+
+            self.spells_list.append(new_spell)
+            i = len(self.spells_list) - 1
+            super_tree_item = self.CharSpell_view.findItems(self.tr(new_spell.get_stat("elem")), Qt.MatchExactly, 0)[0]
+            tree_item = super_tree_item.child(self.subcateglist.index(new_spell.get_stat("subcateg")))
+            tree_item.addChild(QTreeWidgetItem(new_spell.get_stats_aslist(["name", "effect", "description"]) +
+                                               [str(new_spell.get_stat("cost")),
+                                                str(self.get_selectedchar().get_lightnings(new_spell)), str(i)]))
 
     @Slot()
-    def modif_lightning(self, number):
+    def transfer_spell(self):
         """
-        Method called to consume lightnings
+        Method called to give the selected spell to the character
 
-        :param number: change to apply
         :return: None
         """
-        if self.selected_charitem is not None:
-            print(self.spells_list)
-            print(self.selected_charitem)
-            selected_spell = self.spells_list[self.selected_charitem]
-            self.get_selectedchar().use_lightning(selected_spell, number)
+        if self.selected_item is not None:
+            new_spell = self.get_spelllist()[self.selected_item].copy()
+            self.get_selectedchar().spell_add(new_spell)
             self.save_character()
-            self.refresh_char()
-
-    def get_selectedchar(self):
-        """
-        Method called to get the character selected to display
-
-        :return: character (Perso_class.player)
-        """
-        return self.parent().get_selectedchar()
-
-    def get_spelllist(self):
-        """
-        Method called to get the available spells
-
-        :return: Reference to the list of spells
-        """
-        return self.parent().get_spelllist()
-
-    def parent(self) -> CNbk.CharNotebook:
-        """
-        Method called to get the parent widget (the CharUsefulFrame)
-
-        :return: the reference to the parent
-        """
-        return self.parentWidget().parent()
-
-    def save_character(self):
-        """
-        Method called to save the character
-
-        :return: None
-        """
-        self.parent().save_character()
+            self.spells_list.append(new_spell)
+            i = len(self.spells_list) - 1
+            super_tree_item = self.CharSpell_view.findItems(self.tr(new_spell.get_stat("elem")), Qt.MatchExactly, 0)[0]
+            tree_item = super_tree_item.child(self.subcateglist.index(new_spell.get_stat("subcateg")))
+            tree_item.addChild(QTreeWidgetItem(new_spell.get_stats_aslist(["name", "effect", "description"]) +
+                                               [str(new_spell.get_stat("cost")),
+                                                str(self.get_selectedchar().get_lightnings(new_spell)), str(i)]))
