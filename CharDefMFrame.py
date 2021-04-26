@@ -1,4 +1,4 @@
-from PySide6.QtCore import SIGNAL
+from PySide6.QtCore import SIGNAL, Qt
 from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QGridLayout, QComboBox, QPushButton)
 import CCaF
@@ -17,6 +17,14 @@ class CharDefMFrame(QWidget):
                           "Cuissots", "Grèves", "Solerets"]
 
         self.grid.addWidget(QLabel(self.tr("Utiliser l'XP")), 0, 0, 1, 2)
+
+        self.hide_button = QPushButton("×")
+        self.hide_button.setCursor(Qt.PointingHandCursor)
+        self.hide_button.setStyleSheet("QPushButton {background: white; color: red; border: none;"
+                                       "font-weight: bold; font-size: 25px;}")
+        self.connect(self.hide_button, SIGNAL("clicked()"), self.hide)
+        self.grid.addWidget(self.hide_button, 0, 2)
+
         self.grid.addWidget(QLabel(self.tr("Utiliser l'Armure")), 3, 0, 1, 2)
 
         self.statlist = QComboBox()
