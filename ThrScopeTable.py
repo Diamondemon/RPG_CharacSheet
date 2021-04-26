@@ -12,7 +12,6 @@ class ThrScopeTable(QTableWidget):
         self.setRowCount(3)
         self.setVerticalHeaderLabels([self.tr("Portée max"), self.tr("Vitesse"), self.tr("Précision")])
         self.setMinimumHeight(100)
-        self.setMinimumWidth(200)
         self.verticalHeader().setMaximumWidth(70)
         self.setShowGrid(False)
 
@@ -34,3 +33,4 @@ class ThrScopeTable(QTableWidget):
                 item.setFlags(Qt.ItemIsEnabled)
                 self.setItem(value[0], i, item)
             i += 1
+        self.setMinimumWidth(170 + i * 20)

@@ -42,7 +42,7 @@ class CharIFrame(QWidget):
         self.Obj_view.setHeaderLabels([self.tr("Nom"), self.tr("Nombre"), self.tr("Id")])
         self.Obj_view.hideColumn(2)
         self.Obj_view.setColumnWidth(0, 170)
-        self.Obj_view.setMinimumHeight(120)
+        self.Obj_view.setMinimumHeight(150)
         self.connect(self.Obj_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.obj_options)
 
         self.Melee_view = QTreeWidget()
@@ -51,6 +51,7 @@ class CharIFrame(QWidget):
         self.Melee_view.hideColumn(4)
         self.Melee_view.setColumnWidth(0, 170)
         self.Melee_view.setMinimumHeight(120)
+        self.Melee_view.setMinimumWidth(500)
         self.connect(self.Melee_view, SIGNAL("itemClicked(QTreeWidgetItem *, int)"), self.melee_options)
 
         self.Throw_view = QTreeWidget()
