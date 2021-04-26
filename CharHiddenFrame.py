@@ -22,19 +22,6 @@ class CharHiddenFrame(QWidget):
             self.grid.addWidget(self.labels[i], 1, 2 * i + 1)
             i += 1
 
-    def refresh(self):
-        """
-        Method called to refresh the invested points
-
-        :return: None
-        """
-        thirdstats = self.get_selectedchar().get_thirdstats()
-
-        i = 0
-        for key in ["thievery", "ambush", "escape"]:
-            self.labels[i].setText(str(thirdstats["hidden_action"][key]))
-            i += 1
-
     def get_selectedchar(self):
         """
         Method called to get the character selected to display
@@ -50,3 +37,16 @@ class CharHiddenFrame(QWidget):
         :return: the reference to the parent
         """
         return self.parentWidget()
+
+    def refresh(self):
+        """
+        Method called to refresh the invested points
+
+        :return: None
+        """
+        thirdstats = self.get_selectedchar().get_thirdstats()
+
+        i = 0
+        for key in ["thievery", "ambush", "escape"]:
+            self.labels[i].setText(str(thirdstats["hidden_action"][key]))
+            i += 1
