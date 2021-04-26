@@ -2,6 +2,7 @@ import CDF
 
 
 class CharNotebook:
+    """ Widget that contains all the wigets used to display and manage the character """
 
     def get_competlist(self):
         """

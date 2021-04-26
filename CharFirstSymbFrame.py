@@ -6,6 +6,7 @@ import CUF
 
 
 class CharFirstSymbFrame(QWidget):
+    """ Widget to display the 3 most important symb stats of the character """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -25,16 +26,6 @@ class CharFirstSymbFrame(QWidget):
             self.grid.addWidget(self.labels[i], 0, 2 * i + 1)
             i += 1
 
-    def refresh(self):
-        secondstats = self.get_selectedchar().get_secondstats()
-        i = 0
-        for key in self.SymbList:
-            if key == "strength":
-                self.labels[i].setText(str(secondstats["symb-"+key][0]))
-            else:
-                self.labels[i].setText(str(secondstats["symb-" + key]))
-            i += 1
-
     def get_selectedchar(self):
         """
         Method called to get the character selected to display
@@ -50,3 +41,18 @@ class CharFirstSymbFrame(QWidget):
         :return: the reference to the parent
         """
         return QWidget.parent(self)
+
+    def refresh(self):
+        """
+        Method called torefresh the 3 most important symbol stats of the character
+
+        :return: None
+        """
+        secondstats = self.get_selectedchar().get_secondstats()
+        i = 0
+        for key in self.SymbList:
+            if key == "strength":
+                self.labels[i].setText(str(secondstats["symb-"+key][0]))
+            else:
+                self.labels[i].setText(str(secondstats["symb-" + key]))
+            i += 1

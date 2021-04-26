@@ -7,7 +7,7 @@ import CUF
 
 
 class CharMelFrame(QGroupBox):
-    """ Widget to display the melee equipment of the character"""
+    """ Widget to display the melee equipment of the character """
 
     def __init__(self):
         QGroupBox.__init__(self, " Mélée ")

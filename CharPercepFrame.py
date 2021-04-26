@@ -5,6 +5,7 @@ import CUF
 
 
 class CharPercepFrame(QWidget):
+    """ Widget to display the statistics of the character related to its perception """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -56,22 +57,6 @@ class CharPercepFrame(QWidget):
             self.grid.addWidget(self.labels[i+7], i, 8)
             i += 1
 
-    def refresh(self):
-        thirdstats = self.get_selectedchar().get_thirdstats()
-
-        i = 2
-        for key in ["sight", "hearing", "smelling"]:
-            self.labels[i-2].setText(str(thirdstats[key]))
-            i += 1
-
-        j = 0
-        for key in ["clue", "field", "ambush"]:
-            i = 2
-            for stat in self.perceplist[j]:
-                self.labels[3 * j + i + 1].setText(str(thirdstats[key][stat]))
-                i += 1
-            j += 1
-
     def get_selectedchar(self):
         """
         Method called to get the character selected to display
@@ -87,3 +72,24 @@ class CharPercepFrame(QWidget):
         :return: the reference to the parent
         """
         return QWidget.parent(self)
+
+    def refresh(self):
+        """
+        Method called to refresh all of the stats representing the characters perception
+
+        :return: None
+        """
+        thirdstats = self.get_selectedchar().get_thirdstats()
+
+        i = 2
+        for key in ["sight", "hearing", "smelling"]:
+            self.labels[i-2].setText(str(thirdstats[key]))
+            i += 1
+
+        j = 0
+        for key in ["clue", "field", "ambush"]:
+            i = 2
+            for stat in self.perceplist[j]:
+                self.labels[3 * j + i + 1].setText(str(thirdstats[key][stat]))
+                i += 1
+            j += 1

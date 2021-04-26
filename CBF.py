@@ -2,9 +2,14 @@ import CCaF
 
 
 class CharBundleFrame:
-    """ Widget d'affichage de toutes les caractéristiques """
+    """ Widget to display all the caracteristics of the character """
 
     def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
         return self.parent().get_selectedchar()
 
     def modify_abi(self):

@@ -13,7 +13,7 @@ from CharPercFrame import CharPercFrame
 
 
 class CharUsefulFrame(QWidget):
-    """ Fiche personnage résumée """
+    """ Widget representing the character sheet summed up """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -51,18 +51,12 @@ class CharUsefulFrame(QWidget):
         self.CharArmF = CharArmFrame()
         self.grid.addWidget(self.CharArmF, 4, 4, 3, 1)
 
-    def refresh(self):
-        self.CharFSymF.refresh()
-        self.CharPercepF.refresh()
-        self.CharStealthF.refresh()
-        self.CharHiddenF.refresh()
-        self.CharUCompF.refresh()
-        self.PercFrame.refresh()
-        self.CharArmF.refresh()
-        self.CharMelF.refresh()
-        self.CharThrF.refresh()
-
     def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
         return self.parent().get_selectedchar()
 
     def parent(self) -> CNbk.CharNotebook:
@@ -72,6 +66,22 @@ class CharUsefulFrame(QWidget):
         :return: the reference to the parent
         """
         return self.parentWidget().parent()
+
+    def refresh(self):
+        """
+        Method called to refresh all the statistics displayed in the widget
+
+        :return: None
+        """
+        self.CharFSymF.refresh()
+        self.CharPercepF.refresh()
+        self.CharStealthF.refresh()
+        self.CharHiddenF.refresh()
+        self.CharUCompF.refresh()
+        self.PercFrame.refresh()
+        self.CharArmF.refresh()
+        self.CharMelF.refresh()
+        self.CharThrF.refresh()
 
     def save_character(self):
         """

@@ -9,6 +9,7 @@ import CDF
 
 
 class CharNotebook(QTabWidget):
+    """ Widget that contains all the wigets used to display and manage the character """
 
     def __init__(self, parent):
         QTabWidget.__init__(self, parent)

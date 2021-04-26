@@ -6,6 +6,7 @@ import CUF
 
 
 class CharArmFrame(QGroupBox):
+    """ Widget to display the armor equipment equipped on the character """
 
     def __init__(self):
         QGroupBox.__init__(self, " Armure ")

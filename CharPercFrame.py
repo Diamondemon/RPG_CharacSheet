@@ -5,7 +5,7 @@ import CUF
 
 
 class CharPercFrame(QGroupBox):
-    """ cadre d'affichage des pourcentages du personnage """
+    """ Widget to display the percentages of the character """
 
     def __init__(self):
         QGroupBox.__init__(self, " Pourcentages ")
@@ -23,8 +23,28 @@ class CharPercFrame(QGroupBox):
         self.table.verticalHeader().hide()
         self.grid.addWidget(self.table, 0, 0)
 
+    def get_selectedchar(self):
+        """
+        Method called to get the character selected to display
+
+        :return: character (Perso_class.player)
+        """
+        return self.parent().get_selectedchar()
+
+    def parent(self) -> CUF.CharUsefulFrame:
+        """
+        Method called to get the parent widget (the CharUsefulFrame)
+
+        :return: the reference to the parent
+        """
+        return QGroupBox.parent(self)
+
     def refresh(self):
-        """ fonction qui réaffiche les statistiques de pourcentages du personnage """
+        """
+        Method called to refresh the percentages of the character
+
+        :return: None
+        """
         selectedchar = self.get_selectedchar()
         percentages = selectedchar.get_percentages()
         self.table.clear()
@@ -44,19 +64,3 @@ class CharPercFrame(QGroupBox):
                     k += 1
                     i = 0
             j += 1
-
-    def get_selectedchar(self):
-        """
-        Method called to get the character selected to display
-
-        :return: character (Perso_class.player)
-        """
-        return self.parent().get_selectedchar()
-
-    def parent(self) -> CUF.CharUsefulFrame:
-        """
-        Method called to get the parent widget (the CharUsefulFrame)
-
-        :return: the reference to the parent
-        """
-        return QGroupBox.parent(self)
