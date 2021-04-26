@@ -64,7 +64,7 @@ class CharArmFrame(QGroupBox):
 
     def refresh(self):
         """
-        Method called to refresh the armor equipments of the character along with it's compatibility with them
+        Method called to refresh the armor equipments of the character along with its compatibility with them
 
         :return: None
         """

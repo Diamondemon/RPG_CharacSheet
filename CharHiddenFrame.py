@@ -1,12 +1,10 @@
-from PySide6.QtCore import SIGNAL
-from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout, QSplitter, QFrame)
-from PySide6.QtGui import (QPixmap, Qt)
+from PySide6.QtWidgets import (QWidget, QLabel, QGridLayout)
 
 import CUF
 
 
 class CharHiddenFrame(QWidget):
-    """ Widget qui affiche ce qui a été investi dans action dissimulée """
+    """ Widget displaying what has been invested in hidden actions """
 
     def __init__(self):
         QWidget.__init__(self)
@@ -25,6 +23,11 @@ class CharHiddenFrame(QWidget):
             i += 1
 
     def refresh(self):
+        """
+        Method called to refresh the invested points
+
+        :return: None
+        """
         thirdstats = self.get_selectedchar().get_thirdstats()
 
         i = 0
