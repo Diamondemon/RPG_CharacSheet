@@ -64,3 +64,11 @@ class CharPercFrame(QGroupBox):
                     k += 1
                     i = 0
             j += 1
+        if i != 0:
+            for row in range(i, 4):
+                newitem = QTableWidgetItem()
+                newitem.setFlags(Qt.ItemIsEnabled)
+                self.table.setItem(row, k, newitem)
+
+
+
