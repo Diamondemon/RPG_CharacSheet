@@ -1,3 +1,4 @@
-# RPG_CharacSheet Qt_version branch
 
-This branch is dedicated to the rework of the whole tkinter interface into a Qt interface in order to enhance performances.
+# RPG_CharacSheet
+
+RPG_CharacSheet is a UI made to handle more easily the character sheets of a Role Playing Game with specific rules that a friend created. Current stable version is made with Qt for Python.
