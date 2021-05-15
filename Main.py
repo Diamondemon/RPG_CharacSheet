@@ -1,8 +1,10 @@
 from os import path, chdir
 from pickle import Pickler
+from PySide6.QtWidgets import QApplication
+import sys
 
 chdir(path.dirname(__file__))
-from UI_classes import UI_Window
+from MainWindow import UIWindow as UI_W
 
 if not path.exists("characters"):
     dico = []
@@ -19,6 +21,9 @@ if not path.exists("spells"):
     with open("spells", "wb") as fichier:
         Pickler(fichier).dump(dico)
 
-window = UI_Window()
-
-window.mainloop()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    app.setStyleSheet("QTableWidget {border: 0px;} QHeaderView::section {border: 0px;}")
+    window = UI_W()
+    window.show()
+    sys.exit(app.exec_())

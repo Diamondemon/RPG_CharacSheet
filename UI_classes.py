@@ -7,6 +7,7 @@ import numpy as np
 from functools import partial
 
 
+
 """import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -51,7 +52,7 @@ class HomeFrame(Frame):
         """ Si un personnage a été sélectionné dans la liste, le définit comme personnage sélectionné
         et ouvre le panneau de consultation de personnage, en fermant le panneau d'accueil """
         if self.Char_list.curselection() !=():
-            self.master.CDF.selectedchar=self.master.characlist[self.Char_list.curselection()[0]] # le numéro du personnage dans la liste correspond au numéro du personnage sur l'affichage
+            self.set_selectedchar(self.Char_list.curselection()[0]) # le numéro du personnage dans la liste correspond au numéro du personnage sur l'affichage
             for i in self.master.grid_slaves():
                 i.grid_forget()
             self.master.children['!chardframe'].grid(row=0,column=0)
@@ -99,6 +100,10 @@ class HomeFrame(Frame):
     def grid_forget(self):
         Frame.grid_forget(self)
         self.Char_list.delete(0,"end")
+
+    def set_selectedchar(self,character):
+
+        self.master.set_selectedchar(character)
 
 
 
@@ -174,10 +179,6 @@ class CharSFrame(Frame):
         self.refresh()
 
 
-
-
-
-
 ## Partie 2 -- Caractéristiques
 
 class CharDFrame(Frame):
@@ -212,9 +213,7 @@ class CharDFrame(Frame):
 
         self.subFrame_1.grid(row=0,column=0,sticky="N")
 
-
         self.NBK=CharNotebook(self)
-
 
     def reload(self,event=None):
         Label(self.subFrame_1,text=str(self.selectedchar.totalxp)).grid(row=1,column=1)
@@ -244,6 +243,9 @@ class CharDFrame(Frame):
         self.selectedchar.clearstats()
         self.NBK.refresh()
 
+    def get_selectedchar(self):
+        return self.selectedchar
+
     def GM_reinit_char(self):
         self.selectedchar.GM_clearstats()
         self.NBK.refresh()
@@ -268,6 +270,14 @@ class CharDFrame(Frame):
         for i in self.grid_slaves(column=1):
             i.grid_forget()
 
+    def set_selectedchar(self,character):
+        if type(character==pc.player):
+            self.selectedchar=character
+
+class CharMiscSubFrame(Frame):
+
+    def __init__(self, master=None,**kwargs):
+        Frame.__init__(self,master,kwargs)
 
 
 
@@ -306,6 +316,9 @@ class CharNotebook(ttk.Notebook):
         if self.master.selectedchar.mage:
             self.forget(4)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -332,6 +345,9 @@ class CharCaracFrame(Frame):
         for i in self.grid_slaves():
             i.grid_forget()
         self.BNDL.grid(row=0,column=0,sticky="N")
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -396,6 +412,9 @@ class CharAtkFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MATK.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -422,14 +441,19 @@ class CharAtkMFrame(Frame):
         self.add_stat.grid(row=1,column=1)
         self.Register_new.grid(row=2,column=0,columnspan=2)
 
+
+
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.ATK.refresh()
         # with open("characters","wb") as fichier:
         #     pk.Pickler(fichier).dump(self.master.master.master.master.characlist)
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -481,6 +505,9 @@ class CharDefFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MDEF.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -521,18 +548,19 @@ class CharDefMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.DEF.refresh()
 
     def register_third(self,event=None):
         """ Consomme un symbole d'armure pour l'assigner à une pièce d'équipement """
-        self.master.master.master.selectedchar.upstats("invested_armor",self.New_third.get(),self.statthird.get())
+        self.get_selectedchar().upstats("invested_armor",self.New_third.get(),self.statthird.get())
         self.New_third.set(0)
         self.master.BNDL.DEF.refresh()
 
-
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 class CharPhyFrame(LabelFrame):
@@ -594,6 +622,9 @@ class CharPhyFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MPHY.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -637,14 +668,14 @@ class CharPhyMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.PHY.refresh()
 
     def register_third(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.thirdlist[self.statthird.current()],self.New_third.get())
+        self.get_selectedchar().upstats(self.thirdlist[self.statthird.current()],self.New_third.get())
         self.New_third.set(0)
         self.master.master.master.reload()
         self.master.BNDL.PHY.refresh()
@@ -653,6 +684,9 @@ class CharPhyMFrame(Frame):
         self.master.master.master.selectedchar.convert_init(1)
         self.master.BNDL.PHY.refresh()
         self.master.BNDL.ABI.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -709,6 +743,9 @@ class CharAbiFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MABI.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
@@ -754,7 +791,7 @@ class CharAbiMFrame(Frame):
 
         self.add_sight=Button(self.senseFrame,text="+",command=partial(self.add_sense,"sight"),state="disabled")
         self.add_hearing=Button(self.senseFrame,text="+",command=partial(self.add_sense,"hearing"),state="disabled")
-        self.add_smell=Button(self.senseFrame,text="+",command=partial(self.add_sense,"smell"),state="disabled")
+        self.add_smell=Button(self.senseFrame,text="+",command=partial(self.add_sense,"smelling"),state="disabled")
 
         self.add_sight.grid(row=1,column=2,sticky="e")
         self.add_hearing.grid(row=2,column=2,sticky="e")
@@ -851,7 +888,7 @@ class CharAbiMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.ABI.refresh()
@@ -894,7 +931,7 @@ class CharAbiMFrame(Frame):
             self.add_smell["state"]="disabled"
 
         i=1
-        for key in ["sight","hearing","smell"]:
+        for key in ["sight","hearing","smelling"]:
             Label(self.senseFrame,text=self.master.master.master.selectedchar.thirdstats[key]).grid(row=i,column=1)
             i+=1
 
@@ -956,16 +993,18 @@ class CharAbiMFrame(Frame):
 
 
     def add_sense(self,stat):
-        self.master.master.master.selectedchar.upstats(stat,1)
+        self.get_selectedchar().upstats(stat,1)
         self.refresh()
         self.master.BNDL.ABI.refresh()
 
     def invest_furtif(self,stat):
         """ Permet de consommer le tier 2 et obtenir du tier 3 """
-        self.master.master.master.selectedchar.upstats(stat,1)
+        self.get_selectedchar().upstats(stat,1)
         self.refresh()
         self.master.BNDL.ABI.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
     def grid(self,**kw):
         #self.refresh()
@@ -1022,6 +1061,9 @@ class CharSocFrame(LabelFrame):
             i.grid_forget()
         self.master.master.MSOC.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -1050,10 +1092,13 @@ class CharSocMFrame(Frame):
 
     def register(self,event=None):
         """ Transforme l'expérience en points de la caractéristique sélectionnée avec statlist, et enregistre la nouvelle configuration du personnage"""
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.SOC.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1117,6 +1162,9 @@ class CharEthFrame(LabelFrame):
             i.grid_forget()
         self.master.master.METH.grid(row=0,column=3)
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
         self.refresh()
@@ -1145,13 +1193,15 @@ class CharEthMFrame(Frame):
 
     def register(self,event=None):
         """ On modifie les caractéristiques du personnage, grâce à l'xp, et on recharge le widget qui les affiche """
-        self.master.master.master.selectedchar.upstats(self.baselist[self.statlist.current()],self.New_carac.get())
+        self.get_selectedchar().upstats(self.baselist[self.statlist.current()],self.New_carac.get())
         self.New_carac.set(0)
         self.master.master.master.reload()
         self.master.BNDL.ETH.refresh()
         self.master.BNDL.ABI.refresh()
-        # with open("characters","wb") as fichier:
-        #     pk.Pickler(fichier).dump(self.master.master.master.master.characlist)
+
+    def get_selectedchar(self):
+
+        return self.master.get_selectedchar()
 
 
 
@@ -1174,6 +1224,9 @@ class CharSymbFrame(LabelFrame):
         for key in self.baselist:
             Label(self,text=self.master.master.master.master.selectedchar.secondstats["symb-"+key]).grid(row=i,column=1)
             i+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
     def grid(self,**kwargs):
         LabelFrame.grid(self,kwargs)
@@ -1200,6 +1253,9 @@ class CharBundleFrame(Frame):
     def refresh(self):
         for i in self.grid_slaves():
             i.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
     def grid(self,**kwargs):
 
@@ -1258,8 +1314,7 @@ class CharUsefulFrame(Frame):
         self.PercFrame=CharPercFrame(self,text=" Pourcentages ",relief="groove")
         self.PercFrame.grid(row=6,column=4,padx="4p",pady="4p",sticky="we")
 
-        # self.bind("<Visibility>",func=self.refresh)
-        #self.bind("<Enter>",func=self.toggle_visibility)
+        self.bind("<Visibility>",func=self.refresh)
 
 
     def refresh(self,event=None):
@@ -1275,14 +1330,10 @@ class CharUsefulFrame(Frame):
         self.CharThrF.refresh()
         self.PercFrame.refresh()
 
-    """def toggle_visibility(self,event=None):
-        print("tamer")
-        self.oui+=1
-        self.oui%=2
-        if self.oui%2==0:
-            self.lower()
-        else:
-            self.lift()"""
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
+
 
 
 
@@ -1317,6 +1368,9 @@ class CharFirstSymbFrame(Frame):
             else:
                 Label(self,text=self.master.master.master.selectedchar.secondstats["symb-"+key]).grid(row=0,column=2*i+1,sticky="w")
             i+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1366,7 +1420,7 @@ class CharPercepFrame(Frame):
                 i.destroy()
 
         i=2
-        for key in ["sight","hearing","smell"]:
+        for key in ["sight","hearing","smelling"]:
             Label(self,text=self.master.master.master.selectedchar.thirdstats[key]).grid(row=i,column=1)
             i+=1
 
@@ -1378,6 +1432,9 @@ class CharPercepFrame(Frame):
                 i+=1
 
             j+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1433,6 +1490,9 @@ class CharStealthFrame(Frame):
 
             j+=1
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
 
 
 
@@ -1467,6 +1527,9 @@ class CharPercFrame(LabelFrame):
                     ttk.Separator(self,orient="vertical").grid(row=0,column=2*k-1,rowspan=4,sticky="ns",pady="2p")
             j+=1
 
+        def get_selectedchar(self):
+            return self.master.get_selectedchar()
+
 
 
 
@@ -1498,6 +1561,9 @@ class CharHiddenFrame(Frame):
         for stat in ["thievery","ambush","escape"]:
             Label(self,text=self.master.master.master.selectedchar.thirdstats["hidden_action"][stat]).grid(row=1,column=3*j+1)
             j+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1672,10 +1738,18 @@ class CharMelFrame(LabelFrame):
                     Label(self,text="...").grid(row=3,column=i)
                     Label(self,text="...").grid(row=4,column=i)
 
+
     def up_mastery(self,where,number):
         self.master.master.master.selectedchar.playerequipment[where+"_melee"].upmastery(number)
-        self.refresh()
 
+        if where=="left":
+            item = self.grid_slaves(1,6)
+        else:
+            item = self.grid_slaves(4, 6)
+        item[0]["text"]=str(self.master.master.master.selectedchar.get_weapon(where, "melee").get_stats_aslist(["mastery"])[0])
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 class CharThrFrame(LabelFrame):
@@ -1860,82 +1934,103 @@ class CharThrFrame(LabelFrame):
                     Label(self,text="...").grid(row=4,column=i)
 
     def up_mastery(self,where,number):
-        self.master.master.master.selectedchar.playerequipment[where+"_throw"].upmastery(number)
-        self.refresh()
+        self.master.master.master.selectedchar.get_weapon(where,"throw").upmastery(number)
 
+        if self.master.master.master.selectedchar.get_weapon(where,"throw").get_stats_aslist(["type"])[0]=="Tir":
+            col=5
+        else:
+            col=4
 
+        if where=="left":
+            item = self.grid_slaves(1,col)
+        else:
+            item = self.grid_slaves(4, col)
+        item[0]["text"]=str(self.master.master.master.selectedchar.get_weapon(where, "throw").get_stats_aslist(["mastery"])[0])
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 class CharArmFrame(LabelFrame):
-    """ Cadre d'affichage de l'armure du personnage """
 
-    def __init__(self,master,**kw):
-        LabelFrame.__init__(self,master,**kw)
-        self.armor_image=ImageTk.PhotoImage(Image.open("Images/symb-armor.png").resize((12,20),Image.ANTIALIAS))
+    def __init__(self, master, **kw):
+        LabelFrame.__init__(self, master, **kw)
 
-        self.Armorlist=["Heaume","Spallières","Brassards","Avant-bras","Plastron","Jointures","Tassette","Cuissots","Grèves","Solerets"]
+        self.threshold_types=["Arm. Légère","Arm. Moyenne","Arm. Lourde"]
+        self.Threshold_View=ttk.Treeview(self,height=3)
+        self.Threshold_View.grid(row=0,column=0,sticky="we",padx="4p",pady="4p")
+        
+        self.Threshold_View["columns"]=("0","1","2")
+        self.Threshold_View.column("#0",width=150,anchor="c")
+        self.Threshold_View.column("0",width=120,anchor="c")
+        self.Threshold_View.column("1",width=120,anchor="c")
+        self.Threshold_View.column("2",width=120,anchor="c")
 
-        Label(self,text="Arm. Légère").grid(row=1,column=1)
-        Label(self,text="Arm. Moyenne").grid(row=2,column=1)
-        Label(self,text="Arm. Lourde").grid(row=3,column=1)
+        self.Threshold_View.heading("0",text="Val. d'Arm.")
+        self.Threshold_View.heading("1",text="Vit.")
+        self.Threshold_View.heading("2",text="Mobi.")
 
-        Label(self,text="Val. d'Arm.").grid(row=0,column=2,columnspan=2)
-        Label(self,text="Vit.").grid(row=0,column=4,columnspan=2)
-        Label(self,text="Mobi.").grid(row=0,column=6,columnspan=2)
+        for key in self.threshold_types:
+            self.Threshold_View.insert("","end",key,text=key)
 
-        ttk.Separator(self,orient="horizontal").grid(row=4,column=0,columnspan=8,sticky="we",padx="4p",pady="4p")
-        for i in range(1,7):
-            self.grid_columnconfigure(i,weight=1)
+        ttk.Separator(self,orient="horizontal").grid(row=1,column=0,columnspan=8,sticky="we",padx="4p",pady="4p")
+
+        self.armor_image = ImageTk.PhotoImage(Image.open("Images/symb-armor.png").resize((12, 20), Image.ANTIALIAS))
+        self.armor_attr = ["Nom","Prot.","Amort.","Mobi.","Vit.","Sol."]
+
+        self.Armorlist = ["Heaume", "Spallières", "Brassards", "Avant-bras", "Plastron", "Jointures", "Tassette",
+                          "Cuissots", "Grèves", "Solerets"]
+
+        self.Armor_View=ttk.Treeview(self,height=len(self.Armorlist))
+        self.Armor_View.grid(row=2,column=0,sticky="we",padx="4p",pady="4p")
+
+        self.Armor_View["columns"]=("0","1","2","3","4","5","6")
+        self.Armor_View.column("#0", width=100)
 
         i=0
-        for key in ["Nom","Prot.","Amort.","Mobi.","Vit.","Sol."]:
-            Label(self,text=key).grid(row=5,column=1+i)
+        for key in self.armor_attr:
+            self.Armor_View.heading(str(i),text=key)
+            if i==0:
+                self.Armor_View.column(str(i), width=100,anchor="c")
+            else:
+                self.Armor_View.column(str(i), width=50,anchor="c")
             i+=1
 
-        Label(self,image=self.armor_image).grid(row=5,column=7,padx="4p")
+        self.Armor_View.heading("6",image=self.armor_image)
+        self.Armor_View.column("6",width=30,anchor="e")
 
-
-        i=0
         for key in self.Armorlist:
-            Label(self,text=key).grid(row=6+i,column=0)
-            i+=1
+            self.Armor_View.insert("","end",key,text=key)
 
     def refresh(self):
-        """ fonction pour rafraichir l'armure du personnage """
-        for i in self.grid_slaves():
-            info=i.grid_info()
-            if info["row"]>=6 and info["column"]>=1:
-                i.destroy()
-            elif 1<=info["row"]<=3 and (info["column"]>=2 or info["column"]==0):
-                i.destroy()
-
-        palier=np.array([[[-10,-4,-8],[-8,-8,-10],[-4,-20,-12]],[[-8,-2,-6],[-4,-4,-6],[-2,-10,-10]],[[-6,0,-4],[-3,-4,-6],[-1,-8,-8]],[[-4,0,-2],[-1,-4,-4],[0,-6,-6]],[[-2,0,0],[0,-2,-2],[0,-4,-4]],[[0,2,0],[0,0,-1],[0,-2,-2]],[[0,4,0],[0,2,-1],[2,0,-2]],[[2,6,2],[4,2,1],[6,0,0]],[[4,8,4],[6,3,2],[8,0,0]]])
-
-
-        armor_level=self.master.master.master.selectedchar.secondstats["armor-level"]
-
-        Label(self,text="Palier d'armure "+str(armor_level)).grid(row=1,column=0,rowspan=2)
-
-        for i in range(3):
+        palier = np.array([[[-10, -4, -8], [-8, -8, -10], [-4, -20, -12]], [[-8, -2, -6], [-4, -4, -6], [-2, -10, -10]],
+                           [[-6, 0, -4], [-3, -4, -6], [-1, -8, -8]], [[-4, 0, -2], [-1, -4, -4], [0, -6, -6]],
+                           [[-2, 0, 0], [0, -2, -2], [0, -4, -4]], [[0, 2, 0], [0, 0, -1], [0, -2, -2]],
+                           [[0, 4, 0], [0, 2, -1], [2, 0, -2]], [[2, 6, 2], [4, 2, 1], [6, 0, 0]],
+                           [[4, 8, 4], [6, 3, 2], [8, 0, 0]]])
+        armor_level = self.master.master.master.selectedchar.get_armor_level()
+        self.Threshold_View.heading("#0",text="Palier d'armure "+str(armor_level))
+        i=0
+        for item in self.Threshold_View.get_children():
             for j in range(3):
-                Label(self,text=("+"*int(palier[armor_level,i,j]>0))+str(palier[armor_level,i,j])).grid(row=i+1,column=2*j+2,columnspan=2)
-
-
-        i=6
-        for key in self.Armorlist:
-            # si l'objet est équipé, on met ses caractéristiques, sinon, on met des "..."
-            if self.master.master.master.selectedchar.playerequipment[key]:
-                Label(self,text=self.master.master.master.selectedchar.playerequipment[key].name).grid(row=i,column=1)
-                j=2
-                for stat in ["prot","amort","mobi","vit","solid"]:
-                    Label(self,text=self.master.master.master.selectedchar.playerequipment[key].carac[stat]).grid(row=i,column=j)
-                    j+=1
-            else:
-                for j in range(1,7):
-                    Label(self,text="...").grid(row=i,column=j)
-            Label(self,text=self.master.master.master.selectedchar.thirdstats["invested_armor"][key]).grid(row=i,column=7,padx="4p")
+                self.Threshold_View.set(item,column=str(j),value=("+"*int(palier[armor_level,i,j]>0))+str(palier[armor_level,i,j]))
             i+=1
 
+        for item in self.Armor_View.get_children():
+            self.Armor_View.set(item,"6",self.master.master.master.selectedchar.get_invested_armor(item))
+            linked_equip=self.master.master.master.selectedchar.get_current_armor(item)
+            if linked_equip:
+                valuelist=linked_equip.get_stats_aslist(["name","prot", "amort", "mobi", "vit", "solid"])
+                for i in range(6):
+                    self.Armor_View.set(item,str(i),value=valuelist[i])
+
+            else:
+
+                for i in range(6):
+                    self.Armor_View.set(item,str(i),value="...")
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -1953,6 +2048,9 @@ class CharUseCompetFrame(LabelFrame):
         for compet in self.master.master.master.selectedchar.competences:
             Message(self,text=compet.name+" : "+compet.effect,width=500).grid(row=i,column=0)
             i+=1
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 ## Partie 4 Inventaire
@@ -2203,7 +2301,7 @@ class CharIFrame(Frame):
         """ Arrête l'attente pour afficher le popup, et efface le popup s'il est présent """
         if self.id:
             self.after_cancel(self.id)
-            self.id=None
+            self.id = None
         self.Obj_pop.hideinfo()
         self.Melee_pop.hideinfo()
         self.Throw_pop.hideinfo()
@@ -2583,6 +2681,9 @@ class CharIFrame(Frame):
                 self.CharThrF.refresh()
 
             self.refresh()
+
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
 
@@ -3072,17 +3173,16 @@ class ObjCreatorFrame(Frame):
             for i in range(1,self.Throw["scope"].grid_size()[1]):
                 sublist=[]
                 for key in self.Throw["scope"].grid_slaves(row=i):
-                    sublist.insert(0,int(key.get()))
+                    sublist.insert(0, int(key.get()))
                 scopelist.append(sublist)
             new_obj.newscope(scopelist)
 
-        elif val=="Armure":
+        elif val == "Armure":
             new_obj=pc.ArmorEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get(),self.Armor["location_entry"].get())
             new_obj.upstats(self.Armor["prot_var"].get(),self.Armor["amort_var"].get(),self.Armor["mobi_var"].get(),self.Armor["vit_var"].get())
             new_obj.upsolid(self.Armor["solidity_var"].get())
 
-
-        elif val=="Bouclier":
+        elif val == "Bouclier":
             new_obj=pc.ShieldEquip(self.New_name.get(),self.Description_entry.get(0.0,"end"),self.New_stackable.get())
             new_obj.upstats(self.Shield["hand_entry"].current()+1,self.Shield["close_var"].get(),self.Shield["dist_var"].get(),self.Shield["mobi_var"].get(),self.Shield["vit_var"].get())
             new_obj.upsolid(self.Shield["solidity_var"].get())
@@ -3096,158 +3196,155 @@ class ObjCreatorFrame(Frame):
         # print(self.master.master.master.selectedchar.inventory)
         self.master.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
-
-## Partie 6 Compétences
+# Partie 6 Compétences
 
 class CompetCreatorFrame(Frame):
     """ Widget de création des compétences """
 
-    def __init__(self,master,**kw):
-        Frame.__init__(self,master,**kw)
-        Label(self,text="Créer une compétence").grid(row=0,column=0,sticky="w",columnspan=2)
-        self.categlist=["Lore","Mélée","Jet","Combat vétéran","Armure"]
-        self.Name_var=StringVar()
+    def __init__(self, master, **kw):
+        Frame.__init__(self, master, **kw)
+        Label(self, text="Créer une compétence").grid(row=0, column=0, sticky="w", columnspan=2)
+        self.categlist = ["Lore", "Mélée", "Jet", "Combat vétéran", "Armure"]
+        self.Name_var = StringVar()
+        self.selected_item = None
 
-        Label(self,text="Catégorie").grid(row=1,column=0,sticky="w")
-        Label(self,text="Sous-catégorie").grid(row=1,column=1,sticky="w")
-        Label(self,text="Intitulé").grid(row=1,column=2)
-        Label(self,text="Effets").grid(row=1,column=3,sticky="w")
+        Label(self, text="Catégorie").grid(row=1, column=0, sticky="w")
+        Label(self, text="Sous-catégorie").grid(row=1, column=1, sticky="w")
+        Label(self, text="Intitulé").grid(row=1, column=2)
+        Label(self, text="Effets").grid(row=1, column=3, sticky="w")
 
-        self.Categ_entry=ttk.Combobox(self,values=self.categlist,state="readonly")
+        self.Categ_entry = ttk.Combobox(self, values=self.categlist, state="readonly")
         self.Categ_entry.current(0)
-        self.Subcateg_entry=ttk.Combobox(self,values=[],state="disabled")
-        self.Name_entry=Entry(self,textvariable=self.Name_var)
-        self.Effect_entry=Text(self,width=100,height=5)
-        self.Register_choice=Button(self,text="Enregistrer",command=self.register)
-        self.suppr_choice=Button(self,text="Supprimer",command=self.suppr,state="disabled")
+        self.Subcateg_entry = ttk.Combobox(self, values=[], state="disabled")
+        self.Name_entry = Entry(self, textvariable=self.Name_var)
+        self.Effect_entry = Text(self, width=100, height=5)
+        self.Register_choice = Button(self, text="Enregistrer", command=self.register)
+        self.suppr_choice = Button(self, text="Supprimer", command=self.suppr, state="disabled")
 
-        self.Categ_entry.grid(row=2,column=0,sticky="n",padx='4p')
-        self.Subcateg_entry.grid(row=2,column=1,sticky="n",padx='4p')
-        self.Name_entry.grid(row=2,column=2,sticky="n",padx='4p')
-        self.Effect_entry.grid(row=2,column=3,padx='4p')
-        self.Register_choice.grid(row=1,column=4,rowspan=2,padx='4p')
-        self.suppr_choice.grid(row=3,column=5,padx='4p')
+        self.Categ_entry.grid(row=2, column=0, sticky="n", padx='4p')
+        self.Subcateg_entry.grid(row=2, column=1, sticky="n", padx='4p')
+        self.Name_entry.grid(row=2, column=2, sticky="n", padx='4p')
+        self.Effect_entry.grid(row=2, column=3, padx='4p')
+        self.Register_choice.grid(row=1, column=4, rowspan=2, padx='4p')
+        self.suppr_choice.grid(row=3, column=5, padx='4p')
 
-        self.Categ_entry.bind("<<ComboboxSelected>>",self.subcateg_roll)
+        self.Categ_entry.bind("<<ComboboxSelected>>", self.subcateg_roll)
 
         # les compétences qui existent déjà
         self.Compet_view=ttk.Treeview(self)
-        self.Compet_view["columns"]=("0","1")
-        self.Compet_view.heading("#0",text="Catégorie")
-        self.Compet_view.heading("0",text="Nom")
-        self.Compet_view.heading("1",text="Effet")
-        self.Compet_view.column("#0",width=110)
-        self.Compet_view.column("0",width=200)
-        self.Compet_view.column("1",width=1000)
+        self.Compet_view["columns"] = ("0", "1")
+        self.Compet_view.heading("#0", text="Catégorie")
+        self.Compet_view.heading("0", text="Nom")
+        self.Compet_view.heading("1", text="Effet")
+        self.Compet_view.column("#0", width=110)
+        self.Compet_view.column("0", width=200)
+        self.Compet_view.column("1", width=1000)
         # les catégories
         for key in self.categlist:
-            self.Compet_view.insert("","end",key,text=key)
+            self.Compet_view.insert("", "end", key, text=key)
 
-        for key in ["Mains nues","Une main","Doubles","Deux mains","Bouclier"]:
-            self.Compet_view.insert("Mélée","end",key,text=key)
+        for key in ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]:
+            self.Compet_view.insert("Mélée", "end", key, text=key)
 
-        for key in ["Lancer","Arc","Arbalète"]:
-            self.Compet_view.insert("Jet","end",key,text=key)
+        for key in ["Lancer", "Arc", "Arbalète"]:
+            self.Compet_view.insert("Jet", "end", key, text=key)
 
-        self.Compet_view.grid(row=3,column=0,columnspan=5,pady="8p",sticky="w")
-        self.Compet_view.bind("<Button-1>",func=self.select_compet)
+        self.Compet_view.grid(row=3, column=0, columnspan=5, pady="8p", sticky="w")
+        self.Compet_view.bind("<Button-1>", func=self.select_compet)
 
-    def subcateg_roll(self,event=None):
+    def subcateg_roll(self, event=None):
         """ Méthode pour faire changer les sous-catégories proposées en fonction de la catégorie choisie """
-        val=self.Categ_entry.get()
+        val = self.Categ_entry.get()
 
-        if val =="Mélée":
-            self.Subcateg_entry["values"]=["Mains nues","Une main","Doubles","Deux mains","Bouclier"]
+        if val == "Mélée":
+            self.Subcateg_entry["values"] = ["Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier"]
             self.Subcateg_entry.current(0)
-            self.Subcateg_entry["state"]="readonly"
+            self.Subcateg_entry["state"] = "readonly"
 
-        elif val=="Jet":
-            self.Subcateg_entry["values"]=["Lancer","Arc","Arbalète"]
-            self.Subcateg_entry["state"]="readonly"
+        elif val == "Jet":
+            self.Subcateg_entry["values"] = ["Lancer", "Arc", "Arbalète"]
+            self.Subcateg_entry["state"] = "readonly"
             self.Subcateg_entry.current(0)
 
-        elif val=="Armure":
+        elif val == "Armure":
             self.Subcateg_entry.set("")
-            self.Subcateg_entry["values"]=[]
-            self.Subcateg_entry["state"]="disabled"
+            self.Subcateg_entry["values"] = []
+            self.Subcateg_entry["state"] = "disabled"
 
         else:
             self.Subcateg_entry.set("")
-            self.Subcateg_entry["values"]=[]
-            self.Subcateg_entry["state"]="disabled"
-
-
+            self.Subcateg_entry["values"] = []
+            self.Subcateg_entry["state"] = "disabled"
 
     def register(self):
         """ Méthode qui crée la nouvelle compétence """
-        new_compet=pc.Competence(self.Categ_entry.get(),self.Subcateg_entry.get(),self.Name_var.get(),self.Effect_entry.get(0.0,"end"))
+        new_compet = pc.Competence(self.Categ_entry.get(), self.Subcateg_entry.get(), self.Name_var.get(), self.Effect_entry.get(0.0, "end"))
 
         self.master.competlist.append(new_compet)
         if new_compet.subcateg:
-            self.Compet_view.insert(new_compet.subcateg,"end",(len(self.master.competlist)),values=[new_compet.name,new_compet.effect])
+            self.Compet_view.insert(new_compet.subcateg, "end", (len(self.master.competlist)), values=[new_compet.name, new_compet.effect])
         else:
-            self.Compet_view.insert(new_compet.categ,"end",(len(self.master.competlist)),values=[new_compet.name,new_compet.effect])
+            self.Compet_view.insert(new_compet.categ, "end", (len(self.master.competlist)), values=[new_compet.name, new_compet.effect])
 
     def refresh(self):
         """ Méthode qui rafraîchit la liste des compétences """
 
-        for key in ["Lore","Mains nues","Une main","Doubles","Deux mains","Bouclier","Lancer","Arc","Arbalète","Combat vétéran","Armure"]:
+        for key in ["Lore", "Mains nues", "Une main", "Doubles", "Deux mains", "Bouclier", "Lancer", "Arc", "Arbalète", "Combat vétéran", "Armure"]:
             for i in self.Compet_view.get_children(key):
                 self.Compet_view.delete(i)
 
         if self.master.competlist:
-            i=1
+            i = 1
             for key in self.master.competlist:
                 if key.subcateg:
-                    self.Compet_view.insert(key.subcateg,"end",i,values=[key.name,key.effect])
+                    self.Compet_view.insert(key.subcateg, "end", i, values=[key.name, key.effect])
                 else:
-                    self.Compet_view.insert(key.categ,"end",i,values=[key.name,key.effect])
+                    self.Compet_view.insert(key.categ, "end", i, values=[key.name, key.effect])
 
-                i+=1
+                i += 1
 
     def select_compet(self,event):
         """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
         if self.Compet_view.identify_row(event.y):
 
             try:
-                self.selected_item=int(self.Compet_view.identify_row(event.y))
-                self.suppr_choice["state"]="normal"
+                self.selected_item = int(self.Compet_view.identify_row(event.y))
+                self.suppr_choice["state"] = "normal"
 
             except:
-                self.selected_item=None
-                self.suppr_choice["state"]="disabled"
+                self.selected_item = None
+                self.suppr_choice["state"] = "disabled"
 
         else:
-            self.selected_item=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_item = None
+            self.suppr_choice["state"] = "disabled"
 
     def suppr(self):
         """ Méthode qui supprime la compétence sélectionnée """
-        if type(self.selected_item)==int:
+        if type(self.selected_item) == int:
             self.master.competlist.pop(self.selected_item-1)
             self.refresh()
-            self.selected_item=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_item = None
+            self.suppr_choice["state"] = "disabled"
 
-    def grid(self,**kw):
-        Frame.grid(self,**kw)
+    def grid(self, **kw):
+        Frame.grid(self, **kw)
         self.refresh()
-
-
 
 
 class CharCompetFrame(Frame):
     """ Widget pour attribuer des compétences au personnage """
 
-    def __init__(self,master,**kw):
-        Frame.__init__(self,master,**kw)
-        self.selected_item=None
-        self.selected_charitem=None
-        self.modif_compet=None
-        self.categlist=["Lore","Mélée","Jet","Combat vétéran","Armure"]
-
+    def __init__(self, master, **kw):
+        Frame.__init__(self, master, **kw)
+        self.selected_item = None
+        self.selected_charitem = None
+        self.modif_compet = None
+        self.categlist = ["Lore", "Mélée", "Jet", "Combat vétéran", "Armure"]
 
         # les compétences du personnage
 
@@ -3429,79 +3526,78 @@ class CharCompetFrame(Frame):
         self.selected_compet.effect=self.modif_effect.get(0.0,"end")
         self.refresh_char()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
 
 
-
-## Partie 7 Les sorts
+# Partie 7 Les sorts
 
 class SpellCreatorFrame(Frame):
     """ Widget de création des sorts """
 
-    def __init__(self,master,**kw):
-        Frame.__init__(self,master,**kw)
-        Label(self,text="Créer un sort").grid(row=0,column=0,sticky="w",columnspan=2)
-        self.selected_item=None
-        self.elemlist=["Foudre"]
-        self.subcateglist=["Emprise","Appel","Altération","Transfert","Divination","Lien"]
-        self.Name_var=StringVar()
-        self.Cost_var=IntVar()
+    def __init__(self, master, **kw):
+        Frame.__init__(self, master, **kw)
+        Label(self, text="Créer un sort").grid(row=0, column=0, sticky="w", columnspan=2)
+        self.selected_item = None
+        self.elemlist = ["Foudre"]
+        self.subcateglist = ["Emprise", "Appel", "Altération", "Transfert", "Divination", "Lien"]
+        self.Name_var = StringVar()
+        self.Cost_var = IntVar()
 
-        Label(self,text="Elément").grid(row=1,column=0,sticky="w")
-        Label(self,text="Sous-catégorie").grid(row=1,column=1,sticky="w")
-        Label(self,text="Nom").grid(row=1,column=2,sticky="w")
-        Label(self,text="Effets").grid(row=3,column=0,sticky="w")
-        Label(self,text="Description").grid(row=3,column=2,sticky="w")
-        Label(self,text="Coût").grid(row=1,column=3,sticky="w")
+        Label(self, text="Elément").grid(row=1, column=0, sticky="w")
+        Label(self, text="Sous-catégorie").grid(row=1, column=1, sticky="w")
+        Label(self, text="Nom").grid(row=1, column=2, sticky="w")
+        Label(self, text="Effets").grid(row=3, column=0, sticky="w")
+        Label(self, text="Description").grid(row=3, column=2, sticky="w")
+        Label(self, text="Coût").grid(row=1, column=3, sticky="w")
 
-        self.Elem_entry=ttk.Combobox(self,values=self.elemlist,state="readonly")
+        self.Elem_entry = ttk.Combobox(self, values=self.elemlist, state="readonly")
         self.Elem_entry.current(0)
-        self.Subcateg_entry=ttk.Combobox(self,values=self.subcateglist,state="readonly")
+        self.Subcateg_entry = ttk.Combobox(self, values=self.subcateglist, state="readonly")
         self.Subcateg_entry.current(0)
-        self.Name_entry=Entry(self,textvariable=self.Name_var)
-        self.Effect_entry=Text(self,width=50,height=5)
-        self.Description_entry=Text(self,width=50,height=5)
-        self.Cost_entry=Entry(self,textvariable=self.Cost_var)
-        self.Register_choice=Button(self,text="Enregistrer",command=self.register)
-        self.suppr_choice=Button(self,text="Supprimer",command=self.suppr,state="disabled")
+        self.Name_entry = Entry(self, textvariable=self.Name_var)
+        self.Effect_entry = Text(self, width=50, height=5)
+        self.Description_entry = Text(self, width=50, height=5)
+        self.Cost_entry = Entry(self, textvariable=self.Cost_var)
+        self.Register_choice = Button(self, text="Enregistrer", command=self.register)
+        self.suppr_choice = Button(self, text="Supprimer", command=self.suppr, state="disabled")
 
-        self.Elem_entry.grid(row=2,column=0,sticky="w",padx='4p')
-        self.Subcateg_entry.grid(row=2,column=1,sticky="w",padx='4p')
-        self.Name_entry.grid(row=2,column=2,sticky="w",padx='4p')
-        self.Effect_entry.grid(row=4,column=0,padx='4p',columnspan=2,sticky="w")
-        self.Cost_entry.grid(row=2,column=3,padx="4p",sticky="w")
-        self.Description_entry.grid(row=4,column=2,padx='4p',columnspan=2,sticky="w")
-        self.Register_choice.grid(row=2,column=4,rowspan=3,padx='4p')
-        self.suppr_choice.grid(row=5,column=4,padx='4p')
-
+        self.Elem_entry.grid(row=2, column=0, sticky="w", padx='4p')
+        self.Subcateg_entry.grid(row=2, column=1, sticky="w", padx='4p')
+        self.Name_entry.grid(row=2, column=2, sticky="w", padx='4p')
+        self.Effect_entry.grid(row=4, column=0, padx='4p', columnspan=2, sticky="w")
+        self.Cost_entry.grid(row=2, column=3, padx="4p", sticky="w")
+        self.Description_entry.grid(row=4, column=2, padx='4p', columnspan=2, sticky="w")
+        self.Register_choice.grid(row=2, column=4, rowspan=3, padx='4p')
+        self.suppr_choice.grid(row=5, column=4, padx='4p')
 
         # les sorts qui existent déjà
-        self.Spell_view=ttk.Treeview(self)
-        self.Spell_view["columns"]=("0","1","2")
-        self.Spell_view.heading("0",text="Effet")
-        self.Spell_view.heading("1",text="Description")
-        self.Spell_view.heading("2",text="Coût")
-        self.Spell_view.column("#0",width=110)
-        self.Spell_view.column("0",width=400)
-        self.Spell_view.column("1",width=400)
-        self.Spell_view.column("2",width=50)
+        self.Spell_view = ttk.Treeview(self)
+        self.Spell_view["columns"] = ("0", "1", "2")
+        self.Spell_view.heading("0", text="Effet")
+        self.Spell_view.heading("1", text="Description")
+        self.Spell_view.heading("2", text="Coût")
+        self.Spell_view.column("#0", width=110)
+        self.Spell_view.column("0", width=400)
+        self.Spell_view.column("1", width=400)
+        self.Spell_view.column("2", width=50)
         # les catégories
         for key in self.elemlist:
-            self.Spell_view.insert("","end",key,text=key)
+            self.Spell_view.insert("", "end", key, text=key)
 
             for kkey in self.subcateglist:
                 self.Spell_view.insert(key, "end", key+kkey, text=kkey)
 
-
-        self.Spell_view.grid(row=5,column=0,columnspan=4,pady="8p",sticky="w")
-        self.Spell_view.bind("<Button-1>",func=self.select_spell)
+        self.Spell_view.grid(row=5, column=0, columnspan=4, pady="8p", sticky="w")
+        self.Spell_view.bind("<Button-1>", func=self.select_spell)
 
 
     def register(self):
         """ Méthode qui crée le nouveau sort """
-        new_spell=pc.Spell(self.Elem_entry.get(),self.Subcateg_entry.get(),self.Name_var.get(),self.Effect_entry.get(0.0,"end"),self.Description_entry.get(0.0,"end"),self.Cost_var.get())
+        new_spell = pc.Spell(self.Elem_entry.get(), self.Subcateg_entry.get(), self.Name_var.get(), self.Effect_entry.get(0.0, "end"), self.Description_entry.get(0.0, "end"), self.Cost_var.get())
 
         self.master.spelllist.append(new_spell)
-        self.Spell_view.insert(new_spell.elem+new_spell.subcateg,"end",(len(self.master.spelllist)),text=new_spell.name,values=[new_spell.effect,new_spell.description,new_spell.cost])
+        self.Spell_view.insert(new_spell.elem+new_spell.subcateg, "end", (len(self.master.spelllist)), text=new_spell.name, values=[new_spell.effect, new_spell.description, new_spell.cost])
 
     def refresh(self):
         """ Méthode qui rafraîchit la liste des sorts """
@@ -3512,158 +3608,151 @@ class SpellCreatorFrame(Frame):
                     self.Spell_view.delete(i)
 
         if self.master.spelllist:
-            i=1
+            i = 1
             for key in self.master.spelllist:
-                self.Spell_view.insert(key.elem+key.subcateg,"end",i,text=key.name,values=[key.effect,key.description,key.cost])
+                self.Spell_view.insert(key.elem+key.subcateg, "end", i, text=key.name, values=[key.effect,key.description,key.cost])
 
-                i+=1
+                i += 1
 
     def select_spell(self,event):
         """ Méthode qui est appelée quand on sélectionne une compétence, pour ensuite la supprimer si besoin """
         if self.Spell_view.identify_row(event.y):
 
             try:
-                self.selected_item=int(self.Spell_view.identify_row(event.y))
-                self.suppr_choice["state"]="normal"
+                self.selected_item = int(self.Spell_view.identify_row(event.y))
+                self.suppr_choice["state"] = "normal"
 
             except:
-                self.selected_item=None
-                self.suppr_choice["state"]="disabled"
+                self.selected_item = None
+                self.suppr_choice["state"] = "disabled"
 
         else:
-            self.selected_item=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_item = None
+            self.suppr_choice["state"] = "disabled"
 
     def suppr(self):
         """ Méthode qui supprime la compétence sélectionnée """
-        if type(self.selected_item)==int:
+        if type(self.selected_item) == int:
             self.master.spelllist.pop(self.selected_item-1)
             self.refresh()
-            self.selected_item=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_item = None
+            self.suppr_choice["state"] = "disabled"
 
-    def grid(self,**kw):
-        Frame.grid(self,**kw)
+    def grid(self, **kw):
+        Frame.grid(self, **kw)
         self.refresh()
-
-
 
 
 class CharSpellFrame(Frame):
     """ Widget de création des sorts """
 
-    def __init__(self,master,**kw):
-        Frame.__init__(self,master,**kw)
-        self.selected_item=None
-        self.selected_charitem=None
-        self.spells_list=[]
-        self.lightning_image=ImageTk.PhotoImage(Image.open("Images/symb-lightning.png").resize((12,15),Image.ANTIALIAS))
+    def __init__(self, master, **kw):
+        Frame.__init__(self, master, **kw)
+        self.selected_item = None
+        self.selected_charitem = None
+        self.spells_list = []
+        self.lightning_image = ImageTk.PhotoImage(Image.open("Images/symb-lightning.png").resize((12, 15), Image.ANTIALIAS))
 
-        self.elemlist=["Foudre"]
-        self.subcateglist=["Emprise","Appel","Altération","Transfert","Divination","Lien"]
+        self.elemlist = ["Foudre"]
+        self.subcateglist = ["Emprise", "Appel", "Altération", "Transfert", "Divination", "Lien"]
 
-        self.columnconfigure(1,weight=1)
-        self.columnconfigure(2,weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
 
-        Label(self,text="Sorts du personnage").grid(row=0,column=0,sticky="w",padx="4p")
-        self.plus_lightning=Button(self,text="+",image=self.lightning_image,compound="right",command=partial(self.modif_lightning,1),state="disabled")
-        self.plus_lightning.grid(row=1,column=1)
-        self.min_lightning=Button(self,text="-",image=self.lightning_image,compound="right",command=partial(self.modif_lightning,-1),state="disabled")
-        self.min_lightning.grid(row=1,column=2,sticky="e")
-        self.suppr_choice=Button(self,text="Retirer",command=self.suppr)
-        self.suppr_choice.grid(row=2,column=1,columnspan=2)
+        Label(self, text="Sorts du personnage").grid(row=0, column=0, sticky="w", padx="4p")
+        self.plus_lightning = Button(self, text="+", image=self.lightning_image, compound="right", command=partial(self.modif_lightning, 1), state="disabled")
+        self.plus_lightning.grid(row=1, column=1)
+        self.min_lightning = Button(self, text="-", image=self.lightning_image, compound="right", command=partial(self.modif_lightning, -1), state="disabled")
+        self.min_lightning.grid(row=1, column=2, sticky="e")
+        self.remove_choice = Button(self, text="Retirer", command=self.remove_charspell)
+        self.remove_choice.grid(row=2, column=1, columnspan=2)
         # les sorts que le personnage a déjà
-        self.CharSpell_view=ttk.Treeview(self,height=5)
-        self.CharSpell_view["columns"]=("0","1","2","3")
-        self.CharSpell_view.heading("0",text="Effet")
-        self.CharSpell_view.heading("1",text="Description")
-        self.CharSpell_view.heading("2",text="Coût")
-        self.CharSpell_view.heading("3",text="Eclairs")
-        self.CharSpell_view.column("#0",width=110)
-        self.CharSpell_view.column("0",width=400)
-        self.CharSpell_view.column("1",width=400)
-        self.CharSpell_view.column("2",width=50,anchor="c")
-        self.CharSpell_view.column("3",width=50,anchor="c")
+        self.CharSpell_view = ttk.Treeview(self, height=5)
+        self.CharSpell_view["columns"] = ("0", "1", "2", "3")
+        self.CharSpell_view.heading("0", text="Effet")
+        self.CharSpell_view.heading("1", text="Description")
+        self.CharSpell_view.heading("2", text="Coût")
+        self.CharSpell_view.heading("3", text="Eclairs")
+        self.CharSpell_view.column("#0", width=110)
+        self.CharSpell_view.column("0", width=400)
+        self.CharSpell_view.column("1", width=400)
+        self.CharSpell_view.column("2", width=50, anchor="c")
+        self.CharSpell_view.column("3", width=50, anchor="c")
 
         # les catégories
         for key in self.elemlist:
-            self.CharSpell_view.insert("","end",key,text=key)
+            self.CharSpell_view.insert("", "end", key, text=key)
 
             for kkey in self.subcateglist:
-                self.CharSpell_view.insert(key,"end",key+kkey,text=kkey)
+                self.CharSpell_view.insert(key, "end", key+kkey, text=kkey)
 
+        self.CharSpell_view.grid(row=1, column=0, rowspan=3, pady="8p", sticky="w")
+        self.CharSpell_view.bind("<Button-1>", func=self.select_charspell)
 
-        self.CharSpell_view.grid(row=1,column=0,rowspan=3,pady="8p",sticky="w")
-        self.CharSpell_view.bind("<Button-1>",func=self.select_charspell)
-
-
-        Label(self,text="Sorts disponibles").grid(row=4,column=0,sticky="w",padx="4p")
-        self.transfer_choice=Button(self,text="Prendre",command=self.transfer_spell)
-        self.transfer_choice.grid(row=5,column=1,columnspan=2)
+        Label(self, text="Sorts disponibles").grid(row=4, column=0, sticky="w", padx="4p")
+        self.transfer_choice = Button(self, text="Prendre", command=self.transfer_spell)
+        self.transfer_choice.grid(row=5, column=1, columnspan=2)
         # les sorts qui existent
-        self.Spell_view=ttk.Treeview(self,height=5)
-        self.Spell_view["columns"]=("0","1","2")
-        self.Spell_view.heading("0",text="Effet")
-        self.Spell_view.heading("1",text="Description")
-        self.Spell_view.heading("2",text="Coût")
-        self.Spell_view.column("#0",width=110)
-        self.Spell_view.column("0",width=400)
-        self.Spell_view.column("1",width=400)
-        self.Spell_view.column("2",width=50)
+        self.Spell_view = ttk.Treeview(self, height=5)
+        self.Spell_view["columns"] = ("0", "1", "2")
+        self.Spell_view.heading("0", text="Effet")
+        self.Spell_view.heading("1", text="Description")
+        self.Spell_view.heading("2", text="Coût")
+        self.Spell_view.column("#0", width=110)
+        self.Spell_view.column("0", width=400)
+        self.Spell_view.column("1", width=400)
+        self.Spell_view.column("2", width=50)
         # les catégories
         for key in self.elemlist:
-            self.Spell_view.insert("","end",key,text=key)
+            self.Spell_view.insert("", "end", key, text=key)
 
             for kkey in self.subcateglist:
-                self.Spell_view.insert(key,"end",key+kkey,text=kkey)
+                self.Spell_view.insert(key, "end", key+kkey, text=kkey)
 
-
-        self.Spell_view.grid(row=5,column=0,pady="8p",sticky="w")
-        self.Spell_view.bind("<Button-1>",func=self.select_spell)
+        self.Spell_view.grid(row=5, column=0, pady="8p", sticky="w")
+        self.Spell_view.bind("<Button-1>", func=self.select_spell)
 
         # la FUUUU-SIOOOON de sorts
 
-        ttk.Separator(self,orient="horizontal").grid(row=6,column=0,columnspan=4,sticky="we",pady='4p',padx="4p")
-        self.fusionFrame=Frame(self)
-        self.fusionFrame.grid(row=7,column=0,columnspan=4,sticky="w")
-        Label(self.fusionFrame,text="Sort spécial").grid(row=0,column=0,sticky="w") # ,font=("TkDefault","10")
-        Label(self.fusionFrame,text="Elément").grid(row=1,column=0,sticky="w")
-        Label(self.fusionFrame,text="Sous-catégorie").grid(row=1,column=1,sticky="w")
-        Label(self.fusionFrame,text="Nom").grid(row=1,column=2,sticky="w")
-        Label(self.fusionFrame,text="Coût").grid(row=1,column=3,sticky="w")
-        Label(self.fusionFrame,text="Effets").grid(row=3,column=0,sticky="w")
-        Label(self.fusionFrame,text="Description").grid(row=3,column=2,sticky="w")
-        self.Name_var=StringVar()
-        self.Cost_var=IntVar()
-        self.Elem_entry=ttk.Combobox(self.fusionFrame,values=self.elemlist)
+        ttk.Separator(self, orient="horizontal").grid(row=6, column=0, columnspan=4, sticky="we", pady='4p', padx="4p")
+        self.fusionFrame = Frame(self)
+        self.fusionFrame.grid(row=7, column=0, columnspan=4, sticky="w")
+        Label(self.fusionFrame, text="Sort spécial").grid(row=0, column=0, sticky="w") # ,font=("TkDefault","10")
+        Label(self.fusionFrame, text="Elément").grid(row=1, column=0, sticky="w")
+        Label(self.fusionFrame, text="Sous-catégorie").grid(row=1, column=1, sticky="w")
+        Label(self.fusionFrame, text="Nom").grid(row=1, column=2, sticky="w")
+        Label(self.fusionFrame, text="Coût").grid(row=1, column=3, sticky="w")
+        Label(self.fusionFrame, text="Effets").grid(row=3, column=0, sticky="w")
+        Label(self.fusionFrame, text="Description").grid(row=3, column=2, sticky="w")
+        self.Name_var = StringVar()
+        self.Cost_var = IntVar()
+        self.Elem_entry = ttk.Combobox(self.fusionFrame, values=self.elemlist)
         self.Elem_entry.current(0)
-        self.Subcateg_entry=ttk.Combobox(self.fusionFrame,values=self.subcateglist)
+        self.Subcateg_entry = ttk.Combobox(self.fusionFrame, values=self.subcateglist)
         self.Subcateg_entry.current(0)
-        self.Name_entry=Entry(self.fusionFrame,textvariable=self.Name_var)
-        self.Cost_entry=Entry(self.fusionFrame,textvariable=self.Cost_var)
-        self.Effect_entry=Text(self.fusionFrame,width=50,height=5)
-        self.Description_entry=Text(self.fusionFrame,width=50,height=5)
-        self.Special_register=Button(self.fusionFrame,text="Enregistrer",command=self.special_create)
+        self.Name_entry = Entry(self.fusionFrame, textvariable=self.Name_var)
+        self.Cost_entry = Entry(self.fusionFrame, textvariable=self.Cost_var)
+        self.Effect_entry = Text(self.fusionFrame, width=50,height=5)
+        self.Description_entry = Text(self.fusionFrame, width=50, height=5)
+        self.Special_register = Button(self.fusionFrame, text="Enregistrer", command=self.special_create)
 
-        self.Elem_entry.grid(row=2,column=0,sticky="w",padx='4p')
-        self.Subcateg_entry.grid(row=2,column=1,sticky="w",padx='4p')
-        self.Name_entry.grid(row=2,column=2,sticky="w",padx='4p')
-        self.Cost_entry.grid(row=2,column=3,padx="4p",sticky="w")
-        self.Effect_entry.grid(row=4,column=0,padx='4p',columnspan=2,sticky="w")
-        self.Description_entry.grid(row=4,column=2,padx='4p',columnspan=2,sticky="w")
-        self.Special_register.grid(row=2,column=4,rowspan=3,padx="4p")
+        self.Elem_entry.grid(row=2, column=0, sticky="w", padx='4p')
+        self.Subcateg_entry.grid(row=2, column=1, sticky="w", padx='4p')
+        self.Name_entry.grid(row=2, column=2, sticky="w", padx='4p')
+        self.Cost_entry.grid(row=2, column=3, padx="4p", sticky="w")
+        self.Effect_entry.grid(row=4, column=0, padx='4p', columnspan=2, sticky="w")
+        self.Description_entry.grid(row=4, column=2, padx='4p', columnspan=2, sticky="w")
+        self.Special_register.grid(row=2, column=4, rowspan=3, padx="4p")
 
-
-        self.bind("<Visibility>",func=self.refresh)
+        self.bind("<Visibility>", func=self.refresh)
 
     def special_create(self):
         if self.Name_var.get() and self.Cost_var.get():
-            new_spell=pc.Spell(self.Elem_entry.get(),self.Subcateg_entry.get(),self.Name_var.get(),self.Effect_entry.get(0.0,"end"),self.Description_entry.get(0.0,"end"),self.Cost_var.get())
-            self.master.master.selectedchar.spells[new_spell]=0
+            new_spell=pc.Spell(self.Elem_entry.get(), self.Subcateg_entry.get(), self.Name_var.get(), self.Effect_entry.get(0.0,"end"), self.Description_entry.get(0.0,"end"), self.Cost_var.get())
+            self.master.master.selectedchar.spells[new_spell] = 0
 
             self.spells_list.append(new_spell)
-            self.CharSpell_view.insert(new_spell.elem+new_spell.subcateg,"end",(len(self.spells_list)),text=new_spell.name,values=[new_spell.effect,new_spell.description,new_spell.cost,0])
-
+            self.CharSpell_view.insert(new_spell.elem+new_spell.subcateg, "end", (len(self.spells_list)), text=new_spell.name, values=[new_spell.effect,new_spell.description,new_spell.cost, 0])
 
     def transfer_spell(self):
         """ Méthode pour attribuer le sort sélectionné au personnage """
@@ -3672,35 +3761,34 @@ class CharSpellFrame(Frame):
             self.master.master.selectedchar.spells[new_spell]=0
 
             self.spells_list.append(new_spell)
-            self.CharSpell_view.insert(new_spell.elem+new_spell.subcateg,"end",(len(self.spells_list)),text=new_spell.name,values=[new_spell.effect,new_spell.description,new_spell.cost,0])
+            self.CharSpell_view.insert(new_spell.elem+new_spell.subcateg, "end", (len(self.spells_list)), text=new_spell.name, values=[new_spell.effect,new_spell.description,new_spell.cost, 0])
 
-    def refresh(self,event=None):
+    def refresh(self, event=None):
         self.refresh_general()
         self.refresh_char()
-        self.suppr_choice["state"]="disabled"
-        self.transfer_choice["state"]="disabled"
-        self.plus_lightning["state"]="disabled"
-        self.min_lightning["state"]="disabled"
+        self.remove_choice["state"] = "disabled"
+        self.transfer_choice["state"] = "disabled"
+        self.plus_lightning["state"] = "disabled"
+        self.min_lightning["state"] = "disabled"
 
     def refresh_char(self):
         """ Méthode qui rafraîchit la liste des sorts du personnage """
 
-        self.spells_list=[]
+        self.spells_list = []
+        print("oui")
 
         for key in self.elemlist:
             for kkey in self.subcateglist:
                 for i in self.CharSpell_view.get_children(key+kkey):
                     self.CharSpell_view.delete(i)
 
-        if self.master.master.selectedchar.spells:
-            i=1
-            for key in self.master.master.selectedchar.spells.keys():
+        if self.get_selectedchar().ismage():
+            i = 1
+            for key in self.get_selectedchar().get_spelllist():
                 self.spells_list.append(key)
-                self.CharSpell_view.insert(key.elem+key.subcateg,"end",i,text=key.name,values=[key.effect,key.description,key.cost,self.master.master.selectedchar.spells[key]])
+                self.CharSpell_view.insert(key.elem+key.subcateg, "end", i, text=key.name, values=[key.effect,key.description,key.cost, self.get_selectedchar().get_lightnings(key)])
 
-                i+=1
-
-
+                i += 1
 
     def refresh_general(self):
         """ Méthode qui rafraîchit la liste générale des sorts """
@@ -3710,141 +3798,149 @@ class CharSpellFrame(Frame):
                 for i in self.Spell_view.get_children(key+kkey):
                     self.Spell_view.delete(i)
 
-
         if self.master.master.master.spelllist:
-            i=1
+            i = 1
             for key in self.master.master.master.spelllist:
-                self.Spell_view.insert(key.elem+key.subcateg,"end",i,text=key.name,values=[key.effect,key.description,key.cost])
+                self.Spell_view.insert(key.elem+key.subcateg, "end", i, text=key.name, values=[key.effect, key.description,key.cost])
 
                 i+=1
 
     def select_charspell(self,event):
-        """ Méthode qui est appelée quand on sélectionne une compétence, pour retirer la supprimer si besoin """
+        """ Méthode qui est appelée quand on sélectionne un sort, pour le transférer si besoin """
         if self.CharSpell_view.identify_row(event.y):
 
             try:
-                self.selected_charitem=int(self.CharSpell_view.identify_row(event.y))
-                self.suppr_choice["state"]="normal"
-                self.plus_lightning["state"]="normal"
-                self.min_lightning["state"]="normal"
+                self.selected_charitem = int(self.CharSpell_view.identify_row(event.y))
+                self.remove_choice["state"] = "normal"
+                self.plus_lightning["state"] = "normal"
+                self.min_lightning["state"] = "normal"
 
             except:
-                self.selected_charitem=None
-                self.suppr_choice["state"]="disabled"
-                self.plus_lightning["state"]="disabled"
-                self.min_lightning["state"]="disabled"
+                self.selected_charitem = None
+                self.remove_choice["state"] = "disabled"
+                self.plus_lightning["state"] = "disabled"
+                self.min_lightning["state"] = "disabled"
 
         else:
-            self.selected_charitem=None
-            self.suppr_choice["state"]="disabled"
-            self.plus_lightning["state"]="disabled"
-            self.min_lightning["state"]="disabled"
+            self.selected_charitem = None
+            self.remove_choice["state"] = "disabled"
+            self.plus_lightning["state"] = "disabled"
+            self.min_lightning["state"] = "disabled"
 
-    def select_spell(self,event):
-        """ Méthode qui est appelée quand on sélectionne une compétence, pour la transférer si besoin """
+    def select_spell(self, event):
+        """ Méthode qui est appelée quand on sélectionne un sort, pour le transférer si besoin """
         if self.Spell_view.identify_row(event.y):
 
             try:
-                self.selected_item=int(self.Spell_view.identify_row(event.y))
-                self.transfer_choice["state"]="normal"
+                self.selected_item = int(self.Spell_view.identify_row(event.y))
+                self.transfer_choice["state"] = "normal"
 
             except:
-                self.selected_item=None
-                self.transfer_choice["state"]="disabled"
+                self.selected_item = None
+                self.transfer_choice["state"] = "disabled"
 
         else:
-            self.selected_item=None
-            self.transfer_choice["state"]="disabled"
+            self.selected_item = None
+            self.transfer_choice["state"] = "disabled"
 
-
-    def suppr(self):
-        """ Méthode qui supprime la compétence sélectionnée """
+    def remove_charspell(self):
+        """ Méthode qui supprime le sort sélectionné """
         if type(self.selected_charitem)==int:
-            self.master.master.spelllist.pop(self.selected_item-1)
+            self.get_selectedchar().pop_spell(self.spells_list[self.selected_charitem-1])
             self.refresh_char()
-            self.selected_charitem=None
-            self.suppr_choice["state"]="disabled"
+            self.selected_charitem = None
+            self.remove_choice["state"] = "disabled"
 
-    def modif_lightning(self,number):
+    def modif_lightning(self, number):
         """ Méthode qui permet de consommer des éclairs """
         if self.selected_charitem:
-            selected_spell=self.spells_list[self.selected_charitem-1]
-            self.master.master.selectedchar.use_lightning(selected_spell,number)
+            print("key", number)
+            selected_spell = self.spells_list[self.selected_charitem-1]
+            self.get_selectedchar().use_lightning(selected_spell, number)
             self.refresh_char()
             self.master.CharCF.BNDL.ETH.refresh()
 
-    def grid(self,**kw):
-        Frame.grid(self,**kw)
+    def grid(self, **kw):
+        Frame.grid(self, **kw)
         self.refresh()
 
+    def get_selectedchar(self):
+        return self.master.get_selectedchar()
+
+    def get_spelllist(self):
+
+        return self.master.spelllist
 
 
-
-## Fenêtre pricipale
-
-
+# Fenêtre pricipale
 
 
 class CharMenu(Menu):
     """ Widget menu permettant d'accéder aux personnages ou la suppresion de personnage """
 
-    def __init__(self,master):
-        Menu.__init__(self,master)
-        self.submenu_1=Menu(self,tearoff=0)
-        self.add_cascade(label="Changer de perso",menu=self.submenu_1)
-        self.submenu_1.add_command(label="Créer",command=self.goto_create)
+    def __init__(self, master):
+        Menu.__init__(self, master)
+        self.submenu_1 = Menu(self, tearoff=0)
+        self.add_cascade(label="Changer de perso", menu=self.submenu_1)
+        self.submenu_1.add_command(label="Créer", command=self.goto_create)
         self.submenu_1.add_separator()
-        for i in range(len(self.master.characlist)):
-            self.submenu_1.add_command(label=self.master.characlist[i].name,command=partial(self.goto_other,i))
+        for i in range(len(self.get_characlist())):
+            self.submenu_1.add_command(label=self.get_characlist()[i].get_name(), command=partial(self.goto_other, i))
         self.add_separator()
-        self.add_command(label="Supprimer",command=self.goto_suppr)
+        self.add_command(label="Supprimer", command=self.goto_suppr)
         self.add_separator()
-        self.add_command(label="Compétences",command=self.goto_compet)
+        self.add_command(label="Compétences", command=self.goto_compet)
         self.add_separator()
-        self.add_command(label="Sorts",command=self.goto_spell)
+        self.add_command(label="Sorts", command=self.goto_spell)
 
     def refresh(self):
         """ fonction pour rafraîchir la liste des personnages disponibles """
 
-        for i in range(2,2+len(self.submenu_1._tclCommands[1:])): # le séparateur occupe l'indice 1
-            self.submenu_1.delete(self.submenu_1.entrycget(i,"label"))
+        for i in range(2, 2+len(self.submenu_1._tclCommands[1:])):  # le séparateur occupe l'indice 1
+            self.submenu_1.delete(self.submenu_1.entrycget(i, "label"))
 
         for i in range(len(self.master.characlist)):
-            self.submenu_1.add_command(label=self.master.characlist[i].name,command=partial(self.goto_other,i))
+            self.submenu_1.add_command(label=self.master.characlist[i].name, command=partial(self.goto_other, i))
 
+    def get_characlist(self):
+
+        return self.master.get_characlist()
 
     def goto_create(self):
         """ Renvoie dans l'environnement de création de personnage"""
         for i in self.master.grid_slaves():
             i.grid_forget()
-        self.master.children["!homeframe"].grid(row=0,column=0)
-        self.master.children["!charcframe"].grid(row=0,column=1)
+        self.master.children["!homeframe"].grid(row=0, column=0)
+        self.master.children["!charcframe"].grid(row=0, column=1)
 
-    def goto_other(self,number):
+    def goto_other(self, number):
         """ Emène vers la page caractéristique de l'autre personnage selectionné """
 
         for i in self.master.grid_slaves():
             i.grid_forget()
 
-        self.master.CDF.selectedchar=self.master.characlist[number]
-        self.master.children['!chardframe'].grid(row=0,column=0)
+        self.set_selectedchar(number)
+        self.master.children['!chardframe'].grid(row=0, column=0)
 
     def goto_suppr(self):
         """ Emmène vers la page de suppresion des personnages """
         for i in self.master.grid_slaves():
             i.grid_forget()
-        self.master.children["!charsframe"].grid(row=0,column=0)
+        self.master.children["!charsframe"].grid(row=0, column=0)
 
     def goto_compet(self):
         for i in self.master.grid_slaves():
             i.grid_forget()
-        self.master.children["!competcreatorframe"].grid(row=0,column=0)
+        self.master.children["!competcreatorframe"].grid(row=0, column=0)
 
     def goto_spell(self):
         for i in self.master.grid_slaves():
             i.grid_forget()
-        self.master.children["!spellcreatorframe"].grid(row=0,column=0)
+        self.master.children["!spellcreatorframe"].grid(row=0, column=0)
 
+    def set_selectedchar(self, character):
+
+        self.master.set_selectedchar(character)
 
 
 class UI_Window(Tk):
@@ -3854,39 +3950,52 @@ class UI_Window(Tk):
         Tk.__init__(self)
         self.titre="Solo Leveling"
         self.title(self.titre)
-        with open("characters","rb") as fichier:
+        with open("characters", "rb") as fichier:
             self.characlist = pk.Unpickler(fichier).load()
 
-        with open("competences","rb") as fichier:
+        with open("competences", "rb") as fichier:
             self.competlist = pk.Unpickler(fichier).load()
 
-        with open("spells","rb") as fichier:
-            self.spelllist=pk.Unpickler(fichier).load()
+        with open("spells", "rb") as fichier:
+            self.spelllist = pk.Unpickler(fichier).load()
 
-
-        self.Menubar=CharMenu(self)
-        self.HF=HomeFrame(self)
+        self.Menubar = CharMenu(self)
+        self.HF = HomeFrame(self)
         self.HF.grid(row=0,column=0)
-        self.CCF=CharCFrame(self)
-        self.CDF=CharDFrame(self)
-        self.CSF=CharSFrame(self)
-        self.OCF=ObjCreatorFrame(self)
-        self.CompCF=CompetCreatorFrame(self)
-        self.SpellCF=SpellCreatorFrame(self)
+        self.CCF = CharCFrame(self)
+        self.CDF = CharDFrame(self)
+        self.CSF = CharSFrame(self)
+        self.OCF = ObjCreatorFrame(self)
+        self.CompCF = CompetCreatorFrame(self)
+        self.SpellCF = SpellCreatorFrame(self)
         self.configure(menu=self.Menubar)
-        self.protocol("WM_DELETE_WINDOW",self.destroy)
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+
+    def add_character(self, newchar):
+
+        self.characlist.append(newchar)
 
     def destroy(self):
         """ Fonction de destruction de la fenêtre, on sauvegarde les personnages avant de la détruire """
-        with open("characters","wb") as fichier:
-            pk.Pickler(fichier).dump(self.characlist) # on enregistre la liste
+        with open("characters", "wb") as fichier:
+            pk.Pickler(fichier).dump(self.characlist)  # on enregistre la liste
 
-        with open("competences","wb") as fichier:
+        with open("competences", "wb") as fichier:
             pk.Pickler(fichier).dump(self.competlist)
 
-        with open("spells","wb") as fichier:
+        with open("spells", "wb") as fichier:
             pk.Pickler(fichier).dump(self.spelllist)
         Tk.destroy(self)
-        
-    
-        
+
+    def get_characlist(self):
+
+        return self.characlist
+
+    def set_selectedchar(self, number):
+
+        self.CDF.set_selectedchar(self.characlist[number])
+
+if __name__ == "__main__":
+    window = UI_Window()
+
+    window.mainloop()
