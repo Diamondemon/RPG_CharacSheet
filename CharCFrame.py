@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, SIGNAL
+from PySide6.QtCore import Slot, SIGNAL, QObject
 from PySide6.QtWidgets import (QWidget, QLineEdit, QLabel, QCheckBox, QGridLayout, QPushButton)
 from PySide6.QtGui import QIntValidator
 import MW

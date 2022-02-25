@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from os import path, chdir
 from pickle import Pickler
 from PySide6.QtWidgets import QApplication
@@ -26,4 +27,4 @@ if __name__ == "__main__":
     app.setStyleSheet("QTableWidget {border: 0px;} QHeaderView::section {border: 0px;}")
     window = UI_W()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

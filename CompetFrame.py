@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, SIGNAL, Qt
+from PySide6.QtCore import Slot, SIGNAL, Qt, QObject
 from PySide6.QtWidgets import (QGridLayout, QWidget, QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton,
                                QTreeWidget, QTreeWidgetItem)
 import MW
@@ -22,7 +22,7 @@ class CompetCreatorFrame(QWidget):
         self.Categ_entry = QComboBox()
         self.Categ_entry.setEditable(False)
         for key in self.categlist:
-            self.Categ_entry.addItems(self.tr(key))
+            self.Categ_entry.addItem(self.tr(key))
         self.Categ_entry.setCurrentIndex(0)
         self.Subcateg_entry = QComboBox()
         self.Subcateg_entry.setEditable(False)

@@ -1,4 +1,4 @@
-from PySide6.QtCore import SIGNAL, Qt
+from PySide6.QtCore import SIGNAL, Qt, QObject
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QGroupBox, QGridLayout, QLabel, QPushButton, QFrame, QWidget)
 from functools import partial
@@ -17,8 +17,8 @@ class CharThrFrame(QGroupBox):
         self.leftFrame.setMinimumHeight(120)
         self.rightFrame = QWidget()
         self.rightFrame.setMinimumHeight(120)
-        self.leftgrid = QGridLayout(self)
-        self.rightgrid = QGridLayout(self)
+        self.leftgrid = QGridLayout(self.leftFrame)
+        self.rightgrid = QGridLayout(self.rightFrame)
         self.setLayout(self.grid)
         self.grid.addWidget(self.leftFrame, 0, 0, 3, 1)
         self.leftFrame.setLayout(self.leftgrid)
